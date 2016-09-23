@@ -90,5 +90,5 @@ verifyTilePPM (PPM (PPMHeader P4 8 8) (PbmPixelData d)) = Just d
 verifyTilePPM _ = Nothing
 
 pixel2Char :: PbmPixel -> Char
-pixel2Char (PbmPixel True) = '1'
-pixel2Char (PbmPixel False) = '0'
+pixel2Char (PbmPixel True) = '0'
+pixel2Char (PbmPixel False) = '1'
