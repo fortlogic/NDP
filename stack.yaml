@@ -40,6 +40,8 @@ packages:
 - '.'
 - location: https://github.com/dented42/haskell-conf/archive/52459d28598aa99e9b31e9a9d3004a8705fd8ad7.zip
   extra-dep: true
+- location: https://github.com/dented42/safe-globals/archive/master.zip
+  extra-dep: true
 
 # Dependency packages to be pulled from upstream that are not in the resolver
 # (e.g., acme-missiles-0.3)

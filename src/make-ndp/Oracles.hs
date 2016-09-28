@@ -2,7 +2,10 @@
 module Oracles (installOracles,
                 ClashVersion (ClashVersion),
                 clashVersionAddOracle,
-                clashVersionIO) where
+                clashVersionIO,
+                OSName,
+                osNameAddOracle,
+                osNameIO) where
 
 import Data.List
 import Development.Shake
@@ -11,6 +14,7 @@ import Development.Shake.Classes
 installOracles :: Rules ()
 installOracles = do
   clashVersionAddOracle
+  osNameAddOracle
   return ()
 
 newtype ClashVersion = ClashVersion ()
@@ -22,3 +26,13 @@ clashVersionAddOracle = addOracle $ \ (ClashVersion _) ->
 
 clashVersionIO :: IO String
 clashVersionIO = delete <$> pure '\n' <*> (fromStdout <$> cmd "clash --numeric-version")
+
+newtype OSName = OSName ()
+               deriving (Show, Typeable, Eq, Hashable, Binary, NFData)
+
+osNameAddOracle :: Rules (OSName -> Action String)
+osNameAddOracle = addOracle $ \ (OSName _) ->
+                                liftIO osNameIO
+
+osNameIO :: IO String
+osNameIO = delete '\n' <$> (fromStdout <$> cmd "uname")

@@ -1,5 +1,6 @@
 {-# LANGUAGE DataKinds #-}
-module TileROM (buildTileROM) where
+module TileROM (tileROMRules,
+                buildTileROM) where
 
 import qualified Data.ByteString.Char8 as C
 import Data.Conf
@@ -13,6 +14,13 @@ import Graphics.Netpbm
 
 import PPM
 import Utils
+
+tileROMRules = do
+  "build/ROM/tile/*.rom" %> \ rom -> do
+    let mapName = takeBaseName rom
+    tileMap <- fromJust <$> getConfig "TILE_MAP"
+    need [tileMap]
+    buildTileROM tileMap mapName rom
 
 data TileMap = TileMap {
   defaultTile :: TileData,
