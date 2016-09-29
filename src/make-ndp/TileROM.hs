@@ -13,7 +13,7 @@ import Development.Shake.FilePath
 import Graphics.Netpbm
 
 import PPM
-import Utils
+import BuildUtils
 
 tileROMRules = do
   "build/ROM/tile/*.rom" %> \ rom -> do

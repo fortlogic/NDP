@@ -24,7 +24,8 @@ main = shakeArgs shakeOptions $ do
   phony "clean" $ do
     cmd "rm -rvf build"
 
-
+  phony "test" $ do
+    cmd "stack exec test-ndp"
 
   clashRules
   tileROMRules

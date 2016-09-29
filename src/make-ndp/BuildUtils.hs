@@ -1,4 +1,4 @@
-module Utils ((!!?)) where
+module BuildUtils ((!!?)) where
 
 (!!?) :: [a] -> Int -> Maybe a
 as !!? a = if a < 0 then
