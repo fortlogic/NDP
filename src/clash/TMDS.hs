@@ -4,7 +4,11 @@
 {-# LANGUAGE TypeOperators #-}
 module TMDS (encodeByte,
              decodeByte,
-             tmdsEncoder) where
+             tmdsEncoder,
+             xorEncode,
+             xnorEncode,
+             xorDecode,
+             xnorDecode) where
 
 import CLaSH.Prelude
 import Data.Bits
@@ -20,10 +24,12 @@ xnorEncode = v2bv . postscanr xnor 0 . bv2v
   where xnor a b = complement (xor a b)
 
 xorDecode :: KnownNat n => BitVector n -> BitVector n
-xorDecode = id -- undefined
+xorDecode = v2bv . snd . mapAccumR iter low . bv2v
+  where iter prev this = (this, prev `xor` this)
 
 xnorDecode :: KnownNat n => BitVector n -> BitVector n
-xnorDecode = id -- undefined
+xnorDecode = v2bv . snd . mapAccumR iter low . bv2v
+  where iter prev this = (this, complement $ prev `xor` this)
 
 transitionCount :: (KnownNat (2 ^ n),
                      KnownNat n) =>

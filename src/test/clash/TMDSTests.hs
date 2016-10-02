@@ -13,8 +13,10 @@ import Test.QuickCheck
 import TMDS
 
 tmdsTests name = describe name $ do
-  it "should be idempotent" $ property $
-    \ byte dc -> byte == (decodeByte $ snd $ encodeByte dc byte)
+  it "xorEncode and xorDecode are inverses" $ property $
+    \ byte -> (byte :: BitVector 16) == (xorEncode . xorDecode) byte
+  it "xnorEncode and xnorDecode are inverses" $ property $
+    \ byte -> (byte :: BitVector 16) == (xnorEncode . xnorDecode) byte
   describe "Decoder" $ do
     itShouldDecode $$(bLit "0111110000") 0x10
     itShouldDecode $$(bLit "0001001111") 0x2F
@@ -24,6 +26,8 @@ tmdsTests name = describe name $ do
     itShouldDecode $$(bLit "1000111001") 0xB4
     itShouldDecode $$(bLit "1000011011") 0xD2
     itShouldDecode $$(bLit "1011110000") 0xEF
+  it "should be idempotent" $ property $
+    \ byte dc -> byte == (decodeByte $ snd $ encodeByte dc byte)
 
 itShouldDecode :: BitVector 10 -> Unsigned 8 -> SpecWith ()
 itShouldDecode word byte = do
