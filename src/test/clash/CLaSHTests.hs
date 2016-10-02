@@ -1,7 +1,8 @@
-module CLaSHTests where
+module CLaSHTests (clashTests) where
 
 import Test.Hspec
 
+import TMDSTests
+
 clashTests name = describe name $ do
-  it "should have tests" $ do
-    pending
+  tmdsTests "TMDS"

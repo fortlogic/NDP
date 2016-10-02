@@ -2,7 +2,9 @@
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE MagicHash#-}
 {-# LANGUAGE TypeOperators #-}
-module TMDS where
+module TMDS (encodeByte,
+             decodeByte,
+             tmdsEncoder) where
 
 import CLaSH.Prelude
 import Data.Bits
@@ -16,6 +18,12 @@ xorEncode = v2bv . postscanr xor 0 . bv2v
 xnorEncode :: KnownNat n => BitVector n -> BitVector n
 xnorEncode = v2bv . postscanr xnor 0 . bv2v
   where xnor a b = complement (xor a b)
+
+xorDecode :: KnownNat n => BitVector n -> BitVector n
+xorDecode = id -- undefined
+
+xnorDecode :: KnownNat n => BitVector n -> BitVector n
+xnorDecode = id -- undefined
 
 transitionCount :: (KnownNat (2 ^ n),
                      KnownNat n) =>
@@ -42,7 +50,13 @@ encodeByte dc byte = (dc', word)
         dc' = dc + offset'
         word = pack invert ++# pack gate ++# byte''
 
--- make decodeByte so that we can test for idempoteny
+decodeByte :: BitVector 10 -> BitVector 8
+decodeByte word = byte''
+  where (header, byte) = split word :: (BitVector 2, BitVector 8)
+        invert = unpack $ msb header
+        gate = unpack $ lsb header
+        byte' = if invert then complement byte else byte
+        byte'' = (if gate then xorDecode else xnorDecode) byte'
 
 byte :: Unsigned 8 -> BitVector 8
 byte n = pack n

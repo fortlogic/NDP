@@ -31,7 +31,9 @@ executable test-ndp
   default-language:    Haskell2010
   build-depends:       base >= 4.7 && < 5,
                        clash-prelude >= 0.10.14 && < 0.11,
-                       hspec >= 2.2.3 && < 3
+                       formatting >= 6.2.2 && < 7,
+                       hspec >= 2.2.3 && < 3,
+                       QuickCheck >= 2.8.2 && < 3
 
 
 
