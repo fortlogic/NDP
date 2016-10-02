@@ -16,20 +16,22 @@ import qualified Prelude as P
 
 import Utils
 
+xnor :: Bits a => a -> a -> a
+xnor a b = complement (xor a b)
+
 xorEncode :: KnownNat n => BitVector n -> BitVector n
 xorEncode = v2bv . postscanr xor 0 . bv2v
 
 xnorEncode :: KnownNat n => BitVector n -> BitVector n
-xnorEncode = v2bv . postscanr xnor 0 . bv2v
-  where xnor a b = complement (xor a b)
+xnorEncode = v2bv . postscanr xnor 1 . bv2v
 
 xorDecode :: KnownNat n => BitVector n -> BitVector n
 xorDecode = v2bv . snd . mapAccumR iter low . bv2v
   where iter prev this = (this, prev `xor` this)
 
 xnorDecode :: KnownNat n => BitVector n -> BitVector n
-xnorDecode = v2bv . snd . mapAccumR iter low . bv2v
-  where iter prev this = (this, complement $ prev `xor` this)
+xnorDecode = v2bv . snd . mapAccumR iter high . bv2v
+  where iter prev this = (this, prev `xnor` this)
 
 transitionCount :: (KnownNat (2 ^ n),
                      KnownNat n) =>
@@ -63,15 +65,6 @@ decodeByte word = byte''
         gate = unpack $ lsb header
         byte' = if invert then complement byte else byte
         byte'' = (if gate then xorDecode else xnorDecode) byte'
-
-byte :: Unsigned 8 -> BitVector 8
-byte n = pack n
-
-
--- encodeByte False False byte = low ++# low ++# xnorEncode byte
--- encodeByte False True byte = low ++# high ++# xorEncode byte
--- encodeByte True False byte = high ++# low ++# complement (xnorEncode byte)
--- encodeByte True True byte = high ++# low ++# complement (xorEncode byte)
 
 tmdsEncoder :: Signal (BitVector 8) -> Signal (BitVector 10)
 tmdsEncoder = mealy encodeByte 0

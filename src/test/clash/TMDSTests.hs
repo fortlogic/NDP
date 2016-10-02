@@ -26,7 +26,7 @@ tmdsTests name = describe name $ do
     itShouldDecode $$(bLit "1000111001") 0xB4
     itShouldDecode $$(bLit "1000011011") 0xD2
     itShouldDecode $$(bLit "1011110000") 0xEF
-  it "should be idempotent" $ property $
+  it "encodeByte and decodeByte are inverses" $ property $
     \ byte dc -> byte == (decodeByte $ snd $ encodeByte dc byte)
 
 itShouldDecode :: BitVector 10 -> Unsigned 8 -> SpecWith ()
