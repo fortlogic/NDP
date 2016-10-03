@@ -2,9 +2,11 @@
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE MagicHash#-}
 {-# LANGUAGE TypeOperators #-}
-module TMDS (encodeByte,
-             decodeByte,
+module TMDS (TMDS (TMDSData, TMDSControl),
              tmdsEncoder,
+             encodeTMDS,
+             encodeByte,
+             decodeByte,
              xorEncode,
              xnorEncode,
              xorDecode,
@@ -15,6 +17,19 @@ import Data.Bits
 import qualified Prelude as P
 
 import Utils
+
+data TMDS = TMDSData (Unsigned 8)
+          | TMDSControl (Unsigned 2)
+
+tmdsEncoder :: Signal TMDS -> Signal (BitVector 10)
+tmdsEncoder = mealy encodeTMDS 0
+
+encodeTMDS :: Signed 4 -> TMDS -> (Signed 4, BitVector 10)
+encodeTMDS dc (TMDSData byte) = encodeByte dc (pack byte)
+encodeTMDS dc (TMDSControl 0) = (dc,   $$(bLit "0010101011"))
+encodeTMDS dc (TMDSControl 1) = (dc,   $$(bLit "1101010100"))
+encodeTMDS dc (TMDSControl 2) = (dc-1, $$(bLit "0010101010"))
+encodeTMDS dc (TMDSControl 3) = (dc+1, $$(bLit "1101010101"))
 
 xnor :: Bits a => a -> a -> a
 xnor a b = complement (xor a b)
@@ -65,6 +80,3 @@ decodeByte word = byte''
         gate = unpack $ lsb header
         byte' = if invert then complement byte else byte
         byte'' = (if gate then xorDecode else xnorDecode) byte'
-
-tmdsEncoder :: Signal (BitVector 8) -> Signal (BitVector 10)
-tmdsEncoder = mealy encodeByte 0
