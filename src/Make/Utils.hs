@@ -1,4 +1,4 @@
-module BuildUtils ((!!?)) where
+module Make.Utils ((!!?)) where
 
 (!!?) :: [a] -> Int -> Maybe a
 as !!? a = if a < 0 then

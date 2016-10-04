@@ -6,10 +6,10 @@ import Development.Shake.Config
 import Development.Shake.FilePath
 
 
-import Clash
-import Config
-import Oracles
-import TileROM
+import Make.Clash
+import Make.Config
+import Make.Oracles
+import Make.TileROM
 
 
 

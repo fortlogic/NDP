@@ -1,6 +1,6 @@
 {-# LANGUAGE DataKinds #-}
-module TileROM (tileROMRules,
-                buildTileROM) where
+module Make.TileROM (tileROMRules,
+                     buildTileROM) where
 
 import qualified Data.ByteString.Char8 as C
 import Data.Conf
@@ -12,8 +12,8 @@ import Development.Shake.Config
 import Development.Shake.FilePath
 import Graphics.Netpbm
 
-import PPM
-import BuildUtils
+import Make.PPM
+import Make.Utils
 
 tileROMRules = do
   "build/ROM/tile/*.rom" %> \ rom -> do

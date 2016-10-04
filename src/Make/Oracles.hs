@@ -1,11 +1,11 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
-module Oracles (installOracles,
-                ClashVersion (ClashVersion),
-                clashVersionAddOracle,
-                clashVersionIO,
-                OSName,
-                osNameAddOracle,
-                osNameIO) where
+module Make.Oracles (installOracles,
+                     ClashVersion (ClashVersion),
+                     clashVersionAddOracle,
+                     clashVersionIO,
+                     OSName,
+                     osNameAddOracle,
+                     osNameIO) where
 
 import Data.List
 import Development.Shake

@@ -1,10 +1,10 @@
 {-# LANGUAGE TemplateHaskell #-}
-module Config (setupConfig,
-               maybeConfig,
-               configFlag,
-               configFlag2,
-               getConfigIO,
-               maybeConfigIO) where
+module Make.Config (setupConfig,
+                    maybeConfig,
+                    configFlag,
+                    configFlag2,
+                    getConfigIO,
+                    maybeConfigIO) where
 
 import Control.Concurrent.MVar
 import Data.Global
@@ -13,7 +13,7 @@ import Data.Maybe
 import Development.Shake
 import Development.Shake.Config
 
-import Oracles
+import Make.Oracles
 
 declareEmptyMVar "configV" [t| (H.HashMap String String) |]
 

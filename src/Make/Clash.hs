@@ -1,12 +1,12 @@
-module Clash (clashRules) where
+module Make.Clash (clashRules) where
 
 import Data.List
 import Development.Shake
 import Development.Shake.FilePath
 import Development.Shake.Util
 
-import Config
-import Oracles
+import Make.Config
+import Make.Oracles
 
 clashExec = "stack exec clash --"
 
