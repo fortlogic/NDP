@@ -1,7 +1,7 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE TemplateHaskell #-}
-module TMDSTests (tmdsTests) where
+module Tests.TMDS (tmdsTests) where
 
 import CLaSH.Prelude
 import Formatting
@@ -10,7 +10,7 @@ import Test.Hspec
 import Test.Hspec.QuickCheck
 import Test.QuickCheck
 
-import TMDS
+import NDP.TMDS
 
 tmdsTests name = describe name $ do
   it "xorEncode and xorDecode are inverses" $ property $

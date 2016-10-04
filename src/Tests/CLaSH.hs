@@ -1,8 +1,8 @@
-module CLaSHTests (clashTests) where
+module Tests.CLaSH (clashTests) where
 
 import Test.Hspec
 
-import TMDSTests
+import Tests.TMDS
 
 clashTests name = describe name $ do
   tmdsTests "TMDS"

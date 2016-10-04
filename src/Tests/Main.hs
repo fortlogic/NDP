@@ -1,8 +1,8 @@
-module Main where
+module Tests.Main (main) where
 
 import Test.Hspec
 
-import CLaSHTests
+import Tests.CLaSH
 
 main = hspec $ do
   clashTests "CLaSH Tests"

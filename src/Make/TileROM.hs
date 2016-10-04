@@ -12,11 +12,13 @@ import Development.Shake.Config
 import Development.Shake.FilePath
 import Graphics.Netpbm
 
+import Make.Config
 import Make.PPM
 import Make.Utils
 
 tileROMRules = do
-  "build/ROM/tile/*.rom" %> \ rom -> do
+  buildDir <- liftIO $ maybeConfigIO "BUILD_DIR" "build"
+  (buildDir </> "ROM/tile/*.rom") %> \ rom -> do
     let mapName = takeBaseName rom
     tileMap <- fromJust <$> getConfig "TILE_MAP"
     need [tileMap]

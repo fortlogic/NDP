@@ -3,21 +3,21 @@
 {-# LANGUAGE MagicHash #-}
 {-# LANGUAGE TemplateHaskell #-}
 {-# LANGUAGE TypeOperators #-}
-module TMDS (TMDS (TMDSData, TMDSControl),
-             tmdsEncoder,
-             encodeTMDS,
-             encodeByte,
-             decodeByte,
-             xorEncode,
-             xnorEncode,
-             xorDecode,
-             xnorDecode) where
+module NDP.TMDS (TMDS (TMDSData, TMDSControl),
+                 tmdsEncoder,
+                 encodeTMDS,
+                 encodeByte,
+                 decodeByte,
+                 xorEncode,
+                 xnorEncode,
+                 xorDecode,
+                 xnorDecode) where
 
 import CLaSH.Prelude
 import Data.Bits
 import qualified Prelude as P
 
-import Utils
+import NDP.Utils
 
 data TMDS = TMDSData (Unsigned 8)
           | TMDSControl (Unsigned 2)

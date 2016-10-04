@@ -1,11 +1,11 @@
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE TypeOperators #-}
-module Utils (int2Signed,
-              bvXForm,
-              swap,
-              shuffleInside,
-              shuffleOutside) where
+module NDP.Utils (int2Signed,
+                  bvXForm,
+                  swap,
+                  shuffleInside,
+                  shuffleOutside) where
 
 import CLaSH.Prelude
 import Data.Proxy
