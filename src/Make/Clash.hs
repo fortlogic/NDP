@@ -7,6 +7,7 @@ import Development.Shake.Util
 
 import Make.Config
 import Make.Oracles
+import Make.Utils
 
 clashExec = "stack exec clash --"
 
@@ -27,24 +28,27 @@ clashRules = do
   buildDir <- liftIO $ maybeConfigIO "BUILD_DIR" "build"
   clashOut <- liftIO $ maybeConfigIO "CLASH_OUT" (buildDir </> "clash")
   
-  (clashOut </> "vhdl/*/*_topentity.vhdl") %> \ top -> do
+  (clashOut </> "vhdl//*_topentity.vhdl") %> \ top -> do
     clashDir <- maybeConfig "CLASH_SRC" ""
-    let name = (splitDirectories top !! 3)
-    let src = clashDir </> name <.> "hs"
+    let clashOutLen = length $ splitDirectories clashOut
+    let sharedPath = (withPath $ withReverse tail . tail . drop clashOutLen) top
+    let src = clashDir </> sharedPath -<.> "hs"
+    let mk = clashOut </> "mk" </> sharedPath -<.> "mk"
 
     -- generate the correct dependencies
-    let makefilePath = clashOut </> name -<.> "mk"
-    need [makefilePath]
-    makefile <- parseMakefile <$> readFile' makefilePath
+    need [mk]
+    makefile <- parseMakefile <$> readFile' mk
     need (hsDeps makefile)
 
     -- compile
     flags <- ghcFlags
     cmd clashExec flags "--vhdl" src
 
-  clashOut </> "*.mk" %> \ mk -> do
+  clashOut </> "mk//*.mk" %> \ mk -> do
     alwaysRerun
     clashDir <- maybeConfig "CLASH_SRC" ""
-    let hsfile = (replaceDirectory mk clashDir) -<.> "hs"
+    let clashOutLen = length $ splitDirectories clashOut
+    let sharedPath = (joinPath . tail . drop clashOutLen . splitDirectories) mk
+    let src = clashDir </> sharedPath -<.> "hs"
     flags <- ghcFlags
-    cmd clashExec "-M -dep-suffix=" [""] " -dep-makefile" [mk] flags hsfile
+    cmd clashExec "-M -dep-suffix=" [""] " -dep-makefile" [mk] flags src
