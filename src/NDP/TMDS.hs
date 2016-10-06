@@ -14,17 +14,19 @@ module NDP.TMDS (TMDS (TMDSData, TMDSControl),
                  xnorDecode) where
 
 import CLaSH.Prelude
+import CLaSH.Prelude.Explicit
 import Data.Bits
 import qualified Prelude as P
 
+import NDP.Clocking
 import NDP.Utils
 
 data TMDS = TMDSData (Unsigned 8)
           | TMDSControl (BitVector 2)
           deriving (Show, Eq)
 
-tmdsEncoder :: Signal TMDS -> Signal (BitVector 10)
-tmdsEncoder = mealy encodeTMDS 0
+tmdsEncoder :: SignalPx TMDS -> SignalPx (BitVector 10)
+tmdsEncoder = mealy' pxClk encodeTMDS 0
 
 encodeTMDS :: Signed 4 -> TMDS -> (Signed 4, BitVector 10)
 encodeTMDS dc (TMDSData byte) = encodeByte dc (pack byte)

@@ -1,15 +1,22 @@
 {-# LANGUAGE DataKinds #-}
-module NDP.Clocking (PixelClock,
-                     TMDSClokc) where
+module NDP.Clocking (PixelClk,
+                     PixelDDRClk,
+                     pxClk,
+                     pxDDRClk,
+                     SignalPx,
+                     SignalPxDDR) where
 
 import CLaSH.Prelude.Explicit
 
 -- TMDS clock is the x5 DDR clock
-type PixelClock = Clk "HDMI" 1000
-type TMDSClock  = Clk "HDMI" 200
+type PixelClk = Clk "HDMI" 1000
+type PixelDDRClk  = Clk "HDMI" 200
 
-pixelClk :: SClock PixelClock
-pixelClk = sclock
+pxClk :: SClock PixelClk
+pxClk = sclock
 
-tmdsClk :: SClock TMDSClock
-tmdsClk = sclock
+pxDDRClk :: SClock PixelDDRClk
+pxDDRClk = sclock
+
+type SignalPx a = Signal' PixelClk a
+type SignalPxDDR a = Signal' PixelDDRClk a
