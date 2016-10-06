@@ -1,7 +1,7 @@
 {-# LANGUAGE Arrows #-}
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE TemplateHaskell #-}
-module VideoGenerator (topEntity) where
+module VideoGenerator where
 
 import CLaSH.Prelude
 import qualified Prelude as P
@@ -10,12 +10,15 @@ import NDP.CBMColor
 import NDP.TMDS
 import NDP.VideoTiming
 
+data PixelCoord = Px (Unsigned 10) (Unsigned 10)
+                deriving (Show, Eq)
+
 pixelCounter :: Signal VideoTime
 pixelCounter = register videoTimeZero step
   where step = vidTick <$> pixelCounter
 
 -- (Maybe (row, col), hSync, vSync)
-pixelControl :: VideoTime -> (Maybe (Unsigned 10, Unsigned 10), Bit, Bit)
+pixelControl :: VideoTime -> (Maybe PixelCoord, Bit, Bit)
 pixelControl t = (maybeCoord,
                   boolToBV (hR == SyncR),
                   boolToBV (vR == SyncR))
@@ -23,7 +26,7 @@ pixelControl t = (maybeCoord,
         vT = vTime t
         hT = hTime t
         maybeCoord = if (vR == ImageR) && (hR == ImageR)
-                     then Just (vT, resize hT)
+                     then Just $ Px vT (resize hT)
                      else Nothing
 
 tmdsLow :: TMDS
@@ -48,3 +51,10 @@ rgb2Video mc hSync vSync = bundle (tmdsR :> tmdsG :> tmdsB :> Nil)
         tmdsR = tmdsEncoder $ tmdsVec !! 0
         tmdsG = tmdsEncoder $ tmdsVec !! 1
         tmdsB = tmdsEncoder $ tmdsVec !! 2
+
+generateVideo :: (Signal (Maybe PixelCoord) -> Signal (Maybe RGBColor)) ->
+                 Signal (Vec 3 (BitVector 10))
+generateVideo gen = rgb2Video rgb hSync vSync
+  where timer = pixelCounter
+        (maybeCoord, hSync, vSync) = unbundle $ pixelControl <$> timer
+        rgb = gen maybeCoord

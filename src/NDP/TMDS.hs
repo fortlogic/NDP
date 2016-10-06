@@ -21,6 +21,7 @@ import NDP.Utils
 
 data TMDS = TMDSData (Unsigned 8)
           | TMDSControl (BitVector 2)
+          deriving (Show, Eq)
 
 tmdsEncoder :: Signal TMDS -> Signal (BitVector 10)
 tmdsEncoder = mealy encodeTMDS 0
