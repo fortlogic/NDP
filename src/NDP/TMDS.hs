@@ -20,7 +20,7 @@ import qualified Prelude as P
 import NDP.Utils
 
 data TMDS = TMDSData (Unsigned 8)
-          | TMDSControl (Unsigned 2)
+          | TMDSControl (BitVector 2)
 
 tmdsEncoder :: Signal TMDS -> Signal (BitVector 10)
 tmdsEncoder = mealy encodeTMDS 0

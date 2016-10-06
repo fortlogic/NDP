@@ -1,6 +1,7 @@
-module CBMColor (RGBColor (..),
-                 CBMColor (..),
-                 cbmToRGB) where
+{-# LANGUAGE DataKinds #-}
+module NDP.CBMColor (RGBColor (..),
+                     CBMColor (..),
+                     cbmToRGB) where
 
 import CLaSH.Prelude
 
@@ -46,7 +47,3 @@ cbmToRGB Grey       = RGB 0x6C 0x6C 0x6C
 cbmToRGB LightGreen = RGB 0x9A 0xD2 0x84
 cbmToRGB LightBlue  = RGB 0x6C 0x5E 0xB5
 cbmToRGB LightGrey  = RGB 0x95 0x95 0x95
-
-
-
-
