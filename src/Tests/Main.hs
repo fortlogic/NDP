@@ -1,8 +1,8 @@
-module Main where
+module Tests.Main (main) where
 
 import Test.Hspec
 
-import CLaSHTests
+import Tests.CLaSH
 
 main = hspec $ do
   clashTests "CLaSH Tests"
@@ -12,3 +12,5 @@ main = hspec $ do
   describe "VHDL Testbenches" $ do
     it "should run hardware testbenches in GHDL" $ do
       pendingWith "Waiting on testbenches and GHDL infrastructure"
+
+
