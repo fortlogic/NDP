@@ -34,8 +34,11 @@ rgb2Video mc hSync vSync = bundle' pxClk (tmdsR :> tmdsG :> tmdsB :> Nil)
         tmdsB = tmdsEncoder $ tmdsVec !! 2
 
 generateVideo :: (SignalPx (Maybe PixelCoord) -> SignalPx (Maybe RGBColor)) ->
-                 SignalPx (Vec 3 (BitVector 10))
-generateVideo gen = rgb2Video rgb hSync vSync
+                 SignalPx5 (Vec 3 (BitVector 2))
+generateVideo gen = hdmi
   where timer = pixelCounter
         (maybeCoord, hSync, vSync) = unbundle' pxClk  $ pixelControl <$> timer
         rgb = gen maybeCoord
+        tmdsVec = rgb2tmds <$> rgb <*> hSync <*> vSync
+        wordVec = map tmdsEncoder $ unbundle' pxClk tmdsVec
+        hdmi = bundle' px5Clk $ map pxTo5x wordVec
