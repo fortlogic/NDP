@@ -29,7 +29,9 @@ vagrantStatusIO = do
 withVagrant :: Action a -> Action a
 withVagrant action = do
   vagrantStatus <- askOracleWith (VagrantStatus ()) (Just "")
-  action
+  if statusRunning vagrantStatus
+    then action
+    else error "Unable to start Vagrant VM"
 
 statusRunning :: Maybe String -> Bool
 statusRunning = fromMaybe False . (isPrefixOf "running " <$>)
