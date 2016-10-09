@@ -10,10 +10,10 @@ Vagrant.configure(2) do |config|
   # For a complete reference, please see the online documentation at
   # https://docs.vagrantup.com.
 
-  # config.vm.box = "ubuntu/trusty64"  # This one doesn't seem to have CDC_ACM module :(
-  config.vm.box = "hashicorp/precise64"  # Going with older one because it has serial drivers
+  config.vm.box = "ubuntu/trusty64"  # This one doesn't seem to have CDC_ACM module :(
+  # config.vm.box = "hashicorp/precise64"  # Going with older one because it has serial drivers
 
-  config.vm.hostname = "DMX-playground"
+  config.vm.hostname = "NDP-xilinx-host"
 
   config.vm.synced_folder (ENV['DEVROOT'] + "/hdl/xilinx"), "/xilinx"
 
@@ -25,15 +25,11 @@ Vagrant.configure(2) do |config|
   config.vm.provider :virtualbox do |v|
 
     # Set how much memory and CPU cores to use
-    v.memory = 1024
-    v.cpus = 1
+    v.memory = 2048
+    v.cpus = 2
 
     # Enable USB
     v.customize ["modifyvm", :id, "--usb", "on"]
     v.customize ['usbfilter', 'add', '0', '--target', :id, '--name', 'Saanlima Pipistrello LX45 [0700]', '--manufacturer', 'Saanlima', '--product', 'Pipistrello LX45']
   end
-
-  # config.vm.provision :ansible do |ansible|
-  #   ansible.playbook = "_playbook.yml"
-  # end
 end

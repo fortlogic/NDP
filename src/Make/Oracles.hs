@@ -1,9 +1,9 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 module Make.Oracles (installOracles,
-                     ClashVersion (ClashVersion),
+                     ClashVersion (..),
                      clashVersionAddOracle,
                      clashVersionIO,
-                     OSName,
+                     OSName (..),
                      osNameAddOracle,
                      osNameIO) where
 
@@ -11,10 +11,13 @@ import Data.List
 import Development.Shake
 import Development.Shake.Classes
 
+import Make.Vagrant
+
 installOracles :: Rules ()
 installOracles = do
   clashVersionAddOracle
   osNameAddOracle
+  vagrantStatusAddOracle
   return ()
 
 newtype ClashVersion = ClashVersion ()
@@ -36,3 +39,4 @@ osNameAddOracle = addOracle $ \ (OSName _) ->
 
 osNameIO :: IO String
 osNameIO = delete '\n' <$> (fromStdout <$> cmd "uname")
+

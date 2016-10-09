@@ -11,6 +11,7 @@ import Make.Clash
 import Make.Config
 import Make.Oracles
 import Make.TileROM
+import Make.Vagrant
 import qualified Tests.Main as T
 
 
