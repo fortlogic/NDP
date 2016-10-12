@@ -2,8 +2,10 @@ module Make.Clash (clashRules) where
 
 import Data.List
 import Development.Shake
+import Development.Shake.Config
 import Development.Shake.FilePath
 import Development.Shake.Util
+import System.IO.Temp
 
 import Make.Config
 import Make.Oracles
@@ -17,8 +19,7 @@ ghcFlags = do
   odir <- configFlag2 "-odir" "CLASH_ODIR"
   hidir <- configFlag2 "-hidir" "CLASH_HIDIR"
   idir <- configFlag "-i" "CLASH_INCLUDES"
-  hdldir <- configFlag2 "-clash-hdldir" "CLASH_HDLDIR"
-  return (odir ++ hidir ++ [idir] ++ hdldir)
+  return (odir ++ hidir ++ [idir])
 
 hsDeps :: [(FilePath, [FilePath])] -> [FilePath]
 hsDeps = filter isHs . concat . map snd
@@ -27,28 +28,24 @@ hsDeps = filter isHs . concat . map snd
 clashRules = do
   buildDir <- liftIO $ maybeConfigIO "BUILD_DIR" "build"
   clashOut <- liftIO $ maybeConfigIO "CLASH_OUT" (buildDir </> "clash")
-  
-  (clashOut </> "vhdl//*_topentity.vhdl") %> \ top -> do
-    clashDir <- maybeConfig "CLASH_SRC" ""
-    let clashOutLen = length $ splitDirectories clashOut
-    let sharedPath = (withPath $ withReverse tail . tail . drop clashOutLen) top
-    let src = clashDir </> sharedPath -<.> "hs"
-    let mk = clashOut </> "mk" </> sharedPath -<.> "mk"
 
-    -- generate the correct dependencies
-    need [mk]
-    makefile <- parseMakefile <$> readFile' mk
+  (clashOut </> "*/ndp_topentity.vhdl") %> \ vhdlF -> do
+    let vhdlD = takeDirectory vhdlF
+    let mkF = vhdlD <.> "mk"
+    need [mkF]
+    makefile <- parseMakefile <$> readFile' mkF
     need (hsDeps makefile)
+    withTempDir $ \ tmpD -> do
+      (Just entityD) <- getConfig "CLASH_TOPENTITIES"
+      let srcF = entityD </> takeFileName mkF -<.> "hs"
+      flags <- ghcFlags
+      () <- cmd clashExec flags "-clash-hdldir" tmpD "--vhdl" srcF
+      () <- cmd "rm -rf" vhdlD
+      cmd "mv" (tmpD </> "vhdl" </> "NDP") vhdlD
 
-    -- compile
-    flags <- ghcFlags
-    cmd clashExec flags "--vhdl" src
-
-  clashOut </> "mk//*.mk" %> \ mk -> do
+  (clashOut </> "*.mk") %> \ mkF -> do
     alwaysRerun
-    clashDir <- maybeConfig "CLASH_SRC" ""
-    let clashOutLen = length $ splitDirectories clashOut
-    let sharedPath = (joinPath . tail . drop clashOutLen . splitDirectories) mk
-    let src = clashDir </> sharedPath -<.> "hs"
+    (Just entityD) <- getConfig "CLASH_TOPENTITIES"
+    let srcF = entityD </> takeFileName mkF -<.> "hs"
     flags <- ghcFlags
-    cmd clashExec "-M -dep-suffix=" [""] " -dep-makefile" [mk] flags src
+    cmd clashExec "-M -dep-suffix=" [""] " -dep-makefile" [mkF] flags srcF

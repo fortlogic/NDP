@@ -1,5 +1,7 @@
 module Make.Utils ((!!?),
                   withPath,
+                  pathIdx,
+                  pathIdx',
                   withReverse) where
 
 import Development.Shake.FilePath
@@ -15,6 +17,14 @@ as !!? a = if a < 0 then
 
 withPath :: ([FilePath] -> [FilePath]) -> FilePath -> FilePath
 withPath f = joinPath . f . splitDirectories
+
+pathIdx :: FilePath -> Int -> FilePath
+pathIdx p i = (splitDirectories p) !! i
+
+pathIdx' :: FilePath -> Int -> FilePath
+pathIdx' p i = split !! (max - i)
+  where split = splitDirectories p
+        max = length split - 1
 
 withReverse :: ([a] -> [b]) -> [a] -> [b]
 withReverse f = reverse . f . reverse
