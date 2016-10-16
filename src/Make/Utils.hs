@@ -2,9 +2,12 @@ module Make.Utils ((!!?),
                   withPath,
                   pathIdx,
                   pathIdx',
-                  withReverse) where
+                  withReverse,
+                  getDirectoryFilesWithExt) where
 
+import Data.List
 import Development.Shake.FilePath
+import System.Directory
 
 (!!?) :: [a] -> Int -> Maybe a
 as !!? a = if a < 0 then
@@ -28,3 +31,9 @@ pathIdx' p i = split !! (max - i)
 
 withReverse :: ([a] -> [b]) -> [a] -> [b]
 withReverse f = reverse . f . reverse
+
+getDirectoryFilesWithExt :: FilePath -> String -> IO [FilePath]
+getDirectoryFilesWithExt dir ext = do
+  files <- getDirectoryContents dir
+  let files' = filter ((==ext) . takeExtension) files
+  return $ map (dir </>) files'

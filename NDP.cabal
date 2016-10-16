@@ -20,6 +20,7 @@ executable ndp
                        bytestring >= 0.10.6.0,
                        clash-prelude >= 0.10.14 && < 0.11,
                        conf >= 0.1.1.0 && < 0.2.0.0,
+                       directory >= 1.2.2.0 && < 2,
                        formatting >= 6.2.2 && < 7,
                        hspec >= 2.2.3 && < 3,
                        netpbm >= 1.0.2 && < 2.0,

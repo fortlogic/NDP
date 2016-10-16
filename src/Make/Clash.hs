@@ -32,9 +32,13 @@ clashRules = do
   (clashOut </> "*/ndp_topentity.vhdl") %> \ vhdlF -> do
     let vhdlD = takeDirectory vhdlF
     let mkF = vhdlD <.> "mk"
-    need [mkF]
-    makefile <- parseMakefile <$> readFile' mkF
-    need (hsDeps makefile)
+    (Just entityD) <- getConfig "CLASH_TOPENTITIES"
+    let srcF = entityD </> takeFileName mkF -<.> "hs"
+    flags <- ghcFlags
+    () <- cmd clashExec "-M -dep-suffix=" [""] " -dep-makefile" [mkF] flags srcF
+
+    needMakefileDependencies mkF
+
     withTempDir $ \ tmpD -> do
       (Just entityD) <- getConfig "CLASH_TOPENTITIES"
       let srcF = entityD </> takeFileName mkF -<.> "hs"
@@ -42,10 +46,3 @@ clashRules = do
       () <- cmd clashExec flags "-clash-hdldir" tmpD "--vhdl" srcF
       () <- cmd "rm -rf" vhdlD
       cmd "mv" (tmpD </> "vhdl" </> "NDP") vhdlD
-
-  (clashOut </> "*.mk") %> \ mkF -> do
-    alwaysRerun
-    (Just entityD) <- getConfig "CLASH_TOPENTITIES"
-    let srcF = entityD </> takeFileName mkF -<.> "hs"
-    flags <- ghcFlags
-    cmd clashExec "-M -dep-suffix=" [""] " -dep-makefile" [mkF] flags srcF
