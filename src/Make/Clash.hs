@@ -5,7 +5,6 @@ import Development.Shake
 import Development.Shake.Config
 import Development.Shake.FilePath
 import Development.Shake.Util
-import System.IO.Temp
 
 import Make.Config
 import Make.Oracles
@@ -29,18 +28,23 @@ clashRules = do
   buildDir <- liftIO $ maybeConfigIO "BUILD_DIR" "build"
   clashOut <- liftIO $ maybeConfigIO "CLASH_OUT" (buildDir </> "clash")
 
-  (clashOut </> "*/ndp_topentity.vhdl") %> \ vhdlF -> do
+  (clashOut </> "*/*.vhdl") %> \ vhdlF -> do
     let vhdlD = takeDirectory vhdlF
+
     let mkF = vhdlD <.> "mk"
-    (Just entityD) <- getConfig "CLASH_TOPENTITIES"
+    (Just entityD) <- getConfig "CLASH_ENTITIES"
     let srcF = entityD </> takeFileName mkF -<.> "hs"
     flags <- ghcFlags
-    () <- cmd clashExec "-M -dep-suffix=" [""] " -dep-makefile" [mkF] flags srcF
+    withTempFile $  \ mkF' -> do
+      () <- cmd clashExec "-M -dep-suffix=" [""] " -dep-makefile" [mkF'] flags srcF
+
+      lns <- readFileLines mkF'
+      writeFileLines mkF [ln | ln <- lns, isSuffixOf ".hs" ln]
 
     needMakefileDependencies mkF
 
     withTempDir $ \ tmpD -> do
-      (Just entityD) <- getConfig "CLASH_TOPENTITIES"
+      (Just entityD) <- getConfig "CLASH_ENTITIES"
       let srcF = entityD </> takeFileName mkF -<.> "hs"
       flags <- ghcFlags
       () <- cmd clashExec flags "-clash-hdldir" tmpD "--vhdl" srcF

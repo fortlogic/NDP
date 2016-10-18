@@ -26,8 +26,9 @@ ghdlRules = do
   (ghdlDir </> "*/testbench") %> \ tbF -> do
     let workD = takeDirectory tbF
     need [workD </> "work-obj93.cf"]
-    cmd "ghdl" "-m" ["--workdir=" ++ workD,
-                     "--ieee=synopsys",
-                     "-fexplicit",
-                     "-o", workD </> "testbench",
-                     "ndp_testbench"]
+    cmd "ghdl" ["-m",
+                "--workdir=" ++ workD,
+                "--ieee=synopsys",
+                "-fexplicit",
+                "-o", workD </> "testbench",
+                "ndp_testbench"]
