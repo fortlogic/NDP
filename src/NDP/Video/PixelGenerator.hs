@@ -1,7 +1,7 @@
 {-# LANGUAGE Arrows #-}
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE TemplateHaskell #-}
-module NDP.PixelGenerator (PixelCoord (),
+module NDP.Video.PixelGenerator (PixelCoord (),
                            pixelCounter,
                            pixelCounter',
                            pixelControl,
@@ -11,9 +11,9 @@ import CLaSH.Prelude
 import CLaSH.Prelude.Explicit
 import qualified Prelude as P
 
-import NDP.CBMColor
+import NDP.Video.CBMColor
 import NDP.Clocking
-import NDP.VideoTiming
+import NDP.Video.Timing
 
 -- (Row, Column) or (y,x)
 data PixelCoord = Px (Unsigned 10) (Unsigned 10)

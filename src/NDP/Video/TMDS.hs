@@ -3,7 +3,7 @@
 {-# LANGUAGE MagicHash #-}
 {-# LANGUAGE TemplateHaskell #-}
 {-# LANGUAGE TypeOperators #-}
-module NDP.TMDS (TMDS (TMDSData, TMDSControl),
+module NDP.Video.TMDS (TMDS (TMDSData, TMDSControl),
                  tmdsEncoder,
                  encodeTMDS,
                  encodeByte,
