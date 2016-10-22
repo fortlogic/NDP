@@ -1,4 +1,4 @@
-module PPM (readPPM) where
+module Make.PPM (readPPM) where
 
 import qualified Data.ByteString as BS
 import Graphics.Netpbm

@@ -1,10 +1,10 @@
 {-# LANGUAGE TemplateHaskell #-}
-module Config (setupConfig,
-               maybeConfig,
-               configFlag,
-               configFlag2,
-               getConfigIO,
-               maybeConfigIO) where
+module Make.Config (setupConfig,
+                    maybeConfig,
+                    configFlag,
+                    configFlag2,
+                    getConfigIO,
+                    maybeConfigIO) where
 
 import Control.Concurrent.MVar
 import Data.Global
@@ -12,8 +12,9 @@ import qualified Data.HashMap.Strict as H
 import Data.Maybe
 import Development.Shake
 import Development.Shake.Config
+import qualified System.Environment as E
 
-import Oracles
+import Make.Oracles
 
 declareEmptyMVar "configV" [t| (H.HashMap String String) |]
 
@@ -23,7 +24,13 @@ getConfigIO key = H.lookup key <$> readMVar configV
 initialConfig :: Rules [(String, String)]
 initialConfig = do
   clashVer <- liftIO clashVersionIO
-  return [("CLASH_VER", clashVer)]
+  platform <- liftIO osPlatformIO
+  arch <- liftIO cpuArchitectureIO
+  xilinxRoot <- liftIO $ E.getEnv "XILINXROOT"
+  return [("CLASH_VER", clashVer),
+          ("ARCH", arch),
+          ("PLATFORM", platform),
+          ("XILINX", xilinxRoot)]
 
 setupConfig :: FilePath -> Rules ()
 setupConfig configFile = do
