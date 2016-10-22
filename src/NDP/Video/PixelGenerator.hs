@@ -3,6 +3,7 @@
 {-# LANGUAGE TemplateHaskell #-}
 module NDP.PixelGenerator (PixelCoord (),
                            pixelCounter,
+                           pixelCounter',
                            pixelControl,
                            pixelGenerator) where
 
@@ -21,6 +22,9 @@ data PixelCoord = Px (Unsigned 10) (Unsigned 10)
 pixelCounter :: SignalPx VideoTime
 pixelCounter = register' pxClk videoTimeZero step
   where step = vidTick <$> pixelCounter
+
+pixelCounter' :: SignalPx a -> SignalPx VideoTime
+pixelCounter' _ = pixelCounter
 
 -- (Maybe (row, col), hSync, vSync)
 pixelControl :: VideoTime -> (Maybe PixelCoord, Bit, Bit)
