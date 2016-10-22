@@ -2,6 +2,7 @@ module Make.Clash (clashRules) where
 
 import Data.List
 import Development.Shake
+import Development.Shake.Config
 import Development.Shake.FilePath
 import Development.Shake.Util
 
@@ -17,8 +18,7 @@ ghcFlags = do
   odir <- configFlag2 "-odir" "CLASH_ODIR"
   hidir <- configFlag2 "-hidir" "CLASH_HIDIR"
   idir <- configFlag "-i" "CLASH_INCLUDES"
-  hdldir <- configFlag2 "-clash-hdldir" "CLASH_HDLDIR"
-  return (odir ++ hidir ++ [idir] ++ hdldir)
+  return (odir ++ hidir ++ [idir])
 
 hsDeps :: [(FilePath, [FilePath])] -> [FilePath]
 hsDeps = filter isHs . concat . map snd
@@ -27,28 +27,26 @@ hsDeps = filter isHs . concat . map snd
 clashRules = do
   buildDir <- liftIO $ maybeConfigIO "BUILD_DIR" "build"
   clashOut <- liftIO $ maybeConfigIO "CLASH_OUT" (buildDir </> "clash")
-  
-  (clashOut </> "vhdl//*_topentity.vhdl") %> \ top -> do
-    clashDir <- maybeConfig "CLASH_SRC" ""
-    let clashOutLen = length $ splitDirectories clashOut
-    let sharedPath = (withPath $ withReverse tail . tail . drop clashOutLen) top
-    let src = clashDir </> sharedPath -<.> "hs"
-    let mk = clashOut </> "mk" </> sharedPath -<.> "mk"
 
-    -- generate the correct dependencies
-    need [mk]
-    makefile <- parseMakefile <$> readFile' mk
-    need (hsDeps makefile)
+  (clashOut </> "*/*.vhdl") %> \ vhdlF -> do
+    let vhdlD = takeDirectory vhdlF
 
-    -- compile
+    let mkF = vhdlD <.> "mk"
+    (Just entityD) <- getConfig "CLASH_ENTITIES"
+    let srcF = entityD </> takeFileName mkF -<.> "hs"
     flags <- ghcFlags
-    cmd clashExec flags "--vhdl" src
+    withTempFile $  \ mkF' -> do
+      () <- cmd clashExec "-M -dep-suffix=" [""] " -dep-makefile" [mkF'] flags srcF
 
-  clashOut </> "mk//*.mk" %> \ mk -> do
-    alwaysRerun
-    clashDir <- maybeConfig "CLASH_SRC" ""
-    let clashOutLen = length $ splitDirectories clashOut
-    let sharedPath = (joinPath . tail . drop clashOutLen . splitDirectories) mk
-    let src = clashDir </> sharedPath -<.> "hs"
-    flags <- ghcFlags
-    cmd clashExec "-M -dep-suffix=" [""] " -dep-makefile" [mk] flags src
+      lns <- readFileLines mkF'
+      writeFileLines mkF [ln | ln <- lns, isSuffixOf ".hs" ln]
+
+    needMakefileDependencies mkF
+
+    withTempDir $ \ tmpD -> do
+      (Just entityD) <- getConfig "CLASH_ENTITIES"
+      let srcF = entityD </> takeFileName mkF -<.> "hs"
+      flags <- ghcFlags
+      () <- cmd clashExec flags "-clash-hdldir" tmpD "--vhdl" srcF
+      () <- cmd "rm -rf" vhdlD
+      cmd "mv" (tmpD </> "vhdl" </> "NDP") vhdlD

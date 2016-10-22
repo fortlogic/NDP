@@ -1,14 +1,14 @@
 {-# LANGUAGE DataKinds #-}
-module NDP.HDMIGenerator where
+module NDP.Video.HDMIGenerator where
 
 import CLaSH.Prelude
 import CLaSH.Prelude.Explicit
 import qualified Prelude as P
 
-import NDP.CBMColor
+import NDP.Video.CBMColor
 import NDP.Clocking
-import NDP.PixelGenerator
-import NDP.TMDS
+import NDP.Video.PixelGenerator
+import NDP.Video.TMDS
 
 tmdsLow :: TMDS
 tmdsLow = TMDSControl 0

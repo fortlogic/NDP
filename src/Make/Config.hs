@@ -23,7 +23,11 @@ getConfigIO key = H.lookup key <$> readMVar configV
 initialConfig :: Rules [(String, String)]
 initialConfig = do
   clashVer <- liftIO clashVersionIO
-  return [("CLASH_VER", clashVer)]
+  platform <- liftIO osPlatformIO
+  arch <- liftIO cpuArchitectureIO
+  return [("CLASH_VER", clashVer),
+          ("ARCH", arch),
+          ("PLATFORM", platform)]
 
 setupConfig :: FilePath -> Rules ()
 setupConfig configFile = do

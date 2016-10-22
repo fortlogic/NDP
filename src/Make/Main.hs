@@ -9,8 +9,11 @@ import System.Environment
 
 import Make.Clash
 import Make.Config
+import Make.GHDL
 import Make.Oracles
 import Make.TileROM
+import Make.Vagrant
+import Make.Xilinx
 import qualified Tests.Main as T
 
 
@@ -32,4 +35,6 @@ main = shakeArgs shakeOptions $ do
       withArgs args T.main
 
   clashRules
+  ghdlRules
   tileROMRules
+  xilinxRules

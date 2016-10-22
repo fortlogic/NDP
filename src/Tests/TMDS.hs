@@ -10,7 +10,7 @@ import Test.Hspec
 import Test.Hspec.QuickCheck
 import Test.QuickCheck
 
-import NDP.TMDS
+import NDP.Video.TMDS
 
 tmdsTests name = describe name $ do
   it "xorEncode and xorDecode are inverses" $ property $

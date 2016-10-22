@@ -1,20 +1,27 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 module Make.Oracles (installOracles,
-                     ClashVersion (ClashVersion),
+                     ClashVersion (..),
                      clashVersionAddOracle,
                      clashVersionIO,
-                     OSName,
-                     osNameAddOracle,
-                     osNameIO) where
+                     OSPlatform (..),
+                     osPlatformAddOracle,
+                     osPlatformIO,
+                     CPUArchitecture,
+                     cpuArchitectureAddOracle,
+                     cpuArchitectureIO) where
 
 import Data.List
 import Development.Shake
 import Development.Shake.Classes
 
+import Make.Vagrant
+
 installOracles :: Rules ()
 installOracles = do
   clashVersionAddOracle
-  osNameAddOracle
+  osPlatformAddOracle
+  vagrantStatusAddOracle
+  cpuArchitectureAddOracle
   return ()
 
 newtype ClashVersion = ClashVersion ()
@@ -27,12 +34,23 @@ clashVersionAddOracle = addOracle $ \ (ClashVersion _) ->
 clashVersionIO :: IO String
 clashVersionIO = delete <$> pure '\n' <*> (fromStdout <$> cmd "clash --numeric-version")
 
-newtype OSName = OSName ()
+newtype OSPlatform = OSPlatform ()
                deriving (Show, Typeable, Eq, Hashable, Binary, NFData)
 
-osNameAddOracle :: Rules (OSName -> Action String)
-osNameAddOracle = addOracle $ \ (OSName _) ->
-                                liftIO osNameIO
+osPlatformAddOracle :: Rules (OSPlatform -> Action String)
+osPlatformAddOracle = addOracle $ \ (OSPlatform _) ->
+                                liftIO osPlatformIO
 
-osNameIO :: IO String
-osNameIO = delete '\n' <$> (fromStdout <$> cmd "uname")
+osPlatformIO :: IO String
+osPlatformIO = delete '\n' <$> (fromStdout <$> cmd "uname")
+
+newtype CPUArchitecture = CPUArchitecture ()
+               deriving (Show, Typeable, Eq, Hashable, Binary, NFData)
+
+cpuArchitectureAddOracle :: Rules (CPUArchitecture -> Action String)
+cpuArchitectureAddOracle = addOracle $ \ (CPUArchitecture _) ->
+                                liftIO cpuArchitectureIO
+
+cpuArchitectureIO :: IO String
+cpuArchitectureIO = delete '\n' <$> (fromStdout <$> cmd "arch")
+
