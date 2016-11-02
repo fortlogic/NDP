@@ -38,7 +38,7 @@ xflowRules = do
           bitF -<.> "ucf"]
 
     let entityName = takeBaseName bitF
-    let entityVhdlName = map toLower entityName
+    let entityVhdlName = entityName -- map toLower entityName
 
     let workD = dropExtension bitF
     () <- cmd "mkdir -p" workD
@@ -65,7 +65,8 @@ xflowRules = do
     let xstOptLines' = reverse (optPre ++ ["\"-top " ++ entityVhdlName ++ "\";"] ++ optSuf)
 
     writeFileLines (workD </> takeFileName xstOptF) xstOptLines'
---    writeFileLines "thing.txt" xstOptLines'
+
+    () <- cmd "rm -f" (workD </> (takeBaseName bitF ++ "_map.ncd"))
 
     withVagrant $ do
       let xstOpt = takeFileName xstOptF
@@ -81,4 +82,5 @@ xflowRules = do
                                              "-config", bitgenOpt,
                                              vmPrefix </> bitF -<.> "prj"]
 
-      cmd Shell "vagrant ssh -c" [sshCmd]
+      () <- cmd Shell "vagrant ssh -c" [sshCmd]
+      cmd "cp" (workD </> takeFileName bitF) bitF
