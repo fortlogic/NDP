@@ -1,5 +1,6 @@
-module Make.Xilinx (xilinxRules) where
+module Make.Xilinx.XFlow (xflowRules) where
 
+import Data.Char
 import Data.List
 import Development.Shake
 import Development.Shake.Config
@@ -10,7 +11,7 @@ import Make.Config
 import Make.Utils
 import Make.Vagrant
 
-xilinxRules = do
+xflowRules = do
   (Just xilinxD) <- liftIO $ getConfigIO "XILINX_OUT"
 
   (xilinxD </> "*.prj") %> \ prjF -> do
@@ -19,15 +20,25 @@ xilinxRules = do
     (Just clashOutD) <- getConfig "CLASH_OUT"
     let clashVhdlD = clashOutD </> entityName
 
-    need [clashVhdlD </> "ndp_topentity.vhdl"]
-    vhdlFs <- getDirectoryFiles "" [clashVhdlD  </> "*" <.> "vhdl"]
+    (Just topLevelVhdlD) <- getConfig "TOPLEVEL_ENTITIES"
+    customVhdlFs <- getDirectoryFiles "" [topLevelVhdlD </> entityName </> "*" <.> "vhdl"]
+
+    (Just clashEntity) <- getConfig "CLASH_ENTITY_NAME"
+    need [clashVhdlD </> ( map toLower clashEntity ++ "_topentity.vhdl")]
+    clashVhdlFs <- getDirectoryFiles "" [clashVhdlD  </> "*" <.> "vhdl"]
 
     (Just vmPrefix) <- getConfig "VM_ROOT"
+
+    let vhdlFs = customVhdlFs ++ clashVhdlFs
 
     writeFileLines prjF ["vhdl \"" ++ (vmPrefix </> vhdlF) ++ "\"" | vhdlF <- vhdlFs]
 
   (xilinxD </> "*.bit") %> \ bitF -> do
-    need [bitF -<.> "prj"]
+    need [bitF -<.> "prj",
+          bitF -<.> "ucf"]
+
+    let entityName = takeBaseName bitF
+    let entityVhdlName = map toLower entityName
 
     let workD = dropExtension bitF
     () <- cmd "mkdir -p" workD
@@ -41,9 +52,20 @@ xilinxRules = do
     (Just xflowFastF) <- getConfig "XFLOW_FAST"
     (Just bitgenOptF) <- getConfig "XFLOW_BITGEN_OPT"
 
---     () <- cmd "cp -f" xstOptF (workD ++ "/")
+    -- Move necessary files into work directory
+    () <- cmd "cp -f" (bitF -<.> "ucf") (workD ++ "/")
+    -- () <- cmd "cp -f" xstOptF (workD ++ "/")
     () <- cmd "cp -f" xflowFastF (workD ++ "/")
     () <- cmd "cp -f" bitgenOptF (workD ++ "/")
+
+    -- Add top level entity option to xst opt file and copy to work directory
+    xstOptLines <- readFileLines xstOptF
+    let optPre = takeWhile (not . isPrefixOf "\"run\";") (reverse xstOptLines)
+    let optSuf = dropWhile (not . isPrefixOf "\"run\";") (reverse xstOptLines)
+    let xstOptLines' = reverse (optPre ++ ["\"-top " ++ entityVhdlName ++ "\";"] ++ optSuf)
+
+    writeFileLines (workD </> takeFileName xstOptF) xstOptLines'
+--    writeFileLines "thing.txt" xstOptLines'
 
     withVagrant $ do
       let xstOpt = takeFileName xstOptF
