@@ -30,9 +30,9 @@ architecture Behavioral of MinimalDVIDPlusTMDS is
       blank : IN std_logic;
       hsync : IN std_logic;
       vsync : IN std_logic;
-      red : IN std_logic_vector(2 downto 0);
-      green : IN std_logic_vector(2 downto 0);
-      blue : IN std_logic_vector(2 downto 0);
+      red : IN std_logic_vector(7 downto 0);
+      green : IN std_logic_vector(7 downto 0);
+      blue : IN std_logic_vector(7 downto 0);
       hdmi_p : OUT std_logic_vector(3 downto 0);
       hdmi_n : OUT std_logic_vector(3 downto 0)
       );
@@ -71,9 +71,9 @@ Inst_MinimalDVID_encoder: simple_dvid PORT MAP(
       blank  => blank,
       hsync  => hsync,
       vsync  => vsync,
-      red    => red_p(7 downto 5),
-      green  => green_p(7 downto 5),
-      blue   => blue_p(7 downto 5),
+      red    => red_p,
+      green  => green_p,
+      blue   => blue_p,
       hdmi_p => tmds_p,
       hdmi_n => tmds_n
    );
