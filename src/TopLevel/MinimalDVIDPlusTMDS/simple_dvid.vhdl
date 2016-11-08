@@ -65,7 +65,7 @@ architecture Behavioral of simple_dvid is
    signal clk_x5,  clk_x5_unbuffered  : std_logic;
    signal clk_feedback    : std_logic;
 
-   signal blank_ctl       : std_logic_vector(0 downto 0);
+   signal blank_bool : boolean;
 
 begin
    ctls(0) <= vsync & hsync; -- syncs are set in the channel 0 CTL periods
@@ -76,15 +76,17 @@ begin
 
    symbols(3) <= "0000011111"; -- the clock channel symbol is static
 
-   blank_ctl <= (0 => blank);
+   blank_bool <= TRUE when blank = '1' else FALSE;
 
    tmds_gen:
    for i in 0 to 2 generate
-     tmds_encoder: entity work.tmds_encoder
+     tmds_encoder_1: entity work.tmds_encoder
        port map (
-         blank_en      => blank_ctl,
+         blank_en      => blank_bool,
          ctl_in        => ctls(i),
          px_in         => unsigned(colours(i)),
+         HDMI1000      => clk,
+         HDMI1000_rstn => '1',
          tmds_out      => symbols(i));
    end generate tmds_gen;
 

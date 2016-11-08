@@ -1,6 +1,6 @@
 ----------------------------------------------------------------------------------
 -- Engineer: Mike Field <hamster@snap.net.nz<
--- 
+--
 -- Description: Generate a 40Mhz Pixel clock from the 50Mhz input
 ----------------------------------------------------------------------------------
 library IEEE;
@@ -21,28 +21,28 @@ architecture Behavioral of vga_clocking is
    signal pll_locked           : std_logic;
 begin
    pixel_clock     <= clock_x1;
-   
+
    -- Multiply clk50m by 15, then divide by 10 for the 75 MHz pixel clock
-   -- Because the all come from the same PLL the will all be in phase 
+   -- Because the all come from the same PLL the will all be in phase
    PLL_BASE_inst : PLL_BASE
    generic map (
-      CLKFBOUT_MULT => 16,                  
+      CLKFBOUT_MULT => 16,
       CLKOUT0_DIVIDE => 20,       CLKOUT0_PHASE => 0.0,  -- Output pixel clock, 1.5x original frequency
       CLK_FEEDBACK => "CLKFBOUT",                        -- Clock source to drive CLKFBIN ("CLKFBOUT" or "CLKOUT0")
       CLKIN_PERIOD => 20.0,                              -- IMPORTANT! 20.00 => 50MHz
       DIVCLK_DIVIDE => 1                                 -- Division value for all output clocks (1-52)
    )
       port map (
-      CLKFBOUT => clk_feedback, 
+      CLKFBOUT => clk_feedback,
       CLKOUT0  => clock_x1_unbuffered,
       CLKOUT1  => open,
       CLKOUT2  => open,
       CLKOUT3  => open,
       CLKOUT4  => open,
       CLKOUT5  => open,
-      LOCKED   => pll_locked,      
-      CLKFBIN  => clk_feedback,    
-      CLKIN    => clk50_buffered, 
+      LOCKED   => pll_locked,
+      CLKFBIN  => clk_feedback,
+      CLKIN    => clk50_buffered,
       RST      => '0'              -- 1-bit input: Reset input
    );
 

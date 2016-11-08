@@ -30,10 +30,10 @@ tmdsEncoder = mealy' pxClk encodeTMDS 0
 
 encodeTMDS :: Signed 4 -> TMDS -> (Signed 4, BitVector 10)
 encodeTMDS dc (TMDSData byte) = encodeByte dc (pack byte)
-encodeTMDS dc (TMDSControl 0) = (dc,   $$(bLit "0010101011"))
-encodeTMDS dc (TMDSControl 1) = (dc,   $$(bLit "1101010100"))
-encodeTMDS dc (TMDSControl 2) = (dc-1, $$(bLit "0010101010"))
-encodeTMDS dc (TMDSControl 3) = (dc+1, $$(bLit "1101010101"))
+encodeTMDS dc (TMDSControl 0) = (0, $$(bLit "1101010100"))
+encodeTMDS dc (TMDSControl 1) = (0, $$(bLit "0010101011"))
+encodeTMDS dc (TMDSControl 2) = (0, $$(bLit "0101010100"))
+encodeTMDS dc (TMDSControl 3) = (0, $$(bLit "1010101011"))
 
 xnor :: Bits a => a -> a -> a
 xnor a b = complement (xor a b)
