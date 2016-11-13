@@ -64,18 +64,34 @@ dcOffset :: (KnownNat (2 ^ n),
 dcOffset bv = (offsetOnes . foldr (+) 0 . map (resize . unpack) . bv2v) bv
   where offsetOnes ones = (2 * ones) - (int2Signed $ size# bv)
 
+onesCount :: BitVector 8 -> Unsigned 4
+onesCount byte = fold (+) (map (extend . unpack) bits)
+  where bits :: Vec 8 Bit
+        bits = unpack byte
+
+bit2sign :: KnownNat n => Bit -> Signed n
+bit2sign 0 = 0
+bit2sign 1 = 1
+
+
 encodeByte :: Signed 4 -> BitVector 8 -> (Signed 4, BitVector 10)
-encodeByte dc byte = (dc', word)
-  where xored = xorEncode byte
-        xnored = xnorEncode byte
-        gate = transitionCount xored <= transitionCount xnored
-        byte' = if gate then xored else xnored
-        offset = dcOffset byte'
-        invert = abs (dc - offset) < abs (dc + offset)
-        offset' = if invert then 0 - offset else offset
-        byte'' = if invert then complement byte' else byte'
-        dc' = dc + offset'
-        word = pack invert ++# pack gate ++# byte''
+encodeByte dc byte =  if (wordDc == 0) || (dc == 0)
+                      then if msb word == 1
+                           then (dc + wordDc, low ++# word)
+                           else (dc - wordDc, high ++# low ++# word8Inv)
+                      else if dc == wordDc
+                           then (dc + (bit2sign . msb) word - wordDc, high ++# msb word ++# word8Inv)
+                           else (dc - (bit2sign . msb) wordInv + wordDc, low ++# word)
+  where ones = onesCount byte
+        word = if (ones > 4) || ((ones == 4) && (lsb byte == 0))
+                then low ++# xnorEncode byte
+                else high ++# xorEncode byte
+        wordInv = complement word
+        wordDc = (dcOffset word8) - 4
+        word8 :: BitVector 8
+        word8 = (snd . split) word
+        word8Inv :: BitVector 8
+        word8Inv = (snd . split) wordInv
 
 decodeByte :: BitVector 10 -> BitVector 8
 decodeByte word = byte''
