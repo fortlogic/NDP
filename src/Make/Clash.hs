@@ -37,9 +37,11 @@ clashRules = do
     let srcF = entityD </> takeBaseName mkF </> mainClashNameF -<.> "hs"
     flags <- ghcFlags
     withTempFile $  \ mkF' -> do
+      putNormal "Determining CLaSH dependencies"
       () <- cmd clashExec "-M -dep-suffix=" [""] " -dep-makefile" [mkF'] flags srcF
 
-      lns <- readFileLines mkF'
+      -- lns <- readFileLines mkF' -- We don't want this tracked as a dependency
+      lns <- lines <$> liftIO (readFile mkF')
       writeFileLines mkF [ln | ln <- lns, isSuffixOf ".hs" ln]
 
     needMakefileDependencies mkF
@@ -49,6 +51,7 @@ clashRules = do
       (Just clashName) <- getConfig "CLASH_ENTITY_NAME"
       -- let srcF = entityD </> takeFileName mkF -<.> "hs"
       flags <- ghcFlags
+      putNormal "Compiling CLaSH sources"
       () <- cmd clashExec flags "-clash-hdldir" tmpD "--vhdl" srcF
       () <- cmd "rm -rf" vhdlD
       putNormal tmpD
