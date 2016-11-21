@@ -13,7 +13,8 @@ import Make.GHDL
 import Make.Oracles
 import Make.TileROM
 import Make.Vagrant
-import Make.Xilinx
+import Make.Xilinx.Constraints
+import Make.Xilinx.XFlow
 import qualified Tests.Main as T
 
 
@@ -37,4 +38,5 @@ main = shakeArgs shakeOptions $ do
   clashRules
   ghdlRules
   tileROMRules
-  xilinxRules
+  xflowRules
+  ucfRules

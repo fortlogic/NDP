@@ -1,5 +1,5 @@
 {-# LANGUAGE DataKinds #-}
-module NDP.CBMColor (RGBColor (..),
+module NDP.Video.CBMColor (RGBColor (..),
                      CBMColor (..),
                      cbmToRGB) where
 

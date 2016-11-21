@@ -6,6 +6,8 @@ module NDP.Clocking (PixelClk,
                      px5Clk,
                      SignalPx,
                      SignalPx5,
+                     registerPx,
+                     registerPx5,
                      clockStrobe,
                      pxTo5x) where
 
@@ -25,6 +27,12 @@ px5Clk = sclock
 
 type SignalPx a = Signal' PixelClk a
 type SignalPx5 a = Signal' Pixelx5Clk a
+
+registerPx :: a -> SignalPx a -> SignalPx a
+registerPx = register' pxClk
+
+registerPx5 :: a -> SignalPx5 a -> SignalPx5 a
+registerPx5 = register' px5Clk
 
 -- The fast clock speed must be an integer multiple of the slow in addition to
 -- sharing a common origin. The resulting fast signal pulses true at the

@@ -1,6 +1,6 @@
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
-module NDP.VideoTiming (TimeRegion (..),
+module NDP.Video.Timing (TimeRegion (..),
                         VideoTime,
                         VideoRegion (..),
                         videoTimeZero,

@@ -32,8 +32,9 @@ clashRules = do
     let vhdlD = takeDirectory vhdlF
 
     let mkF = vhdlD <.> "mk"
-    (Just entityD) <- getConfig "CLASH_ENTITIES"
-    let srcF = entityD </> takeFileName mkF -<.> "hs"
+    (Just entityD) <- getConfig "TOPLEVEL_ENTITIES"
+    (Just mainClashNameF) <- getConfig "TOPLEVEL_HS_FILE"
+    let srcF = entityD </> takeBaseName mkF </> mainClashNameF -<.> "hs"
     flags <- ghcFlags
     withTempFile $  \ mkF' -> do
       putNormal "Determining CLaSH dependencies"
@@ -46,10 +47,12 @@ clashRules = do
     needMakefileDependencies mkF
 
     withTempDir $ \ tmpD -> do
-      (Just entityD) <- getConfig "CLASH_ENTITIES"
-      let srcF = entityD </> takeFileName mkF -<.> "hs"
+      (Just entityD) <- getConfig "TOPLEVEL_ENTITIES"
+      (Just clashName) <- getConfig "CLASH_ENTITY_NAME"
+      -- let srcF = entityD </> takeFileName mkF -<.> "hs"
       flags <- ghcFlags
       putNormal "Compiling CLaSH sources"
       () <- cmd clashExec flags "-clash-hdldir" tmpD "--vhdl" srcF
       () <- cmd "rm -rf" vhdlD
-      cmd "mv" (tmpD </> "vhdl" </> "NDP") vhdlD
+      putNormal tmpD
+      cmd "mv" (tmpD </> "vhdl" </> clashName) vhdlD
