@@ -4,3 +4,7 @@ build
 reference
 .vagrant
 ise
+*-cache.lib
+*.bak
+*.bck
+*.kicad_pcb-bak
