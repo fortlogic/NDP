@@ -102,23 +102,23 @@ $EndComp
 $Comp
 L R R1
 U 1 1 584BA334
-P 4000 2850
-F 0 "R1" V 4080 2850 50  0000 C CNN
-F 1 "470" V 4000 2850 50  0000 C CNN
-F 2 "Resistors_ThroughHole:Resistor_Horizontal_RM10mm" V 3930 2850 50  0001 C CNN
-F 3 "" H 4000 2850 50  0000 C CNN
-	1    4000 2850
+P 3850 2850
+F 0 "R1" V 3930 2850 50  0000 C CNN
+F 1 "10k" V 3850 2850 50  0000 C CNN
+F 2 "Resistors_ThroughHole:Resistor_Horizontal_RM10mm" V 3780 2850 50  0001 C CNN
+F 3 "" H 3850 2850 50  0000 C CNN
+	1    3850 2850
 	1    0    0    -1  
 $EndComp
 $Comp
 L +3.3V #PWR05
 U 1 1 584BA39B
-P 4000 2700
-F 0 "#PWR05" H 4000 2550 50  0001 C CNN
-F 1 "+3.3V" H 4000 2840 50  0000 C CNN
-F 2 "" H 4000 2700 50  0000 C CNN
-F 3 "" H 4000 2700 50  0000 C CNN
-	1    4000 2700
+P 3850 2700
+F 0 "#PWR05" H 3850 2550 50  0001 C CNN
+F 1 "+3.3V" H 3850 2840 50  0000 C CNN
+F 2 "" H 3850 2700 50  0000 C CNN
+F 3 "" H 3850 2700 50  0000 C CNN
+	1    3850 2700
 	1    0    0    -1  
 $EndComp
 $Comp
@@ -191,9 +191,6 @@ Wire Wire Line
 Connection ~ 5300 3050
 Wire Wire Line
 	5300 3100 5300 3050
-Connection ~ 4000 3050
-Wire Wire Line
-	4000 3000 4000 3050
 Wire Wire Line
 	3400 3050 4150 3050
 Wire Wire Line
@@ -297,4 +294,7 @@ Wire Wire Line
 Wire Wire Line
 	5850 3050 6300 3050
 Connection ~ 5900 3050
+Wire Wire Line
+	3850 3000 3850 3050
+Connection ~ 3850 3050
 $EndSCHEMATC
