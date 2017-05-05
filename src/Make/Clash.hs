@@ -25,7 +25,7 @@ hsDeps = filter isHs . concat . map snd
   where isHs = isSuffixOf ".hs"
 
 clashRules = do
-  buildDir <- liftIO $ maybeConfigIO "BUILD_DIR" "build"
+  buildDir <- liftIO $ maybeConfigIO "BUILD" "build"
   clashOut <- liftIO $ maybeConfigIO "CLASH_OUT" (buildDir </> "clash")
 
   (clashOut </> "*/*.vhdl") %> \ vhdlF -> do
