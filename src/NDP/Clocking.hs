@@ -48,7 +48,7 @@ pxTo5x :: SignalPx (BitVector 10) -> SignalPx5 (BitVector 2)
 pxTo5x tmdsIn = tail
   where tmds = unsafeSynchronizer pxClk px5Clk tmdsIn
         strobe = clockStrobe pxClk px5Clk
-        (body, tail) = unbundle' px5Clk $ split <$> mux strobe tmds body'
+        (body, tail) = unbundle $ split <$> mux strobe tmds body'
         body' = register' px5Clk 0 $ (++#) <$> tail <*> (body :: SignalPx5 (BitVector 8))
 
 -- simulate pxTo5x [$$(bLit "0101010101"), $$(bLit "0111100001"), $$(bLit "1000011110")]
