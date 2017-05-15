@@ -15,7 +15,8 @@ shortcutRules = do
 
 fpgaCommands = commandGroup "fpga:" [mkCommand "reset:" resetCmd
                                     ,mkCommand "build:" buildCmd
-                                    ,mkCommand "load:" loadCmd]
+                                    ,mkCommand "load:" loadCmd
+                                    ,mkCommand "burn:" burnCmd]
 
 clashCommands = mkCommand "clash:" buildClashCmd
 
@@ -37,10 +38,26 @@ loadCmd project = do
 
   need [container </> project -<.> "bit"]
 
-  withVagrant $ vagrantSSH ["sudo", fpgaProg, "-vf", vmContainer </> project -<.> "bit"]
+  let vagrantBitfile = vmContainer </> project -<.> "bit"
+
+  withVagrant $ vagrantSSH ["sudo", fpgaProg, "-vf", vagrantBitfile]
 
 burnCmd :: String -> Action ()
-burnCmd = undefined
+burnCmd project = do
+  (Just container) <- getConfig "XILINX_OUT"
+  (Just vmContainer) <- getConfig "VM_XILINX_OUT"
+  (Just fpgaProg) <- getConfig "FPGAPROG"
+  (Just burner) <- getConfig "FPGA_BURNER"
+
+  need [container </> project -<.> "bit"]
+
+  let vagrantBitfile = vmContainer </> project -<.> "bit"
+  let command = ["sudo", fpgaProg,
+                 "-vf", vagrantBitfile,
+                 "-b", burner,
+                 "-sa", "-r"]
+
+  withVagrant $ vagrantSSH command
 
 buildClashCmd :: String -> Action ()
 buildClashCmd project = do
