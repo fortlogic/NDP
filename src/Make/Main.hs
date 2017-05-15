@@ -11,7 +11,7 @@ import Make.Clash
 import Make.Config
 import Make.GHDL
 import Make.Oracles
-import Make.Pipistrello
+import Make.Shortcuts
 import Make.TileROM
 import Make.Vagrant
 import Make.Xilinx.Constraints
@@ -38,7 +38,7 @@ main = shakeArgs shakeOptions $ do
 
   clashRules
   ghdlRules
-  pipistrelloRules
+  shortcutRules
   tileROMRules
   xflowRules
   ucfRules

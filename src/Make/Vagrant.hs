@@ -2,12 +2,14 @@
 module Make.Vagrant (withVagrant,
                      VagrantStatus (..),
                      vagrantStatusAddOracle,
-                     vagrantStatusIO) where
+                     vagrantStatusIO,
+                     vagrantSSH) where
 
 import Data.List
 import Data.Maybe
 import Development.Shake
 import Development.Shake.Classes
+import System.Posix.Escape
 
 newtype VagrantStatus = VagrantStatus ()
                       deriving (Show, Typeable, Eq, Hashable, Binary, NFData)
@@ -40,3 +42,5 @@ statusRunning = fromMaybe False . (isPrefixOf "running " <$>)
 startupVagrant :: Action ()
 startupVagrant = cmd "vagrant up"
 
+vagrantSSH :: [String] -> Action ()
+vagrantSSH args = cmd Shell "vagrant ssh -c" [escape $ intercalate " " args]
