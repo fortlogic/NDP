@@ -1,5 +1,7 @@
 module NDP.IO.TriState where
 
+import Prelude()
+
 import CLaSH.Prelude
 
 -- Input coming from a bidirectional IO pin
@@ -25,7 +27,10 @@ type IOBUF = Signal (Bool, Bit) -> Signal Bit
 type Tri = Signal Out -> Signal In
 
 -- A tri-state IO pin that only returns input when it knows that it's the only
--- person on the bus talking.
+-- person on the bus talking. Note that an error is only signalled if another
+-- party is driving the bus in a different direction than we are. We cannot
+-- detect conflict if another person is driving the bus in the same direction as
+-- we are.
 type ErrorTri = Signal Out -> Signal (Maybe In)
 
 iobufInput :: Out -> (Bool, Bit)
@@ -33,6 +38,7 @@ iobufInput LowO    = (True, low)
 iobufInput HighO   = (True, high)
 iobufInput SilentO = (False, undefined)
 
+-- Turn an IOBUF into a Tristate signal.
 mkTri :: IOBUF -> Tri
 mkTri buf tIn = bit2in <$> buf (iobufInput <$> tIn)
 
