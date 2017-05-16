@@ -1,7 +1,9 @@
 module Make.Xilinx.XFlow (xflowRules) where
 
 import Data.Char
+import Data.Conf
 import Data.List
+import Data.Maybe
 import Development.Shake
 import Development.Shake.Config
 import Development.Shake.FilePath
@@ -20,16 +22,28 @@ xflowRules = do
     (Just clashOutD) <- getConfig "CLASH_OUT"
     let clashVhdlD = clashOutD </> entityName
 
+    -- fetch the custom VHDL files that will be included in the project.
     (Just topLevelVhdlD) <- getConfig "TOPLEVEL_ENTITIES"
     customVhdlFs <- getDirectoryFiles "" [topLevelVhdlD </> entityName </> "*" <.> "vhdl"]
 
+    -- fetch the VHDL files that the clash compiler generated.
     (Just clashEntity) <- getConfig "CLASH_ENTITY_NAME"
     need [clashVhdlD </> ( map toLower clashEntity ++ "_topentity.vhdl")]
     clashVhdlFs <- getDirectoryFiles "" [clashVhdlD  </> "*" <.> "vhdl"]
 
+    -- fetch a clocking entity if one is specified
+    (Just clockDir) <- getConfig "VHDL_CLOCKS"
+    (Just entityD) <- getConfig "TOPLEVEL_ENTITIES"
+    (Just configF) <- getConfig "ENTITY_CONFIG_SETTINGS"
+    entityConstraints <- (liftIO . readConf) $ entityD </> entityName </> configF
+    let maybeClockVhdl = do
+          clockFile <- (getConf "clock" entityConstraints) :: Maybe String
+          return $ clockDir </> clockFile -<.> "vhdl"
+
+
     (Just vmPrefix) <- getConfig "VM_ROOT"
 
-    let vhdlFs = customVhdlFs ++ clashVhdlFs
+    let vhdlFs = customVhdlFs ++ clashVhdlFs ++ maybeToList maybeClockVhdl
 
     writeFileLines prjF ["vhdl \"" ++ (vmPrefix </> vhdlF) ++ "\"" | vhdlF <- vhdlFs]
 

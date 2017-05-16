@@ -1,22 +1,22 @@
 requiredConstraints = Constraints {
   rawConstraints = [
       "CONFIG VCCAUX = \"3.3\"",
-      "TIMESPEC \"TS_clk_in\" = PERIOD \"clk_in\" 20000 ps INPUT_JITTER 200 ps"
+      "TIMESPEC \"TS_clk_in\" = PERIOD \"clk_in(0)\" 20000 ps INPUT_JITTER 200 ps"
       ],
   netConstraints = [
-      ("clk_in", [NetLoc "H17", NetKV "IOSTANDARD" "LVTTL"]),
-      ("clk_in", [NetKV "TNM_NET" "\"clk_in\""])
+      ("clk_in(0)", [NetLoc "H17", NetKV "IOSTANDARD" "LVTTL"]),
+      ("clk_in(0)", [NetKV "TNM_NET" "\"clk_in(0)\""])
       ]
   }
 
 audioNets = Constraints {
   rawConstraints = [],
   netConstraints = [
-      ("audio_out_left", [ NetLoc "R7",
+      ("audio_out_left(0)", [ NetLoc "R7",
                            NetKV "IOSTANDARD" "LVTTL",
                            NetKV "SLEW" "SLOW",
                            NetKV "DRIVE" "8" ]),
-      ("audio_out_right", [ NetLoc "T7",
+      ("audio_out_right(0)", [ NetLoc "T7",
                             NetKV "IOSTANDARD" "LVTTL",
                             NetKV "SLEW" "SLOW",
                             NetKV "DRIVE" "8" ])
@@ -26,23 +26,23 @@ audioNets = Constraints {
 builtinLEDNets = Constraints {
   rawConstraints = [],
   netConstraints = [
-      ("led_hdmi_green", [ NetLoc "V16",
+      ("led_hdmi_green(0)", [ NetLoc "V16",
                            NetKV "IOSTANDARD" "LVTTL",
                            NetKV "SLEW" "SLOW",
                            NetKV "DRIVE" "8"]),
-      ("led_hdmi_red", [ NetLoc "U16",
+      ("led_hdmi_red(0)", [ NetLoc "U16",
                          NetKV "IOSTANDARD" "LVTTL",
                          NetKV "SLEW" "SLOW",
                          NetKV "DRIVE" "8"]),
-      ("led_sd_green", [ NetLoc "A16",
+      ("led_sd_green(0)", [ NetLoc "A16",
                          NetKV "IOSTANDARD" "LVTTL",
                          NetKV "SLEW" "SLOW",
                          NetKV "DRIVE" "8"]),
-      ("led_sd_red", [ NetLoc "A15",
+      ("led_sd_red(0)", [ NetLoc "A15",
                        NetKV "IOSTANDARD" "LVTTL",
                        NetKV "SLEW" "SLOW",
                        NetKV "DRIVE" "8"]),
-      ("led_usb_red", [ NetLoc "A12",
+      ("led_usb_red(0)", [ NetLoc "A12",
                         NetKV "IOSTANDARD" "LVTTL",
                         NetKV "SLEW" "SLOW",
                         NetKV "DRIVE" "8"])
@@ -51,7 +51,7 @@ builtinLEDNets = Constraints {
 
 builtinButtonNets = Constraints {
   rawConstraints = [],
-  netConstraints = [ ("button", [ NetLoc "N14", NetKV "IOSTANDARD" "LVTTL" ])]
+  netConstraints = [ ("button(0)", [ NetLoc "N14", NetKV "IOSTANDARD" "LVTTL" ])]
   }
 
 tmdsNets = Constraints {
