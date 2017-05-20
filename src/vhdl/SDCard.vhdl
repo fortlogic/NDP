@@ -158,7 +158,7 @@ library IEEE;
 use IEEE.math_real.all;
 use IEEE.std_logic_1164.all;
 use IEEE.numeric_std.all;
-use SdCardPckg.all;
+use work.SdCardPckg.all;
 
 entity SdCardCtrl is
   generic (
@@ -193,6 +193,17 @@ end entity;
 
 
 architecture arch of SdCardCtrl is
+
+  -- Find the maximum of two integers.
+  function IntMax(a : in integer; b : in integer) return integer is
+  begin
+    if a > b then
+      return a;
+    else
+      return b;
+    end if;
+    return a;
+  end function IntMax;
 
   signal sclk_r   : std_logic := '0';  -- Register output drives SD card clock.
   signal hndShk_r : std_logic := '0';  -- Register output drives handshake output to host.
