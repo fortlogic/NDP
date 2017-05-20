@@ -6,14 +6,14 @@
 -- modify it under the terms of the GNU Lesser General Public
 -- License as published by the Free Software Foundation; either
 -- version 3.0 of the License, or (at your option) any later version.
--- 
+--
 -- This library is distributed in the hope that it will be useful,
 -- but WITHOUT ANY WARRANTY; without even the implied warranty of
 -- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 -- Lesser General Public License for more details.
--- 
+--
 -- You should have received a copy of the GNU Lesser General Public
--- License along with this library.  If not, see 
+-- License along with this library.  If not, see
 -- <http://www.gnu.org/licenses/>.
 --**********************************************************************
 
@@ -21,85 +21,85 @@
 -- SD MEMORY CARD INTERFACE
 --
 -- Reads/writes a single or multiple blocks of data to/from an SD Flash card.
--- 
+--
 -- Based on XESS by by Steven J. Merrifield, June 2008:
 -- http : //stevenmerrifield.com/tools/sd.vhd
--- 
+--
 -- Most of what I learned about interfacing to SD/SDHC cards came from here:
 -- http://elm-chan.org/docs/mmc/mmc_e.html
 --
 -- OPERATION
 --
 --     Set-up:
---         First of all, you have to give the controller a clock signal on the clk_i 
---         input with a higher frequency than the serial clock sent to the SD card 
---         through the sclk_o output. You can set generic parameters for the 
---         controller to tell it the master clock frequency (100 MHz), the SCLK 
---         frequency for initialization (400 KHz), the SCLK frequency for normal 
+--         First of all, you have to give the controller a clock signal on the clk_i
+--         input with a higher frequency than the serial clock sent to the SD card
+--         through the sclk_o output. You can set generic parameters for the
+--         controller to tell it the master clock frequency (100 MHz), the SCLK
+--         frequency for initialization (400 KHz), the SCLK frequency for normal
 --         operation (25 MHz), the size of data sectors in the Flash memory (512 bytes),
---         and the type of card (either SD or SDHC). I typically use a 100 MHz 
---         clock if I'm running an SD card with a 25 Mbps serial data stream. 
---       
+--         and the type of card (either SD or SDHC). I typically use a 100 MHz
+--         clock if I'm running an SD card with a 25 Mbps serial data stream.
+--
 --     Initialize it:
---         Pulsing the reset_i input high and then bringing it low again will make 
---         the controller initialize the SD card so it will XESS in SPI mode. 
+--         Pulsing the reset_i input high and then bringing it low again will make
+--         the controller initialize the SD card so it will XESS in SPI mode.
 --         Basically, it sends the card the commands CMD0, CMD8 and then ACMD41 (which
---         is CMD55 followed by CMD41). The busy_o output will be high during the 
---         initialization and will go low once it is done. 
---        
+--         is CMD55 followed by CMD41). The busy_o output will be high during the
+--         initialization and will go low once it is done.
+--
 --         After the initialization command sequence, the SD card will send back an R1
---         response byte. If only the IDLE bit of the R1 response is set, then the 
---         controller will repeatedly re-try the ACMD41 command while busy_o remains 
---         high. 
---        
---         If any other bit of the R1 response is set, then an error occurred. The 
+--         response byte. If only the IDLE bit of the R1 response is set, then the
+--         controller will repeatedly re-try the ACMD41 command while busy_o remains
+--         high.
+--
+--         If any other bit of the R1 response is set, then an error occurred. The
 --         controller will stall, lower busy_o, and output the R1 response code on the
---         error_o bus. You'll have to pulse reset_i to unfreeze the controller. 
---     
---         If the R1 response is all zeroes (i.e., no errors occurred during the 
---         initialization), then the controller will lower busy_o and wait for a 
+--         error_o bus. You'll have to pulse reset_i to unfreeze the controller.
+--
+--         If the R1 response is all zeroes (i.e., no errors occurred during the
+--         initialization), then the controller will lower busy_o and wait for a
 --         read or write operation from the host. The controller will only accept new
 --         operations when busy_o is low.
---     
+--
 --     Write data:
---         To write a data block to the SD card, the address of a block is placed 
---         on the addr_i input bus and the wr_i input is raised. The address and 
---         write strobe can be removed once busy_o goes high to indicate the write 
---         operation is underway. The data to be written to the SD card is passed as 
---         follows: 
---     
+--         To write a data block to the SD card, the address of a block is placed
+--         on the addr_i input bus and the wr_i input is raised. The address and
+--         write strobe can be removed once busy_o goes high to indicate the write
+--         operation is underway. The data to be written to the SD card is passed as
+--         follows:
+--
 --         1. The controller requests a byte of data by raising the hndShk_o output.
---         2. The host applies the next byte to the data_i input bus and raises the 
+--         2. The host applies the next byte to the data_i input bus and raises the
 --            hndShk_i input.
 --         3. The controller accepts the byte and lowers the hndShk_o output.
 --         4. The host lowers the hndShk_i input.
---     
---         This sequence of steps is repeated until all BLOCK_SIZE_G bytes of the 
---         data block are passed from the host to the controller. Once all the data 
---         is passed, the sector on the SD card will be written and the busy_o output 
---         will be lowered. 
---     
+--
+--         This sequence of steps is repeated until all BLOCK_SIZE_G bytes of the
+--         data block are passed from the host to the controller. Once all the data
+--         is passed, the sector on the SD card will be written and the busy_o output
+--         will be lowered.
+--
 --     Read data:
---         To read a block of data from the SD card, the address of a block is 
---         placed on the addr_i input bus and the rd_i input is raised. The address 
---         and read strobe can be removed once busy_o goes high to indicate the read 
---         operation is underway. The data read from the SD card is passed to the 
---         host as follows: 
---     
+--         To read a block of data from the SD card, the address of a block is
+--         placed on the addr_i input bus and the rd_i input is raised. The address
+--         and read strobe can be removed once busy_o goes high to indicate the read
+--         operation is underway. The data read from the SD card is passed to the
+--         host as follows:
+--
 --         1. The controller raises the hndShk_o output when the next data byte is available.
 --         2. The host reads the byte from the data_o output bus and raises the hndShk_i input.
 --         3. The controller lowers the hndShk_o output.
 --         4. The host lowers the hndShk_i input.
---     
---         This sequence of steps is repeated until all BLOCK_SIZE_G bytes of the 
---         data block are passed from the controller to the host. Once all the data 
+--
+--         This sequence of steps is repeated until all BLOCK_SIZE_G bytes of the
+--         data block are passed from the controller to the host. Once all the data
 --         is read, the busy_o output will be lowered.
---     
+--
 --     Handle errors:
 --         If an error is detected during either a read or write operation, then the
---         controller will stall, lower busy_o, and output an error code on the 
---         error_o bus. You'll have to pulse reset_i to unfreeze the controller. That 
---         may seem a bit excessive, but it does guarantee that you can't ignore any 
+--         controller will stall, lower busy_o, and output an error code on the
+--         error_o bus. You'll have to pulse reset_i to unfreeze the controller. That
+--         may seem a bit excessive, but it does guarantee that you can't ignore any
 --         errors that occur.
 --
 -- TODO:
@@ -110,10 +110,10 @@
 -- *********************************************************************
 
 
-library IEEE, XESS;
+library IEEE;
 use IEEE.std_logic_1164.all;
 use IEEE.numeric_std.all;
-use XESS.CommonPckg.all;
+
 
 package SdCardPckg is
 
@@ -130,22 +130,22 @@ package SdCardPckg is
     port (
       -- Host-side interface signals.
       clk_i      : in  std_logic;       -- Master clock.
-      reset_i    : in  std_logic                     := NO;  -- active-high, synchronous  reset.
-      rd_i       : in  std_logic                     := NO;  -- active-high read block request.
-      wr_i       : in  std_logic                     := NO;  -- active-high write block request.
-      continue_i : in  std_logic                     := NO;  -- If true, inc address and continue R/W.
+      reset_i    : in  std_logic                     := '0';  -- active-high, synchronous  reset.
+      rd_i       : in  std_logic                     := '0';  -- active-high read block request.
+      wr_i       : in  std_logic                     := '0';  -- active-high write block request.
+      continue_i : in  std_logic                     := '0';  -- If true, inc address and continue R/W.
       addr_i     : in  std_logic_vector(31 downto 0) := x"00000000";  -- Block address.
       data_i     : in  std_logic_vector(7 downto 0)  := x"00";  -- Data to write to block.
       data_o     : out std_logic_vector(7 downto 0)  := x"00";  -- Data read from block.
       busy_o     : out std_logic;  -- High when controller is busy performing some operation.
       hndShk_i   : in  std_logic;  -- High when host has data to give or has taken data.
       hndShk_o   : out std_logic;  -- High when controller has taken data or has data to give.
-      error_o    : out std_logic_vector(15 downto 0) := (others => NO);
+      error_o    : out std_logic_vector(15 downto 0) := (others => '0');
       -- I/O signals to the external SD card.
-      cs_bo      : out std_logic                     := HI;  -- Active-low chip-select.
-      sclk_o     : out std_logic                     := LO;  -- Serial clock to SD card.
-      mosi_o     : out std_logic                     := HI;  -- Serial data output to SD card.
-      miso_i     : in  std_logic                     := ZERO  -- Serial data input from SD card.
+      cs_bo      : out std_logic                     := '1';  -- Active-low chip-select.
+      sclk_o     : out std_logic                     := '0';  -- Serial clock to SD card.
+      mosi_o     : out std_logic                     := '1';  -- Serial data output to SD card.
+      miso_i     : in  std_logic                     := '0'  -- Serial data input from SD card.
       );
   end component;
 
@@ -154,12 +154,11 @@ end package;
 
 
 
-library IEEE, XESS;
+library IEEE;
 use IEEE.math_real.all;
 use IEEE.std_logic_1164.all;
 use IEEE.numeric_std.all;
-use XESS.CommonPckg.all;
-use XESS.SdCardPckg.all;
+use SdCardPckg.all;
 
 entity SdCardCtrl is
   generic (
@@ -172,22 +171,22 @@ entity SdCardCtrl is
   port (
     -- Host-side interface signals.
     clk_i      : in  std_logic;         -- Master clock.
-    reset_i    : in  std_logic                     := NO;  -- active-high, synchronous  reset.
-    rd_i       : in  std_logic                     := NO;  -- active-high read block request.
-    wr_i       : in  std_logic                     := NO;  -- active-high write block request.
-    continue_i : in  std_logic                     := NO;  -- If true, inc address and continue R/W.
+    reset_i    : in  std_logic                     := '0';  -- active-high, synchronous  reset.
+    rd_i       : in  std_logic                     := '0';  -- active-high read block request.
+    wr_i       : in  std_logic                     := '0';  -- active-high write block request.
+    continue_i : in  std_logic                     := '0';  -- If true, inc address and continue R/W.
     addr_i     : in  std_logic_vector(31 downto 0) := x"00000000";  -- Block address.
     data_i     : in  std_logic_vector(7 downto 0)  := x"00";  -- Data to write to block.
     data_o     : out std_logic_vector(7 downto 0)  := x"00";  -- Data read from block.
     busy_o     : out std_logic;  -- High when controller is busy performing some operation.
     hndShk_i   : in  std_logic;  -- High when host has data to give or has taken data.
     hndShk_o   : out std_logic;  -- High when controller has taken data or has data to give.
-    error_o    : out std_logic_vector(15 downto 0) := (others => NO);
+    error_o    : out std_logic_vector(15 downto 0) := (others => '0');
     -- I/O signals to the external SD card.
-    cs_bo      : out std_logic                     := HI;  -- Active-low chip-select.
-    sclk_o     : out std_logic                     := LO;  -- Serial clock to SD card.
-    mosi_o     : out std_logic                     := HI;  -- Serial data output to SD card.
-    miso_i     : in  std_logic                     := ZERO  -- Serial data input from SD card.
+    cs_bo      : out std_logic                     := '1';  -- Active-low chip-select.
+    sclk_o     : out std_logic                     := '0';  -- Serial clock to SD card.
+    mosi_o     : out std_logic                     := '1';  -- Serial data output to SD card.
+    miso_i     : in  std_logic                     := '0'  -- Serial data input from SD card.
     );
 end entity;
 
@@ -195,22 +194,22 @@ end entity;
 
 architecture arch of SdCardCtrl is
 
-  signal sclk_r   : std_logic := ZERO;  -- Register output drives SD card clock.
-  signal hndShk_r : std_logic := NO;  -- Register output drives handshake output to host.
+  signal sclk_r   : std_logic := '0';  -- Register output drives SD card clock.
+  signal hndShk_r : std_logic := '0';  -- Register output drives handshake output to host.
 
 begin
-  
+
   process(clk_i)  -- FSM process for the SD card controller.
 
     type FsmState_t is (    -- States of the SD card controller FSM.
-      START_INIT,  -- Send initialization clock pulses to the deselected SD card.    
+      START_INIT,  -- Send initialization clock pulses to the deselected SD card.
       SEND_CMD0,                        -- Put the SD card in the IDLE state.
       CHK_CMD0_RESPONSE,    -- Check card's R1 response to the CMD0.
       SEND_CMD8,   -- This command is needed to initialize SDHC cards.
       GET_CMD8_RESPONSE,                -- Get the R7 response to CMD8.
-      SEND_CMD55,                       -- Send CMD55 to the SD card. 
+      SEND_CMD55,                       -- Send CMD55 to the SD card.
       SEND_CMD41,                       -- Send CMD41 to the SD card.
-      CHK_ACMD41_RESPONSE,  -- Check if the SD card has left the IDLE state.     
+      CHK_ACMD41_RESPONSE,  -- Check if the SD card has left the IDLE state.
       WAIT_FOR_HOST_RW,  -- Wait for the host to issue a read or write command.
       RD_BLK,    -- Read a block of data from the SD card.
       WR_BLK,    -- Write a block of data to the SD card.
@@ -285,14 +284,14 @@ begin
     variable getCmdResponse_v : boolean;  -- When true, get R1 response to command sent to SD card.
     variable rtnData_v        : boolean;  -- When true, signal to host when a data byte arrives from SD card.
     variable doDeselect_v     : boolean;  -- When true, de-select SD card after a command is issued.
-    
+
   begin
     if rising_edge(clk_i) then
 
-      if reset_i = YES then             -- Perform a reset.
+      if reset_i = '1' then             -- Perform a reset.
         state_v          := START_INIT;  -- Send the FSM to the initialization entry-point.
         sclkPhaseTimer_v := 0;  -- Don't delay the initialization right after reset.
-        busy_o           <= YES;  -- Busy while the SD card interface is being initialized.
+        busy_o           <= '1';  -- Busy while the SD card interface is being initialized.
 
       elsif sclkPhaseTimer_v /= 0 then
         -- Setting the clock phase timer to a non-zero value delays any further actions
@@ -309,60 +308,60 @@ begin
         --   4: Host sees controller lower its handshake and removes its handshake.
         --
         -- Handshaking is bypassed when the controller FSM is initializing the SD card.
-        
-      elsif state_v /= START_INIT and hndShk_r = HI and hndShk_i = LO then
+
+      elsif state_v /= START_INIT and hndShk_r = '1' and hndShk_i = '0' then
         null;            -- Waiting for the host to acknowledge handshake.
-      elsif state_v /= START_INIT and hndShk_r = HI and hndShk_i = HI then
+      elsif state_v /= START_INIT and hndShk_r = '1' and hndShk_i = '1' then
         txData_v := data_i;             -- Get any data passed from the host.
-        hndShk_r <= LO;  -- The host acknowledged, so lower the controller handshake.
-      elsif state_v /= START_INIT and hndShk_r = LO and hndShk_i = HI then
+        hndShk_r <= '0';  -- The host acknowledged, so lower the controller handshake.
+      elsif state_v /= START_INIT and hndShk_r = '0' and hndShk_i = '1' then
         null;            -- Waiting for the host to lower its handshake.
-      elsif (state_v = START_INIT) or (hndShk_r = LO and hndShk_i = LO) then
+      elsif (state_v = START_INIT) or (hndShk_r = '0' and hndShk_i = '0') then
         -- Both handshakes are low, so the controller operations can proceed.
-        
-        busy_o <= YES;  -- Busy by default. Only false when waiting for R/W from host or stalled by error.
+
+        busy_o <= '1';  -- Busy by default. Only false when waiting for R/W from host or stalled by error.
 
         case state_v is
-          
+
           when START_INIT =>  -- Deselect the SD card and send it a bunch of clock pulses with MOSI high.
-            error_o          <= (others => ZERO);  -- Clear error flags.
+            error_o          <= (others => '0');  -- Clear error flags.
             clkDivider_v     := INIT_SCLK_PHASE_PERIOD_C - 1;  -- Use slow SPI clock freq during init.
             sclkPhaseTimer_v := INIT_SCLK_PHASE_PERIOD_C - 1;  -- and set the duration of the next clock phase.
-            sclk_r           <= LO;     -- Start with low clock to the SD card.
-            hndShk_r         <= LO;     -- Initialize handshake signal.
-            addr_v           := (others => ZERO);  -- Initialize address.
+            sclk_r           <= '0';     -- Start with low clock to the SD card.
+            hndShk_r         <= '0';     -- Initialize handshake signal.
+            addr_v           := (others => '0');  -- Initialize address.
             rtnData_v        := false;  -- No data is returned to host during initialization.
             bitCnt_v         := NUM_INIT_CLKS_C;  -- Generate this many clock pulses.
             state_v          := DESELECT;  -- De-select the SD card and pulse SCLK.
             rtnState_v       := SEND_CMD0;  -- Then go to this state after the clock pulses are done.
-            
+
           when SEND_CMD0 =>             -- Put the SD card in the IDLE state.
-            cs_bo            <= LO;     -- Enable the SD card.
+            cs_bo            <= '0';     -- Enable the SD card.
             txCmd_v          := CMD0_C & x"00000000" & x"95";  -- 0x95 is the correct CRC for this command.
             bitCnt_v         := txCmd_v'length;  -- Set bit counter to the size of the command.
             getCmdResponse_v := true;  -- Sending a command that generates a response.
             doDeselect_v     := true;  -- De-select SD card after this command finishes.
             state_v          := START_TX;  -- Go to FSM subroutine to send the command.
             rtnState_v       := CHK_CMD0_RESPONSE;  -- Then check the response to the command.
-            
+
           when CHK_CMD0_RESPONSE =>  -- Check card's R1 response to the CMD0.
             if rx_v = IDLE_NO_ERRORS_C then
               state_v := SEND_CMD8;  -- Continue init if SD card is in IDLE state with no errors
             else
               state_v := SEND_CMD0;     -- Otherwise, try CMD0 again.
             end if;
-            
+
           when SEND_CMD8 =>  -- This command is needed to initialize SDHC cards.
-            cs_bo            <= LO;     -- Enable the SD card.
+            cs_bo            <= '0';     -- Enable the SD card.
             txCmd_v          := CMD8_C & x"000001aa" & x"87";  -- 0x87 is the correct CRC for this command.
             bitCnt_v         := txCmd_v'length;  -- Set bit counter to the size of the command.
             getCmdResponse_v := true;  -- Sending a command that generates a response.
             doDeselect_v     := false;  -- Don't de-select, need to get the R7 response sent from the SD card.
             state_v          := START_TX;  -- Go to FSM subroutine to send the command.
             rtnState_v       := GET_CMD8_RESPONSE;  -- Then go to this state after the command is sent.
-            
+
           when GET_CMD8_RESPONSE =>     -- Get the R7 response to CMD8.
-            cs_bo            <= LO;  -- The SD card should already be enabled, but let's be explicit.
+            cs_bo            <= '0';  -- The SD card should already be enabled, but let's be explicit.
             bitCnt_v         := 31;     -- Four bytes (32 bits) in R7 response.
             getCmdResponse_v := false;  -- Not sending a command that generates a response.
             doDeselect_v     := true;  -- De-select card to end the command after getting the four bytes.
@@ -370,42 +369,42 @@ begin
             rtnState_v       := SEND_CMD55;  -- Then go here (we don't care what the actual R7 response is).
 
           when SEND_CMD55 =>  -- Send CMD55 as preamble of ACMD41 initialization command.
-            cs_bo            <= LO;     -- Enable the SD card.
+            cs_bo            <= '0';     -- Enable the SD card.
             txCmd_v          := CMD55_C & x"00000000" & FAKE_CRC_C;
             bitCnt_v         := txCmd_v'length;  -- Set bit counter to the size of the command.
             getCmdResponse_v := true;  -- Sending a command that generates a response.
             doDeselect_v     := true;  -- De-select SD card after this command finishes.
             state_v          := START_TX;  -- Go to FSM subroutine to send the command.
             rtnState_v       := SEND_CMD41;  -- Then go to this state after the command is sent.
-            
+
           when SEND_CMD41 =>  -- Send the SD card the initialization command.
-            cs_bo            <= LO;     -- Enable the SD card.
+            cs_bo            <= '0';     -- Enable the SD card.
             txCmd_v          := CMD41_C & x"40000000" & FAKE_CRC_C;
             bitCnt_v         := txCmd_v'length;  -- Set bit counter to the size of the command.
             getCmdResponse_v := true;  -- Sending a command that generates a response.
             doDeselect_v     := true;  -- De-select SD card after this command finishes.
             state_v          := START_TX;  -- Go to FSM subroutine to send the command.
             rtnState_v       := CHK_ACMD41_RESPONSE;  -- Then check the response to the command.
-            
+
           when CHK_ACMD41_RESPONSE =>
             -- The CMD55, CMD41 sequence should cause the SD card to leave the IDLE state
             -- and become ready for SPI read/write operations. If still IDLE, then repeat the CMD55, CMD41 sequence.
             -- If one of the R1 error flags is set, then report the error and stall.
             if rx_v = ACTIVE_NO_ERRORS_C then   -- Not IDLE, no errors.
               state_v := WAIT_FOR_HOST_RW;  -- Start processing R/W commands from the host.
-            elsif rx_v = IDLE_NO_ERRORS_C then  -- Still IDLE but no errors. 
+            elsif rx_v = IDLE_NO_ERRORS_C then  -- Still IDLE but no errors.
               state_v := SEND_CMD55;    -- Repeat the CMD55, CMD41 sequence.
             else                        -- Some error occurred.
               state_v := REPORT_ERROR;  -- Report the error and stall.
             end if;
-            
+
           when WAIT_FOR_HOST_RW =>  -- Wait for the host to read or write a block of data from the SD card.
             clkDivider_v     := SCLK_PHASE_PERIOD_C - 1;  -- Set SPI clock frequency for normal operation.
             getCmdResponse_v := true;  -- Get R1 response to any commands issued to the SD card.
-            if rd_i = YES then  -- send READ command and address to the SD card.
-              cs_bo <= LO;              -- Enable the SD card.
-              if continue_i = YES then  -- Multi-block read. Use stored address.
-                if CARD_TYPE_G = SD_CARD_E then  -- SD cards use byte-addressing, 
+            if rd_i = '1' then  -- send READ command and address to the SD card.
+              cs_bo <= '0';              -- Enable the SD card.
+              if continue_i = '1' then  -- Multi-block read. Use stored address.
+                if CARD_TYPE_G = SD_CARD_E then  -- SD cards use byte-addressing,
                   addr_v := addr_v + BLOCK_SIZE_G;  -- so add block-size to get next block address.
                 else                    -- SDHC cards use block-addressing,
                   addr_v := addr_v + 1;  -- so just increment current block address.
@@ -419,10 +418,10 @@ begin
               byteCnt_v  := RD_BLK_SZ_C;
               state_v    := START_TX;  -- Go to FSM subroutine to send the command.
               rtnState_v := RD_BLK;  -- Then go to this state to read the data block.
-            elsif wr_i = YES then  -- send WRITE command and address to the SD card.
-              cs_bo <= LO;              -- Enable the SD card.
-              if continue_i = YES then  -- Multi-block write. Use stored address.
-                if CARD_TYPE_G = SD_CARD_E then  -- SD cards use byte-addressing, 
+            elsif wr_i = '1' then  -- send WRITE command and address to the SD card.
+              cs_bo <= '0';              -- Enable the SD card.
+              if continue_i = '1' then  -- Multi-block write. Use stored address.
+                if CARD_TYPE_G = SD_CARD_E then  -- SD cards use byte-addressing,
                   addr_v := addr_v + BLOCK_SIZE_G;  -- so add block-size to get next block address.
                 else                    -- SDHC cards use block-addressing,
                   addr_v := addr_v + 1;  -- so just increment current block address.
@@ -437,8 +436,8 @@ begin
               state_v    := START_TX;  -- Go to this FSM subroutine to send the command ...
               rtnState_v := WR_BLK;  -- then go to this state to write the data block.
             else              -- Do nothing and wait for command from host.
-              cs_bo   <= HI;            -- Deselect the SD card.
-              busy_o  <= NO;  -- SD card interface is waiting for R/W from host, so it's not busy.
+              cs_bo   <= '1';            -- Deselect the SD card.
+              busy_o  <= '0';  -- SD card interface is waiting for R/W from host, so it's not busy.
               state_v := WAIT_FOR_HOST_RW;  -- Keep waiting for command from host.
             end if;
 
@@ -467,12 +466,12 @@ begin
             elsif byteCnt_v = 1 then    -- Receive the 2nd
               byteCnt_v := byteCnt_v - 1;
             else    -- Reading is done, so deselect the SD card.
-              sclk_r     <= LO;
+              sclk_r     <= '0';
               bitCnt_v   := 2;
               state_v    := DESELECT;
               rtnState_v := WAIT_FOR_HOST_RW;
             end if;
-            
+
           when WR_BLK =>             -- Write a block of data to the SD card.
             -- Some default values for these...
             getCmdResponse_v := false;  -- Sending data bytes so there's no command response from SD card.
@@ -484,7 +483,7 @@ begin
             elsif byteCnt_v = WR_BLK_SZ_C - 1 then     -- Send start token.
               txData_v := START_TOKEN_C;   -- Starting token for data block.
             elsif byteCnt_v >= 4 then   -- Now send bytes in the data block.
-              hndShk_r <= HI;           -- Signal host to provide data.
+              hndShk_r <= '1';           -- Signal host to provide data.
             -- The transmit shift register is loaded with data from host in the handshaking section above.
             elsif byteCnt_v = 3 or byteCnt_v = 2 then  -- Send two phony CRC bytes at end of packet.
               txData_v := FAKE_CRC_C;
@@ -501,36 +500,36 @@ begin
               end if;
             end if;
             byteCnt_v := byteCnt_v - 1;
-            
+
           when WR_WAIT =>  -- Wait for SD card to finish writing the data block.
             -- The SD card will pull MISO low while it is busy, and raise it when it is done.
             sclk_r           <= not sclk_r;    -- Toggle the SPI clock...
             sclkPhaseTimer_v := clkDivider_v;  -- and set the duration of the next clock phase.
-            if sclk_r = HI and miso_i = HI then  -- Data block has been written, so deselect the SD card.
+            if sclk_r = '1' and miso_i = '1' then  -- Data block has been written, so deselect the SD card.
               bitCnt_v   := 2;
               state_v    := DESELECT;
               rtnState_v := WAIT_FOR_HOST_RW;
             end if;
-            
+
           when START_TX =>
             -- Start sending command/data by lowering SCLK and outputing MSB of command/data
             -- so it has plenty of setup before the rising edge of SCLK.
-            sclk_r           <= LO;  -- Lower the SCLK (although it should already be low).
+            sclk_r           <= '0';  -- Lower the SCLK (although it should already be low).
             sclkPhaseTimer_v := clkDivider_v;  -- Set the duration of the low SCLK.
             mosi_o           <= tx_v(tx_v'high);  -- Output MSB of command/data.
-            tx_v             := tx_v(tx_v'high-1 downto 0) & ONE;  -- Shift command/data register by one bit.
+            tx_v             := tx_v(tx_v'high-1 downto 0) & '1';  -- Shift command/data register by one bit.
             bitCnt_v         := bitCnt_v - 1;  -- The first bit has been sent, so decrement bit counter.
             state_v          := TX_BITS;  -- Go here to shift out the rest of the command/data bits.
-            
+
           when TX_BITS =>  -- Shift out remaining command/data bits and (possibly) get response from SD card.
             sclk_r           <= not sclk_r;    -- Toggle the SPI clock...
             sclkPhaseTimer_v := clkDivider_v;  -- and set the duration of the next clock phase.
-            if sclk_r = HI then
+            if sclk_r = '1' then
               -- SCLK is going to be flipped from high to low, so output the next command/data bit
               -- so it can setup while SCLK is low.
               if bitCnt_v /= 0 then  -- Keep sending bits until the bit counter hits zero.
                 mosi_o   <= tx_v(tx_v'high);
-                tx_v     := tx_v(tx_v'high-1 downto 0) & ONE;
+                tx_v     := tx_v(tx_v'high-1 downto 0) & '1';
                 bitCnt_v := bitCnt_v - 1;
               else
                 if getCmdResponse_v then
@@ -544,7 +543,7 @@ begin
             end if;
 
           when GET_CMD_RESPONSE =>  -- Get the response of the SD card to a command.
-            if sclk_r = HI and miso_i = LO then  -- MISO will be held high by SD card until 1st bit of R1 response, which is 0.
+            if sclk_r = '1' and miso_i = '0' then  -- MISO will be held high by SD card until 1st bit of R1 response, which is 0.
               -- Shift in the MSB bit of the response.
               rx_v     := rx_v(rx_v'high-1 downto 0) & miso_i;
               bitCnt_v := bitCnt_v - 1;
@@ -554,14 +553,14 @@ begin
             sclkPhaseTimer_v := clkDivider_v;  -- and set the duration of the next clock phase.
 
           when RX_BITS =>               -- Receive bits from the SD card.
-            if sclk_r = HI then    -- Bits enter after the rising edge of SCLK.
+            if sclk_r = '1' then    -- Bits enter after the rising edge of SCLK.
               rx_v := rx_v(rx_v'high-1 downto 0) & miso_i;
               if bitCnt_v /= 0 then     -- More bits left to receive.
                 bitCnt_v := bitCnt_v - 1;
               else                      -- Last bit has been received.
                 if rtnData_v then       -- Send the received data to the host.
                   data_o   <= rx_v;     -- Output received data to the host.
-                  hndShk_r <= HI;  -- Signal to the host that the data is ready.
+                  hndShk_r <= '1';  -- Signal to the host that the data is ready.
                 end if;
                 if doDeselect_v then
                   bitCnt_v := 1;
@@ -573,17 +572,17 @@ begin
             end if;
             sclk_r           <= not sclk_r;    -- Toggle the SPI clock...
             sclkPhaseTimer_v := clkDivider_v;  -- and set the duration of the next clock phase.
-            
+
           when DESELECT =>  -- De-select the SD card and send some clock pulses (Must enter with sclk at zero.)
             doDeselect_v     := false;  -- Once the de-select is done, clear the flag that caused it.
-            cs_bo            <= HI;     -- De-select the SD card.
-            mosi_o           <= HI;  -- Keep the data input of the SD card pulled high.
+            cs_bo            <= '1';     -- De-select the SD card.
+            mosi_o           <= '1';  -- Keep the data input of the SD card pulled high.
             state_v          := PULSE_SCLK;  -- Pulse the clock so the SD card will see the de-select.
-            sclk_r           <= LO;  -- Clock is set low so the next rising edge will see the new CS and MOSI
+            sclk_r           <= '0';  -- Clock is set low so the next rising edge will see the new CS and MOSI
             sclkPhaseTimer_v := clkDivider_v;  -- Set the duration of the next clock phase.
-            
+
           when PULSE_SCLK =>  -- Issue some clock pulses. (Must enter with sclk at zero.)
-            if sclk_r = HI then
+            if sclk_r = '1' then
               if bitCnt_v /= 0 then
                 bitCnt_v := bitCnt_v - 1;
               else  -- Return to the calling routine when the pulse counter reaches zero.
@@ -592,10 +591,10 @@ begin
             end if;
             sclk_r           <= not sclk_r;    -- Toggle the SPI clock...
             sclkPhaseTimer_v := clkDivider_v;  -- and set the duration of the next clock phase.
-            
+
           when REPORT_ERROR =>  -- Report the error code and stall here until a reset occurs.
             error_o(rx_v'range) <= rx_v;  -- Output the SD card response as the error code.
-            busy_o              <= NO;  -- Not busy.
+            busy_o              <= '0';  -- Not busy.
 
           when others =>
             state_v := START_INIT;
@@ -606,7 +605,7 @@ begin
 
   sclk_o   <= sclk_r;    -- Output the generated SPI clock for the SD card.
   hndShk_o <= hndShk_r;  -- Output the generated handshake to the host.
-  
+
 end architecture;
 
 
@@ -617,140 +616,140 @@ end architecture;
 -- interface so the controller can be tested from a PC over a USB link.
 --**********************************************************************
 
-library IEEE, XESS;
-use IEEE.std_logic_1164.all;
-use IEEE.numeric_std.all;
-use IEEE.math_real.all;
-use XESS.CommonPckg.all;
-use XESS.ClkGenPckg.all;
-use XESS.HostIoPckg.all;
-use XESS.SdCardPckg.all;
-use XESS.SyncToClockPckg.all;
-use work.XessBoardPckg.all;
+-- library IEEE, XESS;
+-- use IEEE.std_logic_1164.all;
+-- use IEEE.numeric_std.all;
+-- use IEEE.math_real.all;
+-- use XESS.CommonPckg.all;
+-- use XESS.ClkGenPckg.all;
+-- use XESS.HostIoPckg.all;
+-- use XESS.SdCardPckg.all;
+-- use XESS.SyncToClockPckg.all;
+-- use work.XessBoardPckg.all;
 
-entity SdCardCtrlTest is
-  generic (
-    BASE_FREQ_G : real    := 12.0;
-    CLK_MUL_G   : natural := 25;
-    CLK_DIV_G   : natural := 3
-    );
-  port (
-    fpgaClk_i     : in  std_logic;
-    flashCs_bo    : out std_logic;
-    usdflashCs_bo : out std_logic;
-    sclk_o        : out std_logic;
-    miso_i        : in  std_logic;
-    mosi_o        : out std_logic
-    );
-end entity;
+-- entity SdCardCtrlTest is
+--   generic (
+--     BASE_FREQ_G : real    := 12.0;
+--     CLK_MUL_G   : natural := 25;
+--     CLK_DIV_G   : natural := 3
+--     );
+--   port (
+--     fpgaClk_i     : in  std_logic;
+--     flashCs_bo    : out std_logic;
+--     usdflashCs_bo : out std_logic;
+--     sclk_o        : out std_logic;
+--     miso_i        : in  std_logic;
+--     mosi_o        : out std_logic
+--     );
+-- end entity;
 
-architecture arch of SdCardCtrlTest is
-  signal clk_s           : std_logic;
-  signal rd_is           : std_logic;
-  signal wr_is           : std_logic;
-  signal rdFromPc_s      : std_logic;
-  signal wrFromPc_s      : std_logic;
-  signal continue_is     : std_logic;
-  signal addr_is         : std_logic_vector(31 downto 0);
-  signal data_is         : std_logic_vector(7 downto 0);
-  signal hndShkFromPc_s  : std_logic;
-  signal hndShk_is       : std_logic;
-  signal reset_is        : std_logic;
-  signal vectorToDut_s   : std_logic_vector(44 downto 0);
-  signal data_os         : std_logic_vector(7 downto 0);
-  signal busy_os         : std_logic;
-  signal hndShk_os       : std_logic;
-  signal error_os        : std_logic_vector(15 downto 0);
-  signal vectorFromDut_s : std_logic_vector(25 downto 0);
-begin
+-- architecture arch of SdCardCtrlTest is
+--   signal clk_s           : std_logic;
+--   signal rd_is           : std_logic;
+--   signal wr_is           : std_logic;
+--   signal rdFromPc_s      : std_logic;
+--   signal wrFromPc_s      : std_logic;
+--   signal continue_is     : std_logic;
+--   signal addr_is         : std_logic_vector(31 downto 0);
+--   signal data_is         : std_logic_vector(7 downto 0);
+--   signal hndShkFromPc_s  : std_logic;
+--   signal hndShk_is       : std_logic;
+--   signal reset_is        : std_logic;
+--   signal vectorToDut_s   : std_logic_vector(44 downto 0);
+--   signal data_os         : std_logic_vector(7 downto 0);
+--   signal busy_os         : std_logic;
+--   signal hndShk_os       : std_logic;
+--   signal error_os        : std_logic_vector(15 downto 0);
+--   signal vectorFromDut_s : std_logic_vector(25 downto 0);
+-- begin
 
-  --**********************************************************************
-  --**********************************************************************
-  -- Keep the serial configuration flash turned off on the XuLA2.
-  -- There is no serial configuration flash-enable on the XuLA, so set
-  -- this output at high impedance to keep it from affecting anything.
-  flashCs_bo <= HI when XESS_BOARD_C = XuLA2_E else
-                HIZ when XESS_BOARD_C = XuLA_E else
-                HIZ;
+--   --**********************************************************************
+--   --**********************************************************************
+--   -- Keep the serial configuration flash turned off on the XuLA2.
+--   -- There is no serial configuration flash-enable on the XuLA, so set
+--   -- this output at high impedance to keep it from affecting anything.
+--   flashCs_bo <= '1' when XESS_BOARD_C = XuLA2_E else
+--                 'Z' when XESS_BOARD_C = XuLA_E else
+--                 'Z';
 
-  --**********************************************************************
-  -- Generate a higher frequency clock.
-  --**********************************************************************
-  u0 : ClkGen
-    generic map (BASE_FREQ_G => BASE_FREQ_G, CLK_MUL_G => CLK_MUL_G, CLK_DIV_G => CLK_DIV_G)
-    port map(I               => fpgaClk_i, O => clk_s);
+--   --**********************************************************************
+--   -- Generate a higher frequency clock.
+--   --**********************************************************************
+--   u0 : ClkGen
+--     generic map (BASE_FREQ_G => BASE_FREQ_G, CLK_MUL_G => CLK_MUL_G, CLK_DIV_G => CLK_DIV_G)
+--     port map(I               => fpgaClk_i, O => clk_s);
 
-  --**********************************************************************
-  -- Interface a PC to the DUT which is the SD card controller.
-  --**********************************************************************
-  u1 : HostIoToDut
-    generic map(
-      FPGA_DEVICE_G => FPGA_FAMILY_C,
-      SIMPLE_G      => true
-      )
-    port map(
-      vectorToDut_o   => vectorToDut_s,
-      vectorFromDut_i => vectorFromDut_s
-      );
-  rdFromPc_s      <= vectorToDut_s(0);
-  wrFromPc_s      <= vectorToDut_s(1);
-  continue_is     <= vectorToDut_s(2);
-  addr_is         <= vectorToDut_s(34 downto 3);
-  data_is         <= vectorToDut_s(42 downto 35);
-  hndShkFromPc_s  <= vectorToDut_s(43);
-  reset_is        <= vectorToDut_s(44);
-  vectorFromDut_s <= error_os & hndShk_os & busy_os & data_os;
+--   --**********************************************************************
+--   -- Interface a PC to the DUT which is the SD card controller.
+--   --**********************************************************************
+--   u1 : HostIoToDut
+--     generic map(
+--       FPGA_DEVICE_G => FPGA_FAMILY_C,
+--       SIMPLE_G      => true
+--       )
+--     port map(
+--       vectorToDut_o   => vectorToDut_s,
+--       vectorFromDut_i => vectorFromDut_s
+--       );
+--   rdFromPc_s      <= vectorToDut_s(0);
+--   wrFromPc_s      <= vectorToDut_s(1);
+--   continue_is     <= vectorToDut_s(2);
+--   addr_is         <= vectorToDut_s(34 downto 3);
+--   data_is         <= vectorToDut_s(42 downto 35);
+--   hndShkFromPc_s  <= vectorToDut_s(43);
+--   reset_is        <= vectorToDut_s(44);
+--   vectorFromDut_s <= error_os & hndShk_os & busy_os & data_os;
 
-  --**********************************************************************
-  -- Synchronize some control signals from the HostIoToDut to the SD card controller.
-  --**********************************************************************
-  u2a : SyncToClock
-    port map(
-      clk_i      => clk_s,
-      unsynced_i => hndShkFromPc_s,
-      synced_o   => hndShk_is
-      );
+--   --**********************************************************************
+--   -- Synchronize some control signals from the HostIoToDut to the SD card controller.
+--   --**********************************************************************
+--   u2a : SyncToClock
+--     port map(
+--       clk_i      => clk_s,
+--       unsynced_i => hndShkFromPc_s,
+--       synced_o   => hndShk_is
+--       );
 
-  u2b : SyncToClock
-    port map(
-      clk_i      => clk_s,
-      unsynced_i => rdFromPc_s,
-      synced_o   => rd_is
-      );
+--   u2b : SyncToClock
+--     port map(
+--       clk_i      => clk_s,
+--       unsynced_i => rdFromPc_s,
+--       synced_o   => rd_is
+--       );
 
-  u2c : SyncToClock
-    port map(
-      clk_i      => clk_s,
-      unsynced_i => wrFromPc_s,
-      synced_o   => wr_is
-      );
+--   u2c : SyncToClock
+--     port map(
+--       clk_i      => clk_s,
+--       unsynced_i => wrFromPc_s,
+--       synced_o   => wr_is
+--       );
 
-  --**********************************************************************
-  -- SD card controller module.
-  --**********************************************************************
-  u3 : SdCardCtrl
-    generic map (
-      FREQ_G => BASE_FREQ_G * real(CLK_MUL_G) / real(CLK_DIV_G)
-      )
-    port map (
-      clk_i      => clk_s,
-      -- Host interface.
-      reset_i    => reset_is,
-      rd_i       => rd_is,
-      wr_i       => wr_is,
-      continue_i => continue_is,
-      addr_i     => addr_is,
-      data_i     => data_is,
-      data_o     => data_os,
-      busy_o     => busy_os,
-      hndShk_i   => hndShk_is,
-      hndShk_o   => hndShk_os,
-      error_o    => error_os,
-      -- I/O signals to the external SD card.
-      cs_bo      => usdflashCs_bo,
-      sclk_o     => sclk_o,
-      mosi_o     => mosi_o,
-      miso_i     => miso_i
-      );
+--   --**********************************************************************
+--   -- SD card controller module.
+--   --**********************************************************************
+--   u3 : SdCardCtrl
+--     generic map (
+--       FREQ_G => BASE_FREQ_G * real(CLK_MUL_G) / real(CLK_DIV_G)
+--       )
+--     port map (
+--       clk_i      => clk_s,
+--       -- Host interface.
+--       reset_i    => reset_is,
+--       rd_i       => rd_is,
+--       wr_i       => wr_is,
+--       continue_i => continue_is,
+--       addr_i     => addr_is,
+--       data_i     => data_is,
+--       data_o     => data_os,
+--       busy_o     => busy_os,
+--       hndShk_i   => hndShk_is,
+--       hndShk_o   => hndShk_os,
+--       error_o    => error_os,
+--       -- I/O signals to the external SD card.
+--       cs_bo      => usdflashCs_bo,
+--       sclk_o     => sclk_o,
+--       mosi_o     => mosi_o,
+--       miso_i     => miso_i
+--       );
 
-end architecture;
+-- end architecture;
