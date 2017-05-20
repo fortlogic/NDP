@@ -54,6 +54,20 @@ builtinButtonNets = Constraints {
   netConstraints = [ ("button(0)", [ NetLoc "N14", NetKV "IOSTANDARD" "LVTTL" ])]
   }
 
+sdCardSpiNets = Constraints {
+  rawConstraints = [],
+  netConstraints = [
+      ("sd_cs", [ NetLoc "A2", NetKV "IOSTANDARD" "SDIO", NetKV "SLEW" "FAST",
+                  NetKV "DRIVE" "8", NetFlag "PULLUP" ]),
+      ("sd_miso", [ NetLoc "B4", NetKV "IOSTANDARD" "SDIO", NetKV "SLEW" "FAST",
+                    NetKV "DRIVE" "8", NetFlag "PULLUP" ]),
+      ("sd_mosi", [ NetLoc "B3", NetKV "IOSTANDARD" "SDIO", NetKV "SLEW" "FAST",
+                    NetKV "DRIVE" "8", NetFlag "PULLUP" ]),
+      ("sd_clk", [ NetLoc "A3", NetKV "IOSTANDARD" "SDIO", NetKV "SLEW" "FAST",
+                    NetKV "DRIVE" "8" ])
+      ]
+  }
+
 tmdsNets = Constraints {
   rawConstraints = [],
   netConstraints = [
