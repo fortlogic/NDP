@@ -40,10 +40,13 @@ xflowRules = do
           clockFile <- (getConf "clock" entityConstraints) :: Maybe String
           return $ clockDir </> clockFile -<.> "vhdl"
 
+    -- fetch the global vhdl files
+    (Just globalVhdlD) <- getConfig "GLOBAL_VHDL"
+    globalVhdlFs <- getDirectoryFiles "" [globalVhdlD </> "*" <.> "vhdl"]
 
     (Just vmPrefix) <- getConfig "VM_ROOT"
 
-    let vhdlFs = customVhdlFs ++ clashVhdlFs ++ maybeToList maybeClockVhdl
+    let vhdlFs = customVhdlFs ++ clashVhdlFs ++ maybeToList maybeClockVhdl ++ globalVhdlFs
 
     writeFileLines prjF ["vhdl \"" ++ (vmPrefix </> vhdlF) ++ "\"" | vhdlF <- vhdlFs]
 

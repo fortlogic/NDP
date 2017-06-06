@@ -14,11 +14,11 @@ import CLaSH.Signal.Explicit
                   "led_sd_green",
                   "led_sd_red",
                   "led_usb_red"],
-     t_extraIn = [("clk_in", 1),
+     t_extraIn = [("clk_vec_in", 1),
                   ("button", 1)],
      t_clocks = [ ClockSource {
        c_name = "dumb_clock",
-       c_inp = [("raw_clk", "clk_in(0)")],
+       c_inp = [("raw_clk", "clk_vec_in(0)")],
        c_outp = [("main_clk", show (sclock :: SClock SystemClock))],
        c_reset = Just ("reset", "not button(0)"),
        c_lock = "stable",

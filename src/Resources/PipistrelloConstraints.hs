@@ -1,11 +1,11 @@
 requiredConstraints = Constraints {
   rawConstraints = [
       "CONFIG VCCAUX = \"3.3\"",
-      "TIMESPEC \"TS_clk_in\" = PERIOD \"clk_in(0)\" 20000 ps INPUT_JITTER 200 ps"
+      "TIMESPEC \"TS_clk_in\" = PERIOD \"clk_vec_in(0)\" 20000 ps INPUT_JITTER 200 ps"
       ],
   netConstraints = [
-      ("clk_in(0)", [NetLoc "H17", NetKV "IOSTANDARD" "LVTTL"]),
-      ("clk_in(0)", [NetKV "TNM_NET" "\"clk_in(0)\""])
+      ("clk_vec_in(0)", [NetLoc "H17", NetKV "IOSTANDARD" "LVTTL"]),
+      ("clk_vec_in(0)", [NetKV "TNM_NET" "\"clk_in(0)\""])
       ]
   }
 
@@ -57,13 +57,13 @@ builtinButtonNets = Constraints {
 sdCardSpiNets = Constraints {
   rawConstraints = [],
   netConstraints = [
-      ("sd_cs", [ NetLoc "A2", NetKV "IOSTANDARD" "SDIO", NetKV "SLEW" "FAST",
+      ("sd_cs(0)", [ NetLoc "A2", NetKV "IOSTANDARD" "SDIO", NetKV "SLEW" "FAST",
                   NetKV "DRIVE" "8", NetFlag "PULLUP" ]),
-      ("sd_miso", [ NetLoc "B4", NetKV "IOSTANDARD" "SDIO", NetKV "SLEW" "FAST",
+      ("sd_miso(0)", [ NetLoc "B4", NetKV "IOSTANDARD" "SDIO", NetKV "SLEW" "FAST",
                     NetKV "DRIVE" "8", NetFlag "PULLUP" ]),
-      ("sd_mosi", [ NetLoc "B3", NetKV "IOSTANDARD" "SDIO", NetKV "SLEW" "FAST",
+      ("sd_mosi(0)", [ NetLoc "B3", NetKV "IOSTANDARD" "SDIO", NetKV "SLEW" "FAST",
                     NetKV "DRIVE" "8", NetFlag "PULLUP" ]),
-      ("sd_clk", [ NetLoc "A3", NetKV "IOSTANDARD" "SDIO", NetKV "SLEW" "FAST",
+      ("sd_clk(0)", [ NetLoc "A3", NetKV "IOSTANDARD" "SDIO", NetKV "SLEW" "FAST",
                     NetKV "DRIVE" "8" ])
       ]
   }
