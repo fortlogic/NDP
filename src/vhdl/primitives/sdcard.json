@@ -35,6 +35,9 @@
   signal ~GENSYM[handshake_in][104] : std_logic_vector(0 downto 0);
   signal ~GENSYM[miso_in][105]      : std_logic_vector(0 downto 0);
 
+  -- local vars, er... signals
+  signal ~GENSYM[should_reset][200] : std_logic;
+
   -- output signals
   signal ~GENSYM[data_out][1]            : std_logic_vector(7 downto 0);
   signal ~GENSYM[busy_out][2]            : std_logic_vector(0 downto 0);
@@ -52,18 +55,20 @@ begin
   ~SYM[104] <= ~ARG[11];
   ~SYM[105] <= ~ARG[12];
 
+  ~SYM[200] <= (NOT ~RSTO) AND reset_in(0);
+
    ~GENSYM[SDController][1000]_inst : SdCardCtrl
      generic map (
        FREQ_G          => real(~LIT[1]) / real(100.0),
        INIT_SPI_FREQ_G => real(~LIT[2]) / real(100.0),
        SPI_FREQ_G      => real(~LIT[3]) / real(100.0),
        BLOCK_SIZE_G    => ~LIT[4],
-       CARD_TYPE_G     => SDHC_CARD_E
+       CARD_TYPE_G     => SD_CARD_E
        )
      port map (
        clk_i      => ~CLKO,
        -- Host interface.
-       reset_i    => ~SYM[100](0),
+       reset_i    => ~SYM[200],
        rd_i       => ~SYM[101](0),
        wr_i       => ~SYM[102](0),
        continue_i => ~SYM[103](0),

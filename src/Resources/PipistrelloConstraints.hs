@@ -5,7 +5,7 @@ requiredConstraints = Constraints {
       ],
   netConstraints = [
       ("clk_vec_in(0)", [NetLoc "H17", NetKV "IOSTANDARD" "LVTTL"]),
-      ("clk_vec_in(0)", [NetKV "TNM_NET" "\"clk_in(0)\""])
+      ("clk_vec_in(0)", [NetKV "TNM_NET" "\"clk_vec_in(0)\""])
       ]
   }
 
@@ -58,11 +58,14 @@ sdCardSpiNets = Constraints {
   rawConstraints = [],
   netConstraints = [
       ("sd_cs(0)", [ NetLoc "A2", NetKV "IOSTANDARD" "SDIO", NetKV "SLEW" "FAST",
-                  NetKV "DRIVE" "8", NetFlag "PULLUP" ]),
+                  NetKV "DRIVE" "8" --, NetFlag "PULLUP"
+                   ]),
       ("sd_miso(0)", [ NetLoc "B4", NetKV "IOSTANDARD" "SDIO", NetKV "SLEW" "FAST",
-                    NetKV "DRIVE" "8", NetFlag "PULLUP" ]),
+                    NetKV "DRIVE" "8" --, NetFlag "PULLUP"
+                     ]),
       ("sd_mosi(0)", [ NetLoc "B3", NetKV "IOSTANDARD" "SDIO", NetKV "SLEW" "FAST",
-                    NetKV "DRIVE" "8", NetFlag "PULLUP" ]),
+                    NetKV "DRIVE" "8" --, NetFlag "PULLUP"
+                     ]),
       ("sd_clk(0)", [ NetLoc "A3", NetKV "IOSTANDARD" "SDIO", NetKV "SLEW" "FAST",
                     NetKV "DRIVE" "8" ])
       ]

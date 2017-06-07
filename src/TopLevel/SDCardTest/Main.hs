@@ -1,5 +1,6 @@
-{-# LANGUAGE TemplateHaskell #-}
 {-# LANGUAGE DataKinds #-}
+{-# LANGUAGE MagicHash #-}
+{-# LANGUAGE TemplateHaskell #-}
 module TopLevel.PureClashTest.Main where
 
 import CLaSH.Prelude
@@ -27,8 +28,8 @@ import NDP.IO.SDCard
      t_clocks = [ ClockSource {
        c_name = "dumb_clock",
        c_inp = [("raw_clk", "clk_vec_in(0)")],
-       c_outp = [("main_clk", show (sclock :: SClock SystemClock))],
-       c_reset = Just ("reset", "not button(0)"),
+       c_outp = [("main_clk", show (rawClk :: SClock RawClk))],
+       c_reset = Just ("reset", "button(0)"),
        c_lock = "stable",
        c_sync = False
      } ]
@@ -42,17 +43,17 @@ topEntity :: SignalRaw ( Bit -- SD: miso
                                      Bit, -- SD: chip select
                                      Bit, -- SD: mosi
                                      Bit) -- SD: clock
-topEntity miso = register' rawClk (high, low, high, low, high, 0, 0, 0) (bundle outputs)
+topEntity miso = register' rawClk (low, low, low, high, high, 0, 0, 0) (bundle outputs)
   where outputs = (pure low, -- lights
-                   pure high,
                    pure low,
-                   pure high,
+                   ready,
+                   err,
                    pure low,
                    sdCs, sdMosi, sdClk) -- sd card
-        (sdCs, sdMosi, sdClk) = unbundle $ tiedOffSD miso
+        (sdCs, sdMosi, sdClk, ready, err) = unbundle $ tiedOffSD miso
 
-tiedOffSD :: SignalRaw Bit -> SignalRaw (Bit, Bit, Bit)
-tiedOffSD miso = bundle (cs, spiClk, mosi)
+tiedOffSD :: SignalRaw Bit -> SignalRaw (Bit, Bit, Bit, Bit, Bit) -- cs, mosy, sdclk, ready, err
+tiedOffSD miso = bundle (cs, spiClk, mosi, ready, isErr)
   where reset = pure 0
         readReq = pure 0
         writeReq = pure 0
@@ -63,4 +64,9 @@ tiedOffSD miso = bundle (cs, spiClk, mosi)
         (d', busy, h', err, cs, spiClk, mosi) = unbundle sdOut
         sdOut = timedSD reset readReq writeReq k addr d h miso
         timedSD = sdController# rawClk SNat (SNat :: SNat 40) (SNat :: SNat 2500) (SNat :: SNat 512)
+        ready = flipBit <$> busy
+        isErr = (\ e -> if e == 0 then 0 else 1) <$> err
 
+flipBit :: Bit -> Bit
+flipBit 0 = 1
+flipBit 1 = 0

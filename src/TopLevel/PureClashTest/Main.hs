@@ -20,7 +20,7 @@ import CLaSH.Signal.Explicit
        c_name = "dumb_clock",
        c_inp = [("raw_clk", "clk_vec_in(0)")],
        c_outp = [("main_clk", show (sclock :: SClock SystemClock))],
-       c_reset = Just ("reset", "not button(0)"),
+       c_reset = Just ("reset", "button(0)"),
        c_lock = "stable",
        c_sync = False
      } ]
