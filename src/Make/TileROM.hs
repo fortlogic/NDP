@@ -17,7 +17,7 @@ import Make.PPM
 import Make.Utils
 
 tileROMRules = do
-  buildDir <- liftIO $ maybeConfigIO "BUILD_DIR" "build"
+  buildDir <- liftIO $ maybeConfigIO "BUILD" "build"
   (buildDir </> "ROM/tile/*.rom") %> \ rom -> do
     let mapName = takeBaseName rom
     tileMap <- fromJust <$> getConfig "TILE_MAP"

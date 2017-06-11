@@ -85,8 +85,8 @@ begin
          blank_en      => blank_bool,
          ctl_in        => ctls(i),
          px_in         => unsigned(colours(i)),
-         HDMI1000      => clk,
-         HDMI1000_rstn => '1',
+         HDMI4000      => clk,
+         HDMI4000_rstn => '1',
          tmds_out      => symbols(i));
    end generate tmds_gen;
 
