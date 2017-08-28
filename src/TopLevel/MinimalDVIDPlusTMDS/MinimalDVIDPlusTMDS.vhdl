@@ -2,7 +2,7 @@ library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 
 Entity MinimalDVIDPlusTMDS is
-    Port ( clk_in         : in  STD_LOGIC;
+    Port ( clk_vec_in         : in  STD_LOGIC_VECTOR(0 downto 0);
 
            tmds_p : out  STD_LOGIC_VECTOR(3 downto 0);
            tmds_n : out  STD_LOGIC_VECTOR(3 downto 0));
@@ -47,7 +47,11 @@ architecture Behavioral of MinimalDVIDPlusTMDS is
    signal hsync   : std_logic;
    signal vsync   : std_logic;
 
+   signal clk_in : std_logic;
+
 begin
+
+  clk_in <= clk_vec_in(0);
 
 ---------------------------------------
 -- Generate a 800x600 VGA test pattern

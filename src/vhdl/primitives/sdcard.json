@@ -1,0 +1,100 @@
+[
+  { "BlackBox" :
+      { "name" : "NDP.IO.SDCard.sdController#"
+      , "type" :
+"sdController# :: SClock (Clk clk speed) ->                    -- (arg 0)
+           SNat speed ->                                -- (arg 1)
+           SNat initSpeed ->                            -- (arg 2)
+           SNat spiSpeed ->                             -- (arg 3)
+           SNat blockSize ->                            -- (arg 4)
+           Signal' (Clk clk speed) Bool ->              -- (arg 5) reset in
+           Signal' (Clk clk speed) Bool ->              -- (arg 6) read request
+           Signal' (Clk clk speed) Bool ->              -- (arg 7) write request
+           Signal' (Clk clk speed) Bool ->              -- (arg 8) continue. next I/O byte
+           Signal' (Clk clk speed) (Unsigned 32) ->     -- (arg 9) block address
+           Signal' (Clk clk speed) (BitVector 8) ->     -- (arg 10) data to write
+           Signal' (Clk clk speed) Bool ->              -- (arg 11) handshake. high when host has data to give or has taken data
+           Signal' (Clk clk speed) Bit ->               -- (arg 12) SPI data in (miso)
+           Signal' (Clk clk speed) ((BitVector 8),  -- data to read
+                                    Bool,           -- controller is busy
+                                    Bool,           -- handshake. high when controller has data to give or has taken data
+                                    (BitVector 16), -- controller error.
+                                    Bool,           -- chip select
+                                    Bit,            -- spi clock
+                                    Bit)            -- spi data (mosi)"
+        , "templateD" :
+"-- SD Interface Begin
+~GENSYM[~COMPNAME_SD_Interface][0] : block
+  use work.SdCardPckg.all;
+
+  -- input coercions
+  signal ~GENSYM[reset_in][100]     : std_logic_vector(0 downto 0);
+  signal ~GENSYM[read_req_in][101]  : std_logic_vector(0 downto 0);
+  signal ~GENSYM[write_req_in][102] : std_logic_vector(0 downto 0);
+  signal ~GENSYM[continue_in][103]  : std_logic_vector(0 downto 0);
+  signal ~GENSYM[handshake_in][104] : std_logic_vector(0 downto 0);
+  signal ~GENSYM[miso_in][105]      : std_logic_vector(0 downto 0);
+
+  -- local vars, er... signals
+  signal ~GENSYM[should_reset][200] : std_logic;
+
+  -- output signals
+  signal ~GENSYM[data_out][1]            : std_logic_vector(7 downto 0);
+  signal ~GENSYM[busy_out][2]            : std_logic_vector(0 downto 0);
+  signal ~GENSYM[handshake_out][3]       : std_logic_vector(0 downto 0);
+  signal ~GENSYM[error_out][4]           : std_logic_vector(15 downto 0);
+  signal ~GENSYM[spi_chip_select_out][5] : std_logic_vector(0 downto 0);
+  signal ~GENSYM[spi_clk_out][6]         : std_logic_vector(0 downto 0);
+  signal ~GENSYM[spi_mosi_out][7]        : std_logic_vector(0 downto 0);
+begin
+
+  ~SYM[100] <= ~ARG[5];
+  ~SYM[101] <= ~ARG[6];
+  ~SYM[102] <= ~ARG[7];
+  ~SYM[103] <= ~ARG[8];
+  ~SYM[104] <= ~ARG[11];
+  ~SYM[105] <= ~ARG[12];
+
+  ~SYM[200] <= (NOT ~RSTO) AND reset_in(0);
+
+   ~GENSYM[SDController][1000]_inst : SdCardCtrl
+     generic map (
+       FREQ_G          => real(~LIT[1]) / real(100.0),
+       INIT_SPI_FREQ_G => real(~LIT[2]) / real(100.0),
+       SPI_FREQ_G      => real(~LIT[3]) / real(100.0),
+       BLOCK_SIZE_G    => ~LIT[4],
+       CARD_TYPE_G     => SD_CARD_E
+       )
+     port map (
+       clk_i      => ~CLKO,
+       -- Host interface.
+       reset_i    => ~SYM[200],
+       rd_i       => ~SYM[101](0),
+       wr_i       => ~SYM[102](0),
+       continue_i => ~SYM[103](0),
+       addr_i     => ~ARG[9],
+       data_i     => ~ARG[10],
+       data_o     => ~SYM[1],
+       busy_o     => ~SYM[2](0),
+       hndShk_i   => ~SYM[104](0),
+       hndShk_o   => ~SYM[3](0),
+       error_o    => ~SYM[4],
+       -- I/O signals to the external SD card.
+       cs_bo      => ~SYM[5](0),
+       sclk_o     => ~SYM[6](0),
+       mosi_o     => ~SYM[7](0),
+       miso_i     => ~SYM[105](0)
+       );
+
+  ~RESULT <= (tup7_sel0 => ~SYM[1]
+             ,tup7_sel1 => ~SYM[2]
+             ,tup7_sel2 => ~SYM[3]
+             ,tup7_sel3 => ~SYM[4]
+             ,tup7_sel4 => ~SYM[5]
+             ,tup7_sel5 => ~SYM[6]
+             ,tup7_sel6 => ~SYM[7]);
+end block;
+-- SD Interface End"
+      }
+  }
+]

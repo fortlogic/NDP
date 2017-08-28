@@ -1,6 +1,9 @@
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE MagicHash #-}
-module NDP.Clocking (PixelClk,
+module NDP.Clocking (RawClk,
+                     rawClk,
+                     SignalRaw,
+                     PixelClk,
                      Pixelx5Clk,
                      pxClk,
                      px5Clk,
@@ -15,9 +18,18 @@ import CLaSH.Prelude
 import CLaSH.Prelude.Explicit
 import CLaSH.Sized.Internal.BitVector (shiftR#)
 
+
+-- The speed parameter for clocks is the frequency in Megahertz * 100
+type RawClk = Clk "Raw" 5000
+
+rawClk :: SClock RawClk
+rawClk = sclock
+
+type SignalRaw a = Signal' RawClk a
+
 -- TMDS clock is the x5 DDR clock
-type PixelClk = Clk "HDMI" 1000
-type Pixelx5Clk  = Clk "HDMI" 200
+type PixelClk = Clk "HDMI" 4000 -- Clock speeds are MHz*100, making this 40Mhz
+type Pixelx5Clk  = Clk "HDMI" 800
 
 pxClk :: SClock PixelClk
 pxClk = sclock

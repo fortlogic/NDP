@@ -11,6 +11,9 @@ import Development.Shake.FilePath
 
 import Make.Config
 
+-- I want a shorter name for this
+utf8 = stringUtf8
+
 ucfRules = do
   (Just xilinxD) <- liftIO $ getConfigIO "XILINX_OUT"
 
@@ -21,7 +24,7 @@ ucfRules = do
     (Just masterConstraintsF) <- getConfig "FPGA_CONSTRAINTS"
     (Just entityD) <- getConfig "TOPLEVEL_ENTITIES"
     (Just mainClashNameF) <- getConfig "TOPLEVEL_HS_FILE"
-    (Just constraintsF) <- getConfig "ENTITY_CONSTRAINTS"
+    (Just constraintsF) <- getConfig "ENTITY_CONFIG_SETTINGS"
 
     need [masterConstraintsF,
           entityD </> entityName </> constraintsF]
@@ -41,8 +44,19 @@ ucfRules = do
 
 data Constraints = Constraints {
   rawConstraints :: [String],
-  netConstraints :: [(String, [(String, String)])]
+  netConstraints :: [(String, [NetParameter])]
   } deriving (Read, Show)
+
+data NetParameter = NetKV String String -- Arbitrary key/value pair
+                  | NetFlag String      -- unary flag (like PULLUP)
+                  | NetLoc String       -- Net location
+                  deriving (Read, Show)
+
+-- Takes a net parameter irons out the sugar, converting it to NetKV or NetFlag
+flattenNetParameter :: NetParameter -> NetParameter
+flattenNetParameter p@(NetKV _ _) = p
+flattenNetParameter p@(NetFlag _) = p
+flattenNetParameter (NetLoc l) = NetKV "LOC" ("\"" ++ l ++ "\"")
 
 renderConstraints :: Constraints -> Builder
 renderConstraints cs = renderLines (rawB ++ netB)
@@ -52,13 +66,18 @@ renderConstraints cs = renderLines (rawB ++ netB)
 renderLines :: [Builder] -> Builder
 renderLines lns = mconcat [ ln <> stringUtf8 ";\n" | ln <- lns ]
 
-renderNet :: (String, [(String, String)]) -> Builder
+renderNet :: (String, [NetParameter]) -> Builder
 renderNet (name, attrs) = net <> spc <> netName <> spc <> renderAttribs attrs
   where net = stringUtf8 "NET"
         netName = stringUtf8 name
         spc = charUtf8 ' '
 
-renderAttribs :: [(String, String)] -> Builder
-renderAttribs attr = mconcat $ intersperse sep [ render l r | (l, r) <- attr]
-  where render l r = stringUtf8 l <> stringUtf8 " = " <> stringUtf8 r
-        sep = stringUtf8 " | "
+renderNetParameter :: NetParameter -> Builder
+renderNetParameter (NetFlag f)        = stringUtf8 f
+renderNetParameter (NetKV l r) = utf8 l <> utf8 " = " <> utf8 r
+renderNetParameter complexParam = renderNetParameter simpleParam
+  where simpleParam = flattenNetParameter complexParam
+
+renderAttribs :: [NetParameter] -> Builder
+renderAttribs attr = mconcat $ intersperse sep $ map renderNetParameter attr
+  where sep = stringUtf8 " | "

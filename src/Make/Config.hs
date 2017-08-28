@@ -8,6 +8,7 @@ module Make.Config (setupConfig,
 
 import Control.Concurrent.MVar
 import Data.Global
+import Data.List (intercalate)
 import qualified Data.HashMap.Strict as H
 import Data.Maybe
 import Development.Shake
@@ -39,11 +40,30 @@ setupConfig configFile = do
   liftIO $ putMVar configV config
   usingConfig config
 
+missingMsg :: String -> String -> String
+missingMsg var fallback = intercalate " " [notFoundMsg, fallbackMsg]
+  where notFoundMsg = concat ["Config variable '", var, "' not found."]
+        fallbackMsg = concat ["Using default value of '", fallback, "'."]
+
 maybeConfig :: String -> String -> Action String
-maybeConfig key fallback = fromMaybe <$> return fallback <*> getConfig key
+maybeConfig key fallback = do
+  maybeVal <- getConfig key
+  case maybeVal of
+    Nothing -> do
+      -- complain if the key isn't present.
+      putNormal $ missingMsg key fallback
+      return fallback
+    Just val -> return val
 
 maybeConfigIO :: String -> String -> IO String
-maybeConfigIO key fallback = fromMaybe <$> return fallback <*> getConfigIO key
+maybeConfigIO key fallback = do
+  maybeVal <- getConfigIO key
+  case maybeVal of
+    Nothing -> do
+      -- complain if the key isn't present.
+      putStrLn $ missingMsg key fallback
+      return fallback
+    Just val -> return val
 
 configFlag :: String -> String -> Action String
 configFlag flagName configKey = do
