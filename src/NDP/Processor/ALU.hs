@@ -58,5 +58,7 @@ data ALUOp = Zero
            | RotateUp
            | RotateDown
 
-alu :: ALUMode -> ALUOp -> Word32 -> Word32 -> (Word32, Word32)
-alu _ Zero _ _ = (0,0)
+data ALUFault
+
+alu :: ALUMode -> ALUOp -> Word32 -> Word32 -> (Word32, Word32, ALUFault)
+alu _ Zero _ _ = (0,0,undefined)
