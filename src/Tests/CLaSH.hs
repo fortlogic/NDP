@@ -4,6 +4,7 @@ import Test.Hspec
 
 import Tests.TMDS
 import Tests.IO.TriState
+import Tests.ALU
 
 clashTests name = describe name $ do
   tmdsTests "TMDS"
