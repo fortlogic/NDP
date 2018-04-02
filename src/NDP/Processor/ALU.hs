@@ -12,7 +12,7 @@ module NDP.Processor.ALU (ALUMode, ALUOp, alu) where
 
 import Data.Singletons.Prelude
 import Data.Word
-import CLaSH.Prelude hiding (Left,Right)
+import CLaSH.Prelude
 
 {-
 | Mode     | Description                             |
@@ -49,13 +49,13 @@ import CLaSH.Prelude hiding (Left,Right)
 -}
 
 type ALUWord = Word32
-type ALUResult = (ALUWord, ALUWord, ALUFault)
+type ALUResult = Either ALUFault ALUWord
 
 data ALUMode = Signed | Unsigned | Raw | BCD deriving (Read, Show, Eq)
 
 data ALUOp = Zero
-           | Left
-           | Right
+           | TakeLeft
+           | TakeRight
            | Not
            | And
            | Or
@@ -67,7 +67,7 @@ data ALUOp = Zero
            | Add
            | Subtract
            | Multiply
-           | Divide -- if ALU can have two outputs then this encompasses quotient and remainder
+--           | Divide -- if ALU can have two outputs then this encompasses quotient and remainder
            | Quotient
            | Remainder
            | ShiftUp
@@ -76,34 +76,26 @@ data ALUOp = Zero
            | RotateDown
            deriving (Show, Read, Eq)
 
-data ALUFault = Faultless | Overflow | Underflow | DivZero | BadMode deriving (Show, Read, Eq)
+data ALUFault = Overflow | Underflow | DivZero | BadMode deriving (Show, Read, Eq)
 
 alu :: ALUMode -> ALUOp -> ALUWord -> ALUWord -> ALUResult
-alu _ Zero  _ _ = unaryResult 0
-alu _ Left  l _ = unaryResult l
-alu _ Right _ r = unaryResult r
-alu m Not   l _ = rawMode m $ unaryResult (bitwise not l)
-alu m And   l r = rawMode m $ unaryResult (bitwise2 (&&) l r)
-alu m Or    l r = rawMode m $ unaryResult (bitwise2 (||) l r)
-alu m Xor   l r = rawMode m $ unaryResult (bitwise2 xor l r)
+alu _ Zero      _ _ = Right 0
+alu _ TakeLeft  l _ = Right l
+alu _ TakeRight _ r = Right r
+alu m Not       l _ = rawMode m $ Right (bitwise not l)
+alu m And       l r = rawMode m $ Right (bitwise2 (&&) l r)
+alu m Or        l r = rawMode m $ Right (bitwise2 (||) l r)
+alu m Xor       l r = rawMode m $ Right (bitwise2 xor l r)
 
 -- Returns the result if the modes match, otherwise fail with `BadMode`.
 requireMode :: ALUMode -> ALUMode -> ALUResult -> ALUResult
 requireMode m m' r
   | m == m'   = r
-  | otherwise = aluFail BadMode
+  | otherwise = Left BadMode
 
 -- Fails with `BadMode` if the provided mode isn't `Raw`.
 rawMode :: ALUMode -> ALUResult -> ALUResult
 rawMode m r = requireMode Raw m r
-
--- Constructs a successful single-valued ALU response.
-unaryResult :: ALUWord -> ALUResult
-unaryResult w = (w, undefined, Faultless)
-
--- Constructs a faulting ALU response.
-aluFail :: ALUFault -> ALUResult
-aluFail f = (undefined, undefined, f)
 
 packV :: (BitPack w, KnownNat (BitSize w)) => w -> Vec (BitSize w) Bool
 packV = unpack . pack
