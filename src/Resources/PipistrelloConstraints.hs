@@ -91,12 +91,17 @@ tmdsNets = Constraints {
       ]
   }
 
--- wingA = Constraints {
---   rawConstraints = [],
---   netConstraints = [
---       ("wing_a(0)", [NetLoc "U18"
---                     ,NetKV "IOSTANDARD" "LVTTL"
---                     ,NetKV "DRIVE" "8"
---                     ,NetKV "SLEW" "FAST"])
---       ]
---   }
+wings = Constraints {
+  rawConstraints = [],
+  netConstraints =
+      [ BusNet "wing_a"
+        [ "U18", "T17", "P17", "P16"
+        , "N16", "N17", "M16", "L15"
+        , "L17", "K15", "K17", "J16"
+        , "H15", "H18", "F18", "D18" ]
+        [ NetKV "IOSTANDARD" "LVTTL"
+        , NetKV "DRIVE" "8"
+        , NETKV "SLEW" "FAST"
+        , NetFlag "PULLUP" ]
+      ]
+  }
