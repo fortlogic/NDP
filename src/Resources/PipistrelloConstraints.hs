@@ -103,5 +103,23 @@ wings = Constraints {
         , NetKV "DRIVE" "8"
         , NETKV "SLEW" "FAST"
         , NetFlag "PULLUP" ]
+      , BusNet "wing_b"
+         [ "C18", "E18", "G18", "H16"
+         , "J18", "K18", "K16", "L18"
+         , "L16", "M18", "N18", "N15"
+         , "P15", "P18", "T18", "U17" ]
+         [ NetKV "IOSTANDARD" "LVTTL"
+         , NetKV "DRIVE" "8"
+         , NETKV "SLEW" "FAST"
+         , NetFlag "PULLUP" ]
+      , BusNet "wing_c"
+         [ "F17", "F16", "E16", "G16"
+         , "F15", "G14", "F14", "H14"
+         , "H13", "J13", "G13", "H12"
+         , "K14", "K13", "K12", "L12" ]
+         [ NetKV "IOSTANDARD" "LVTTL"
+         , NetKV "DRIVE" "8"
+         , NETKV "SLEW" "FAST"
+         , NetFlag "PULLUP" ]
       ]
   }
