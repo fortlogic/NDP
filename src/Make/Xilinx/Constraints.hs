@@ -1,5 +1,8 @@
 {-# LANGUAGE OverloadedStrings #-}
-module Make.Xilinx.Constraints (ucfRules) where
+module Make.Xilinx.Constraints ( ucfRules
+                               , Constraints (..)
+                               , NetConstraint (..)
+                               , NetParameter (..)) where
 
 import Data.ByteString.Builder
 import qualified Data.ByteString.Lazy as B

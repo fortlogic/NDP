@@ -2,12 +2,15 @@
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE GADTs #-}
 {-# LANGUAGE KindSignatures #-}
+{-# LANGUAGE MagicHash #-}
 {-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE TypeApplications #-}
 {-# LANGUAGE TypeFamilies #-}
 {-# LANGUAGE TypeOperators #-}
 {-# LANGUAGE UndecidableInstances #-}
-{-# OPTIONS_GHC -fplugin GHC.TypeLits.Normalise -fplugin GHC.TypeLits.KnownNat.Solver #-}
+{-# OPTIONS_GHC -fplugin GHC.TypeLits.Extra.Solver #-}
+{-# OPTIONS_GHC -fplugin GHC.TypeLits.KnownNat.Solver #-}
+{-# OPTIONS_GHC -fplugin GHC.TypeLits.Normalise #-}
 module NDP.Processor.ALU (ALUMode, ALUOp, alu) where
 
 import Data.Singletons.Prelude
@@ -86,6 +89,7 @@ alu m Not       l _ = rawMode m $ Right (bitwise not l)
 alu m And       l r = rawMode m $ Right (bitwise2 (&&) l r)
 alu m Or        l r = rawMode m $ Right (bitwise2 (||) l r)
 alu m Xor       l r = rawMode m $ Right (bitwise2 xor l r)
+alu m PopCount  l _ = rawMode m $ Right (popcount' l)
 
 -- Returns the result if the modes match, otherwise fail with `BadMode`.
 requireMode :: ALUMode -> ALUMode -> ALUResult -> ALUResult
@@ -114,6 +118,9 @@ bitwise2 f w1 w2 = unpackV wR
 bv2t :: KnownNat n => BitVector (2 ^ n) -> RTree n Bit
 bv2t = v2t . unpack
 
+u2w :: Unsigned 32 -> ALUWord
+u2w = bitCoerce
+
 data Width2Index (f :: TyFun Nat *) :: *
 type instance Apply Width2Index n = Index ((2^n)+1)
 
@@ -121,3 +128,7 @@ popcount :: KnownNat n => BitVector (2 ^ n) -> Index ((2^n)+1)
 popcount bv = tdfold (Proxy @Width2Index) fromIntegral (\_ a b -> plus a b) rt
   where rt = bv2t bv
 
+popcount' :: ALUWord -> ALUWord
+popcount' = u2w . extend . coerce . popcount . pack
+  where coerce :: Index ((BitSize ALUWord)+1) -> Unsigned 6
+        coerce = bitCoerce

@@ -1,3 +1,5 @@
+-- import Make.Xilinx.Constraints
+
 requiredConstraints = Constraints {
   rawConstraints = [
       "CONFIG VCCAUX = \"3.3\"",
@@ -101,7 +103,7 @@ wings = Constraints {
         , "H15", "H18", "F18", "D18" ]
         [ NetKV "IOSTANDARD" "LVTTL"
         , NetKV "DRIVE" "8"
-        , NETKV "SLEW" "FAST"
+        , NetKV "SLEW" "FAST"
         , NetFlag "PULLUP" ]
       , BusNet "wing_b"
          [ "C18", "E18", "G18", "H16"
@@ -110,7 +112,7 @@ wings = Constraints {
          , "P15", "P18", "T18", "U17" ]
          [ NetKV "IOSTANDARD" "LVTTL"
          , NetKV "DRIVE" "8"
-         , NETKV "SLEW" "FAST"
+         , NetKV "SLEW" "FAST"
          , NetFlag "PULLUP" ]
       , BusNet "wing_c"
          [ "F17", "F16", "E16", "G16"
@@ -119,7 +121,7 @@ wings = Constraints {
          , "K14", "K13", "K12", "L12" ]
          [ NetKV "IOSTANDARD" "LVTTL"
          , NetKV "DRIVE" "8"
-         , NETKV "SLEW" "FAST"
+         , NetKV "SLEW" "FAST"
          , NetFlag "PULLUP" ]
       ]
   }
