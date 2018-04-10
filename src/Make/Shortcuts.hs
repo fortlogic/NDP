@@ -8,6 +8,7 @@ import Development.Shake.FilePath
 
 import Make.Command
 import Make.Config
+import Make.HDL
 import Make.Vagrant
 
 shortcutRules = do
@@ -18,7 +19,7 @@ fpgaCommands = commandGroup "fpga:" [mkCommand "reset:" resetCmd
                                     ,mkCommand "load:" loadCmd
                                     ,mkCommand "burn:" burnCmd]
 
-clashCommands = mkCommand "clash:" buildClashCmd
+clashCommands = mkCommand "clash:" (buildClashCmd VHDL)
 
 resetCmd :: String -> Action ()
 resetCmd _ = do
@@ -59,8 +60,8 @@ burnCmd project = do
 
   withVagrant $ vagrantSSH command
 
-buildClashCmd :: String -> Action ()
-buildClashCmd project = do
+buildClashCmd :: HDL -> String -> Action ()
+buildClashCmd hdl project = do
   buildDir <- maybeConfig "BUILD" "build"
   clashOut <- maybeConfig "CLASH_OUT" (buildDir </> "clash")
-  need [clashOut </> project </> project -<.> "vhdl"]
+  need [clashOut </> project </> hdlName hdl </> project -<.> "vhdl"]
