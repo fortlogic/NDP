@@ -1,3 +1,4 @@
+{-# LANGUAGE TypeApplications #-}
 module Make.Xilinx.XFlow (xflowRules) where
 
 import Data.Char
@@ -10,6 +11,7 @@ import Development.Shake.FilePath
 import System.Posix.Escape
 
 import Make.Config
+import Make.HDL
 import Make.Utils
 import Make.Vagrant
 
@@ -19,43 +21,46 @@ xflowRules = do
   (xilinxD </> "*.prj") %> \ prjF -> do
     let entityName = takeBaseName prjF
 
+    (Just hdl) <- (readConfig @ HDL) "PREFERRED_HDL"
     (Just clashOutD) <- getConfig "CLASH_OUT"
-    let clashVhdlD = clashOutD </> entityName
+    let clashHdlD = clashOutD </> entityName </> hdlName hdl
+    let hdlExt = hdlExtension hdl
 
-    -- fetch the custom VHDL files that will be included in the project.
-    (Just topLevelVhdlD) <- getConfig "TOPLEVEL_ENTITIES"
-    customVhdlFs <- getDirectoryFiles "" [topLevelVhdlD </> entityName </> "*" <.> "vhdl"]
+    -- fetch the custom HDL files that will be included in the project.
+    (Just topLevelHdlD) <- getConfig "TOPLEVEL_ENTITIES"
+    customHdlFs <- getDirectoryFiles "" [topLevelHdlD </> entityName </> "*" <.> hdlExt]
 
-    -- fetch the VHDL files that the clash compiler generated.
+    -- fetch the HDL files that the clash compiler generated.
     (Just clashEntity) <- getConfig "CLASH_ENTITY_NAME"
-    need [clashVhdlD </> ( map toLower clashEntity ++ "_topentity.vhdl")]
-    clashVhdlFs <- getDirectoryFiles "" [clashVhdlD  </> "*" <.> "vhdl"]
+    --need [clashHdlD </> ( map toLower clashEntity ++ "_topentity") <.> hdlExt]
+    need [ clashHdlD </> entityName <.> hdlExt ]
+    clashHdlFs <- getDirectoryFiles "" [clashHdlD  </> "*" <.> hdlExt]
 
     -- fetch a clocking entity if one is specified
-    (Just clockDir) <- getConfig "VHDL_CLOCKS"
+    (Just clockDir) <- getConfig "HDL_CLOCKS"
     (Just entityD) <- getConfig "TOPLEVEL_ENTITIES"
     (Just configF) <- getConfig "ENTITY_CONFIG_SETTINGS"
     entityConstraints <- (liftIO . readConf) $ entityD </> entityName </> configF
-    let maybeClockVhdl = do
+    let maybeClockHdl = do
           clockFile <- (getConf "clock" entityConstraints) :: Maybe String
-          return $ clockDir </> clockFile -<.> "vhdl"
+          return $ clockDir </> clockFile -<.> hdlExt
 
-    -- fetch the global vhdl files
-    (Just globalVhdlD) <- getConfig "GLOBAL_VHDL"
-    globalVhdlFs <- getDirectoryFiles "" [globalVhdlD </> "*" <.> "vhdl"]
+    -- fetch the global hdl files
+    (Just globalHdlD) <- getConfig "GLOBAL_HDL"
+    globalHdlFs <- getDirectoryFiles "" [globalHdlD </> "*" <.> hdlExt]
 
     (Just vmPrefix) <- getConfig "VM_ROOT"
 
-    let vhdlFs = customVhdlFs ++ clashVhdlFs ++ maybeToList maybeClockVhdl ++ globalVhdlFs
+    let hdlFs = customHdlFs ++ clashHdlFs ++ maybeToList maybeClockHdl ++ globalHdlFs
 
-    writeFileLines prjF ["vhdl \"" ++ (vmPrefix </> vhdlF) ++ "\"" | vhdlF <- vhdlFs]
+    writeFileLines prjF [ hdlName hdl ++ " \"" ++ (vmPrefix </> hdlF) ++ "\"" | hdlF <- hdlFs]
 
   (xilinxD </> "*.bit") %> \ bitF -> do
     need [bitF -<.> "prj",
           bitF -<.> "ucf"]
 
     let entityName = takeBaseName bitF
-    let entityVhdlName = entityName -- map toLower entityName
+    let entityHdlName = entityName -- map toLower entityName
 
     let workD = dropExtension bitF
     () <- cmd "mkdir -p" workD
@@ -79,7 +84,7 @@ xflowRules = do
     xstOptLines <- readFileLines xstOptF
     let optPre = takeWhile (not . isPrefixOf "\"run\";") (reverse xstOptLines)
     let optSuf = dropWhile (not . isPrefixOf "\"run\";") (reverse xstOptLines)
-    let xstOptLines' = reverse (optPre ++ ["\"-top " ++ entityVhdlName ++ "\";"] ++ optSuf)
+    let xstOptLines' = reverse (optPre ++ ["\"-top " ++ entityHdlName ++ "\";"] ++ optSuf)
 
     writeFileLines (workD </> takeFileName xstOptF) xstOptLines'
 

@@ -1,11 +1,16 @@
+{-# LANGUAGE LambdaCase #-}
 {-# LANGUAGE TemplateHaskell #-}
 {-# LANGUAGE TupleSections #-}
-module Make.Config (setupConfig,
-                    maybeConfig,
-                    configFlag,
-                    configFlag2,
-                    getConfigIO,
-                    maybeConfigIO) where
+module Make.Config (setupConfig
+                   , maybeConfig
+                   , readConfig
+                   , maybeReadConfig
+                   , configFlag
+                   , configFlag2
+                   , getConfigIO
+                   , maybeConfigIO
+                   , readConfigIO
+                   , maybeReadConfigIO ) where
 
 import Control.Concurrent.MVar
 import Data.Global
@@ -15,6 +20,7 @@ import Data.Maybe
 import Development.Shake
 import Development.Shake.Config
 import qualified System.Environment as E
+import Text.Read
 
 import Make.Oracles
 
@@ -48,30 +54,43 @@ missingMsg var fallback = intercalate " " [notFoundMsg, fallbackMsg]
 
 maybeConfig :: String -> String -> Action String
 maybeConfig key fallback = do
-  maybeVal <- getConfig key
-  case maybeVal of
+  getConfig key >>= \case
     Nothing -> do
       -- complain if the key isn't present.
       putNormal $ missingMsg key fallback
       return fallback
     Just val -> return val
 
+readConfig :: Read a => String -> Action (Maybe a)
+readConfig key = getConfig key >>= \case
+  Nothing -> return Nothing
+  (Just str) -> return (readMaybe str)
+
+maybeReadConfig :: Read a => String -> a -> Action a
+maybeReadConfig key fallback = (fromMaybe fallback) <$> readConfig key
+
 maybeConfigIO :: String -> String -> IO String
 maybeConfigIO key fallback = do
-  maybeVal <- getConfigIO key
-  case maybeVal of
+  getConfigIO key >>= \case
     Nothing -> do
       -- complain if the key isn't present.
       putStrLn $ missingMsg key fallback
       return fallback
     Just val -> return val
 
+readConfigIO :: Read a => String -> IO (Maybe a)
+readConfigIO key = getConfigIO key >>= \case
+  Nothing -> return Nothing
+  (Just str) -> return (readMaybe str)
+
+maybeReadConfigIO :: Read a => String -> a -> IO a
+maybeReadConfigIO key fallback = (fromMaybe fallback) <$> readConfigIO key
+
 configFlag :: String -> String -> Action String
 configFlag flagName configKey = do
-  maybeVal <- getConfig configKey
-  return $ case maybeVal of
-    Nothing -> ""
-    Just val -> flagName ++ val
+  getConfig configKey >>= \case
+    Nothing -> return ""
+    Just val -> return $ flagName ++ val
 
 
 configFlag2 :: String -> String -> Action [String]
