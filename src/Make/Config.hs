@@ -1,4 +1,5 @@
 {-# LANGUAGE TemplateHaskell #-}
+{-# LANGUAGE TupleSections #-}
 module Make.Config (setupConfig,
                     maybeConfig,
                     configFlag,
@@ -27,11 +28,11 @@ initialConfig = do
   clashVer <- liftIO clashVersionIO
   platform <- liftIO osPlatformIO
   arch <- liftIO cpuArchitectureIO
-  xilinxRoot <- liftIO $ E.getEnv "XILINXROOT"
-  return [("CLASH_VER", clashVer),
-          ("ARCH", arch),
-          ("PLATFORM", platform),
-          ("XILINX", xilinxRoot)]
+  xilinxRoot <- liftIO $ E.lookupEnv "XILINXROOT"
+  (return . catMaybes) [ Just ("CLASH_VER", clashVer)
+                       , Just ("ARCH", arch)
+                       , Just ("PLATFORM", platform)
+                       , ("XILINX",) <$> xilinxRoot ]
 
 setupConfig :: FilePath -> Rules ()
 setupConfig configFile = do
