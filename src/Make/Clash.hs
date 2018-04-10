@@ -7,6 +7,7 @@ import Development.Shake.FilePath
 import Development.Shake.Util
 
 import Make.Config
+import Make.HDL
 import Make.Oracles
 import Make.Utils
 
@@ -25,8 +26,6 @@ hsDeps :: [(FilePath, [FilePath])] -> [FilePath]
 hsDeps = filter isHs . concat . map snd
   where isHs = isSuffixOf ".hs"
 
-data HDL = VHDL | Verilog deriving (Read, Show, Eq)
-
 clashRules = do
 
   -- This is cheating but since the locations of the targets are determined by
@@ -34,12 +33,14 @@ clashRules = do
   buildDir <- liftIO $ maybeConfigIO "BUILD" "build"
   clashOut <- liftIO $ maybeConfigIO "CLASH_OUT" (buildDir </> "clash")
 
-  (clashOut </> "*/*.vhdl") %> buildHDL undefined
+  (clashOut </> "*/vhdl/*.vhdl") %> buildHDL VHDL
+  (clashOut </> "*/verilog/*.v") %> buildHDL Verilog
 
 
 buildHDL :: HDL -> FilePath -> Action ()
 buildHDL hdl hdlF = do
   let hdlD = takeDirectory hdlF
+  let baseD = takeDirectory hdlD
 
   -- we depend on any HDL primitives.
   (Just primitiveD) <- getConfig "HDL_PRIMITIVES"
@@ -54,10 +55,10 @@ buildHDL hdl hdlF = do
   -- lets us know what files we need to depend on to (potentially) trigger a
   -- rebuild.
 
-  let mkF = hdlD <.> "mk"
+  let mkF = baseD <.> "mk"
   (Just entityD) <- getConfig "TOPLEVEL_ENTITIES"
   (Just mainClashNameF) <- getConfig "TOPLEVEL_HS_FILE"
-  let srcF = entityD </> takeBaseName mkF </> mainClashNameF -<.> "hs"
+  let srcF = entityD </> takeBaseName baseD </> mainClashNameF -<.> "hs"
   flags <- ghcFlags
 
   -- We need to muck about with the makefile after clash spits it out, so
@@ -77,8 +78,8 @@ buildHDL hdl hdlF = do
   -- Actually include the dependencies.
   needMakefileDependencies mkF
 
-  -- I'm just treating the bunch of VHDL that clash spits out as an atomic
-  -- blob. Remove the previously generated VHDL files and put the new ones in
+  -- I'm just treating the bunch of HDL that clash spits out as an atomic
+  -- blob. Remove the previously generated HDL files and put the new ones in
   -- their place.
   withTempDir $ \ tmpD -> do
 
@@ -89,10 +90,10 @@ buildHDL hdl hdlF = do
 
     -- generate the hdl
     putNormal "Compiling CLaSH sources"
-    () <- cmd clashExec flags "-clash-hdldir" tmpD "--vhdl" srcF
+    () <- cmd clashExec flags "-clash-hdldir" tmpD (hdlFlag hdl) srcF
 
     -- get rid of the old
     () <- cmd "rm -rf" hdlD
 
     -- and replace
-    cmd "mv" (tmpD </> "vhdl" </> clashName) hdlD
+    cmd "mv" (tmpD </> hdlName hdl </> clashName) hdlD

@@ -19,7 +19,8 @@ fpgaCommands = commandGroup "fpga:" [mkCommand "reset:" resetCmd
                                     ,mkCommand "load:" loadCmd
                                     ,mkCommand "burn:" burnCmd]
 
-clashCommands = mkCommand "clash:" (buildClashCmd VHDL)
+clashCommands = commandGroup "clash:" [ mkCommand "vhdl:" (buildClashCmd VHDL)
+                                      , mkCommand "verilog:" (buildClashCmd Verilog)]
 
 resetCmd :: String -> Action ()
 resetCmd _ = do
@@ -64,4 +65,4 @@ buildClashCmd :: HDL -> String -> Action ()
 buildClashCmd hdl project = do
   buildDir <- maybeConfig "BUILD" "build"
   clashOut <- maybeConfig "CLASH_OUT" (buildDir </> "clash")
-  need [clashOut </> project </> hdlName hdl </> project -<.> "vhdl"]
+  need [clashOut </> project </> hdlName hdl </> project -<.> hdlExtension hdl]
