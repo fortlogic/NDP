@@ -53,7 +53,7 @@ xflowRules = do
 
     let hdlFs = customHdlFs ++ clashHdlFs ++ maybeToList maybeClockHdl ++ globalHdlFs
 
-    writeFileLines prjF [ hdlName hdl ++ " \"" ++ (vmPrefix </> hdlF) ++ "\"" | hdlF <- hdlFs]
+    writeFileLines prjF [ hdlName hdl ++ " work " ++ (vmPrefix </> hdlF) | hdlF <- hdlFs]
 
   (xilinxD </> "*.bit") %> \ bitF -> do
     need [bitF -<.> "prj",
@@ -85,8 +85,10 @@ xflowRules = do
     let optPre = takeWhile (not . isPrefixOf "\"run\";") (reverse xstOptLines)
     let optSuf = dropWhile (not . isPrefixOf "\"run\";") (reverse xstOptLines)
     let xstOptLines' = reverse (optPre ++ ["\"-top " ++ entityHdlName ++ "\";"] ++ optSuf)
+    -- this is ugly and I hate it but apparently this option isn't allowed on the spartan 6.
+    let xstOptLines'' = filter (not . isInfixOf "-verilog2001") xstOptLines'
 
-    writeFileLines (workD </> takeFileName xstOptF) xstOptLines'
+    writeFileLines (workD </> takeFileName xstOptF) xstOptLines''
 
     () <- cmd "rm -f" (workD </> (takeBaseName bitF ++ "_map.ncd"))
 
