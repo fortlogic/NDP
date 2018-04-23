@@ -1,3 +1,5 @@
+module Resources.PipistrelloConstraints where
+
 requiredConstraints = Constraints {
   rawConstraints = [
       "CONFIG VCCAUX = \"3.3\"",

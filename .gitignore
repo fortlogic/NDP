@@ -8,3 +8,4 @@ ise
 *.bak
 *.bck
 *.kicad_pcb-bak
+*.cabal

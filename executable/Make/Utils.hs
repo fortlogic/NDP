@@ -5,7 +5,7 @@ module Make.Utils ((!!?),
                   withReverse,
                   getDirectoryFilesWithExt) where
 
-import Data.List
+
 import Development.Shake.FilePath
 import System.Directory
 

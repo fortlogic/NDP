@@ -1,9 +1,9 @@
 {-# LANGUAGE Arrows #-}
 {-# LANGUAGE MagicHash #-}
-module Signal (BoolS',
-               SignalA' (SA, sa),
-               SignalA,
-               delayA') where
+module NDP.Signal (BoolS',
+                   SignalA' (SA, sa),
+                   SignalA,
+                   delayA') where
 
 import CLaSH.Prelude hiding ((.), id)
 import CLaSH.Signal.Explicit

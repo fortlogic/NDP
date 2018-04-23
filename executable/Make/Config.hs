@@ -10,12 +10,13 @@ import Control.Concurrent.MVar
 import Data.Global
 import Data.List (intercalate)
 import qualified Data.HashMap.Strict as H
-import Data.Maybe
+-- import Data.Maybe
 import Development.Shake
 import Development.Shake.Config
 import qualified System.Environment as E
 
 import Make.Oracles
+import Resources.ROM.Tiles
 
 declareEmptyMVar "configV" [t| (H.HashMap String String) |]
 

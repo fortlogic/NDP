@@ -1,3 +1,5 @@
+module TopLevel.SDCardTest.Config where
+
 constraints = [ "requiredConstraints",
                 "builtinLEDNets",
                 "builtinButtonNets",

@@ -1,3 +1,7 @@
+module Resources.ROM.Tiles.Map where
+
+import Resources.ROM.Tiles
+
 cbm = TileMap {
   defaultTile = Empty,
   tiles = [ Tile { name = "A", code = 0x01, content = File "A.pbm" },

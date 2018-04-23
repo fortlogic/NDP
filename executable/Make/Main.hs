@@ -16,7 +16,7 @@ import Make.TileROM
 import Make.Vagrant
 import Make.Xilinx.Constraints
 import Make.Xilinx.XFlow
-import qualified Tests.Main as T
+-- import qualified Tests.Main as T
 
 
 
@@ -31,10 +31,10 @@ main = shakeArgs shakeOptions $ do
   phony "clean" $ do
     cmd "rm -rvf build"
 
-  phony "test" $ do
-    liftIO $ do
-      (_:args) <- getArgs
-      withArgs args T.main
+  -- phony "test" $ do
+  --   liftIO $ do
+  --     (_:args) <- getArgs
+  --     withArgs args T.main
 
   clashRules
   ghdlRules
