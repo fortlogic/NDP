@@ -90,6 +90,7 @@ alu m And       l r = rawMode m $ Right (bitwise2 (&&) l r)
 alu m Or        l r = rawMode m $ Right (bitwise2 (||) l r)
 alu m Xor       l r = rawMode m $ Right (bitwise2 xor l r)
 alu m PopCount  l _ = rawMode m $ Right (popcount' l)
+alu m Increment l _ = undefined
 
 -- Returns the result if the modes match, otherwise fail with `BadMode`.
 requireMode :: ALUMode -> ALUMode -> ALUResult -> ALUResult
@@ -132,3 +133,6 @@ popcount' :: ALUWord -> ALUWord
 popcount' = u2w . extend . coerce . popcount . pack
   where coerce :: Index ((BitSize ALUWord)+1) -> Unsigned 6
         coerce = bitCoerce
+
+class BitPack w => ArithmeticWord w where
+  increment :: w -> Maybe w
