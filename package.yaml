@@ -1,0 +1,80 @@
+# This YAML file describes your package. Stack will automatically generate a
+# Cabal file when you run `stack build`. See the hpack website for help with
+# this file: <https://github.com/sol/hpack>.
+name: NDP
+version: '0.0.0'
+github: "fortlogic/NDP"
+license: MIT
+author: "Matias Eyzaguirre"
+maintainer: "Matias Eyzaguirre"
+synopsis: "Nameless Data Processor: an FPGA sized computer"
+description: The NDP is an experiment in computer design by an idiot (read amateur)
+# category: Other
+
+extra-source-files:
+- CHANGELOG.md
+- LICENSE.md
+- package.yaml
+- README.md
+- stack.yaml
+
+ghc-options: -Wall -Werror
+
+library:
+  dependencies:
+  - base
+  - clash-prelude
+  - data-default
+  source-dirs: hardware
+
+executables:
+  ndp:
+    source-dirs: executable
+    main: Make/Main.hs
+    dependencies:
+    - NDP
+    - base
+    - bytestring
+    - conf
+    - directory
+    - netpbm
+    - posix-escape
+    - safe-globals
+    - shake
+    - unordered-containers
+    - vector
+    ghc-options:
+    - -rtsopts
+    - -threaded
+    - -with-rtsopts=-N
+
+benchmarks:
+  NDP-benchmarks:
+    source-dirs: benchmark
+    main: Main.hs
+    dependencies:
+    - NDP
+    - base
+    - criterion
+    ghc-options:
+    - -rtsopts
+    - -threaded
+    - -with-rtsopts=-N
+
+tests:
+  NDP-test-suite:
+    source-dirs: test-suite
+    main: Main.hs
+    dependencies:
+    - NDP
+    - QuickCheck
+    - base
+    - clash-prelude
+    - formatting
+    - hspec
+    - tasty
+    - tasty-hspec
+    ghc-options:
+    - -rtsopts
+    - -threaded
+    - -with-rtsopts=-N
