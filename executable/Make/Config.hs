@@ -15,6 +15,7 @@ module Make.Config (setupConfig
 import Control.Concurrent.MVar
 import Data.Global
 import Data.List (intercalate)
+import Data.Maybe
 import qualified Data.HashMap.Strict as H
 import Development.Shake
 import Development.Shake.Config

@@ -47,7 +47,7 @@ xflowRules = do
 
     (Just vmPrefix) <- getConfig "VM_ROOT"
 
-    let vhdlFs = clashVhdlFs ++ maybeToList maybeClockVhdl ++ globalVhdlFs
+    let hdlFs = clashHdlFs ++ maybeToList maybeClockHdl ++ globalHdlFs
 
     writeFileLines prjF [ hdlName hdl ++ " work " ++ (vmPrefix </> hdlF) | hdlF <- hdlFs]
 

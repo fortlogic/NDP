@@ -1,5 +1,6 @@
 module Make.Clash (clashRules) where
 
+import Control.Monad.IO.Class
 import Data.List
 import Development.Shake
 import Development.Shake.Config
@@ -22,13 +23,19 @@ ghcFlags = do
   primDir <- configFlag "-i" "HDL_PRIMITIVES"
   return (odir ++ hidir ++ [idir] ++ [primDir])
 
+getBuildDir :: MonadIO m => m String
+getBuildDir = liftIO $ maybeConfigIO "BUILD" "build"
+
+getClashOut :: MonadIO m => m String
+getClashOut = getBuildDir >>= fetch
+  where fetch buildDir = liftIO $ maybeConfigIO "CLASH_OUT" (buildDir </> "clash")
+
 clashRules :: Rules ()
 clashRules = do
 
   -- This is cheating but since the locations of the targets are determined by
   -- the config file...
-  buildDir <- liftIO $ maybeConfigIO "BUILD" "build"
-  clashOut <- liftIO $ maybeConfigIO "CLASH_OUT" (buildDir </> "clash")
+  clashOut <- getClashOut
 
   (clashOut </> "*/vhdl/*.vhdl") %> buildHDL VHDL
   (clashOut </> "*/verilog/*.v") %> buildHDL Verilog
@@ -38,6 +45,8 @@ buildHDL :: HDL -> FilePath -> Action ()
 buildHDL hdl hdlF = do
   let hdlD = takeDirectory hdlF
   let baseD = takeDirectory hdlD
+
+  clashOut <- getClashOut
 
   -- TODO: we depend on any HDL primitives.
   -- (Just primitiveD) <- getConfig "VHDL_PRIMITIVES"
@@ -53,7 +62,7 @@ buildHDL hdl hdlF = do
   -- lets us know what files we need to depend on to (potentially) trigger a
   -- rebuild.
 
-  let mkF = vhdlD <.> "mk"
+  let mkF = hdlD <.> "mk"
   (Just entityD) <- getConfig "TOPLEVEL_ENTITIES"
   (Just mainClashNameF) <- getConfig "TOPLEVEL_HS_FILE"
   let srcF = entityD </> takeBaseName mkF </> mainClashNameF -<.> "hs"
@@ -65,20 +74,20 @@ buildHDL hdl hdlF = do
     putNormal "Determining CLaSH dependencies"
     () <- cmd clashExec "-M -dep-suffix=" [""] " -dep-makefile" [mkF'] flags srcF
 
-    -- We're lifting from IO becdause readFileLines will add the temporary
-    -- make file as additionalVhdlFsa dependency, which we do not want. It is
-    -- a temporary file, after all.
+    -- We're lifting from IO becdause readFileLines will add the temporary make
+    -- file as an additional dependency, which we do not want. It is a temporary
+    -- file, after all.
     lns <- lines <$> liftIO (readFile mkF')
     writeFileLines mkF [ln | ln <- lns, isSuffixOf ".hs" ln]
 
   -- Actually include the dependencies.
   needMakefileDependencies mkF
 
-  -- generate the vhdl
+  -- generate the hdl
   putNormal "Compiling CLaSH sources"
-  () <- cmd clashExec flags "-clash-hdldir" clashOut "--vhdl" srcF
+  () <- cmd clashExec flags "-clash-hdldir" clashOut (hdlFlag hdl) srcF
 
-  -- copy the additional VHDL in the entities folder to the destination
+  -- copy the additional HDL in the entities folder to the destination
   let srcD = takeDirectory srcF
-  additionalVhdlFs <- getDirectoryFiles srcD ["*.vhdl"]
-  mapM_ (\ f -> copyFile' (srcD </> f) (vhdlD </> takeFileName f)) additionalVhdlFs
+  additionalVhdlFs <- getDirectoryFiles srcD [ "*." ++ hdlExtension hdl ]
+  mapM_ (\ f -> copyFile' (srcD </> f) (hdlD </> takeFileName f)) additionalVhdlFs

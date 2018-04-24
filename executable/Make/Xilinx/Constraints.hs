@@ -17,10 +17,8 @@ import Make.Config
 import Resources.Constraints
 
 -- I want a shorter name for this
-utf8 :: String -> Builder
 utf8 = stringUtf8
 
-ucfRules :: Rules ()
 ucfRules = do
   (Just xilinxD) <- liftIO $ getConfigIO "XILINX_OUT"
 
@@ -48,32 +46,3 @@ ucfRules = do
       return $ renderConstraints constraints
 
     (liftIO . B.writeFile ucF . B.concat . map toLazyByteString) constraintBuilders
-
-renderConstraints :: Constraints -> Builder
-renderConstraints cs = renderLines (rawB ++ netB)
-  where rawB = map stringUtf8 (rawConstraints cs)
-        netB = (netConstraints cs) >>= renderNet
-
-renderLines :: [Builder] -> Builder
-renderLines lns = mconcat [ ln <> stringUtf8 ";\n" | ln <- lns ]
-
-renderNet :: NetConstraint -> [Builder]
-renderNet (SingleNet name loc attrs) = [renderPrimNet (name <> "(0)") (locP : attrs)]
-  where locP = NetKV "LOC" loc
-renderNet (SingleNetLocless name attrs) = [renderPrimNet (name <> "(0)") attrs]
-renderNet (BusNet name locs attrs) = zipWith mkSingle locs [0..]
-  where mkSingle loc idx = renderPrimNet (mkName idx) (NetKV "LOC" loc : attrs)
-        mkName idx = name ++ "(" ++ show idx ++ ")"
-
-renderPrimNet :: String -> [NetParameter] -> Builder
-renderPrimNet name attrs = mconcat $ intersperse spc ["NET", netName, renderAttribs attrs]
-  where netName = stringUtf8 name
-        spc = charUtf8 ' '
-
-renderNetParameter :: NetParameter -> Builder
-renderNetParameter (NetFlag f)        = stringUtf8 f
-renderNetParameter (NetKV l r) = utf8 l <> utf8 " = " <> utf8 r
-
-renderAttribs :: [NetParameter] -> Builder
-renderAttribs attr = mconcat $ intersperse sep $ map renderNetParameter attr
-  where sep = stringUtf8 " | "

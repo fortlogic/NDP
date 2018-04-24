@@ -18,13 +18,18 @@ extra-source-files:
 - README.md
 - stack.yaml
 
-ghc-options: -Wall -Werror
+ghc-options: -Wall
 
 library:
   dependencies:
   - base
+  - bytestring
   - clash-prelude
   - data-default
+  - ghc-typelits-extra
+  - ghc-typelits-knownnat
+  - ghc-typelits-natnormalise
+  - singletons
   source-dirs: hardware
 
 executables:
