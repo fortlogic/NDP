@@ -17,7 +17,8 @@ fpgaCommands :: CommandTree
 fpgaCommands = commandGroup "fpga:" [mkCommand "reset:" resetCmd
                                     ,mkCommand "build:" buildCmd
                                     ,mkCommand "load:" loadCmd
-                                    ,mkCommand "burn:" burnCmd]
+                                    ,mkCommand "burn:" burnCmd
+                                    ,mkCommand "stage:" stageCmd]
 
 clashCommands = commandGroup "clash:" [ mkCommand "vhdl:" (buildClashCmd VHDL)
                                       , mkCommand "verilog:" (buildClashCmd Verilog)]
@@ -60,6 +61,12 @@ burnCmd project = do
                  "-sa", "-r"]
 
   withVagrant $ vagrantSSH burnCmdline
+
+stageCmd :: String -> Action ()
+stageCmd project = do
+  (Just container) <- getConfig "XILINX_OUT"
+  need [ container </> project -<.> "prj"
+       , container </> project -<.> "ucf"]
 
 buildClashCmd :: HDL -> String -> Action ()
 buildClashCmd hdl project = do
