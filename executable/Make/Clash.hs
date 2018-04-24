@@ -57,8 +57,8 @@ clashRules = do
       () <- cmd clashExec "-M -dep-suffix=" [""] " -dep-makefile" [mkF'] flags srcF
 
       -- We're lifting from IO becdause readFileLines will add the temporary
-      -- make file as a dependency, which we do not want. It is a temporary
-      -- file, after all.
+      -- make file as additionalVhdlFsa dependency, which we do not want. It is
+      -- a temporary file, after all.
       lns <- lines <$> liftIO (readFile mkF')
       writeFileLines mkF [ln | ln <- lns, isSuffixOf ".hs" ln]
 
@@ -67,4 +67,9 @@ clashRules = do
 
     -- generate the vhdl
     putNormal "Compiling CLaSH sources"
-    cmd clashExec flags "-clash-hdldir" clashOut {-tmpD-} "--vhdl" srcF
+    () <- cmd clashExec flags "-clash-hdldir" clashOut "--vhdl" srcF
+
+    -- copy the additional VHDL in the entities folder to the destination
+    let srcD = takeDirectory srcF
+    additionalVhdlFs <- getDirectoryFiles srcD ["*.vhdl"]
+    mapM_ (\ f -> copyFile' (srcD </> f) (vhdlD </> takeFileName f)) additionalVhdlFs

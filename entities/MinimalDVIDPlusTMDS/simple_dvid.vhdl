@@ -34,7 +34,7 @@ use IEEE.NUMERIC_STD.ALL;
 use IEEE.MATH_REAL.ALL;
 use std.textio.all;
 use work.all;
-use work.toplevel_types.all;
+use work.minimaldvidplustmds_types.all;
 
 entity simple_dvid is
     Port ( clk                   : in  STD_LOGIC;

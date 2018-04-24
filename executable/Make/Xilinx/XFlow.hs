@@ -10,7 +10,6 @@ import Development.Shake.FilePath
 import System.Posix.Escape
 
 import Make.Config
-
 import Make.Vagrant
 
 xflowRules :: Rules ()
@@ -22,10 +21,6 @@ xflowRules = do
 
     (Just clashOutD) <- getConfig "CLASH_OUT"
     let clashVhdlD = clashOutD </> "vhdl" </> entityName
-
-    -- fetch the custom VHDL files that will be included in the project.
-    (Just topLevelVhdlD) <- getConfig "TOPLEVEL_ENTITIES"
-    customVhdlFs <- getDirectoryFiles "" [topLevelVhdlD </> entityName </> "*" <.> "vhdl"]
 
     -- fetch the VHDL files that the clash compiler generated.
     need [clashVhdlD </> entityName <.> "vhdl"]
@@ -46,7 +41,7 @@ xflowRules = do
 
     (Just vmPrefix) <- getConfig "VM_ROOT"
 
-    let vhdlFs = customVhdlFs ++ clashVhdlFs ++ maybeToList maybeClockVhdl ++ globalVhdlFs
+    let vhdlFs = clashVhdlFs ++ maybeToList maybeClockVhdl ++ globalVhdlFs
 
     writeFileLines prjF ["vhdl \"" ++ (vmPrefix </> vhdlF) ++ "\"" | vhdlF <- vhdlFs]
 
@@ -55,7 +50,7 @@ xflowRules = do
           bitF -<.> "ucf"]
 
     let entityName = takeBaseName bitF
-    let entityVhdlName = entityName -- map toLower entityName
+    let entityVhdlName = entityName
 
     let workD = dropExtension bitF
     () <- cmd "mkdir -p" workD
