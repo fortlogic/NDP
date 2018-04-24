@@ -1,6 +1,6 @@
 {-# LANGUAGE TemplateHaskell #-}
 {-# LANGUAGE DataKinds #-}
-module TopLevel.PureClashTest.Main where
+module PureClashTest.Main where
 
 import CLaSH.Prelude
 import CLaSH.Signal.Explicit

@@ -27,7 +27,7 @@ clashRules = do
   buildDir <- liftIO $ maybeConfigIO "BUILD" "build"
   clashOut <- liftIO $ maybeConfigIO "CLASH_OUT" (buildDir </> "clash")
 
-  (clashOut </> "*/*.vhdl") %> \ vhdlF -> do
+  (clashOut </> "vhdl/*/*.vhdl") %> \ vhdlF -> do
     let vhdlD = takeDirectory vhdlF
 
     -- TODO: we depend on any VHDL primitives.
@@ -65,18 +65,6 @@ clashRules = do
     -- Actually include the dependencies.
     needMakefileDependencies mkF
 
-    -- I'm just treating the bunch of VHDL that clash spits out as an atomic
-    -- blob. Remove the previously generated VHDL files and put the new ones in
-    -- their place.
-    withTempDir $ \ tmpD -> do
-      (Just clashName) <- getConfig "CLASH_ENTITY_NAME"
-
-      -- generate the vhdl
-      putNormal "Compiling CLaSH sources"
-      () <- cmd clashExec flags "-clash-hdldir" tmpD "--vhdl" srcF
-
-      -- get rid of the old
-      () <- cmd "rm -rf" vhdlD
-
-      -- and replace
-      cmd "mv" (tmpD </> "vhdl" </> clashName) vhdlD
+    -- generate the vhdl
+    putNormal "Compiling CLaSH sources"
+    cmd clashExec flags "-clash-hdldir" clashOut {-tmpD-} "--vhdl" srcF

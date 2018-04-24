@@ -1,7 +1,7 @@
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE MagicHash #-}
 {-# LANGUAGE TemplateHaskell #-}
-module TopLevel.SDCardTest.Main where
+module SDCardTest.Main where
 
 import CLaSH.Prelude
 import CLaSH.Signal.Explicit

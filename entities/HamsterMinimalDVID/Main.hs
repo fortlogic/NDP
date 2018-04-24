@@ -1,4 +1,4 @@
-module TopLevel.HamsterMinimalDVID.Main where
+module HamsterMinimalDVID.Main where
 
 import CLaSH.Prelude
 

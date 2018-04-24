@@ -1,6 +1,6 @@
 {-# LANGUAGE TemplateHaskell #-}
 {-# LANGUAGE DataKinds #-}
-module TopLevel.MinimalDVIDPlusTMDS.Main where
+module MinimalDVIDPlusTMDS.Main where
 
 import CLaSH.Prelude
 import CLaSH.Prelude.Explicit

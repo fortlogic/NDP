@@ -9,7 +9,7 @@
 {-# OPTIONS_GHC -fplugin GHC.TypeLits.Extra.Solver #-}
 {-# OPTIONS_GHC -fplugin GHC.TypeLits.KnownNat.Solver #-}
 {-# OPTIONS_GHC -fplugin GHC.TypeLits.Normalise #-}
-module TopLevel.PopCountTest.Main where
+module PopCountTest.Main where
 
 import Data.Singletons.Prelude
 import Data.Word

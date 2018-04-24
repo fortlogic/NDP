@@ -64,4 +64,4 @@ buildClashCmd :: String -> Action ()
 buildClashCmd project = do
   buildDir <- maybeConfig "BUILD" "build"
   clashOut <- maybeConfig "CLASH_OUT" (buildDir </> "clash")
-  need [clashOut </> project </> project -<.> "vhdl"]
+  need [clashOut </> "vhdl" </> project </> project -<.> "vhdl"]

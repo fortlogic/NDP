@@ -1,6 +1,6 @@
 module Make.Xilinx.XFlow (xflowRules) where
 
-import Data.Char
+
 import Data.Conf
 import Data.List
 import Data.Maybe
@@ -21,15 +21,14 @@ xflowRules = do
     let entityName = takeBaseName prjF
 
     (Just clashOutD) <- getConfig "CLASH_OUT"
-    let clashVhdlD = clashOutD </> entityName
+    let clashVhdlD = clashOutD </> "vhdl" </> entityName
 
     -- fetch the custom VHDL files that will be included in the project.
     (Just topLevelVhdlD) <- getConfig "TOPLEVEL_ENTITIES"
     customVhdlFs <- getDirectoryFiles "" [topLevelVhdlD </> entityName </> "*" <.> "vhdl"]
 
     -- fetch the VHDL files that the clash compiler generated.
-    (Just clashEntity) <- getConfig "CLASH_ENTITY_NAME"
-    need [clashVhdlD </> ( map toLower clashEntity ++ "_topentity.vhdl")]
+    need [clashVhdlD </> entityName <.> "vhdl"]
     clashVhdlFs <- getDirectoryFiles "" [clashVhdlD  </> "*" <.> "vhdl"]
 
     -- fetch a clocking entity if one is specified

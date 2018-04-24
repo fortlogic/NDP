@@ -15,9 +15,9 @@ Vagrant.configure(2) do |config|
 
   config.vm.hostname = "NDP-xilinx-host"
 
-  config.vm.synced_folder (ENV['DEVROOT'] + "/hdl/xilinx"), "/xilinx"
+  config.vm.synced_folder (ENV['DEVROOT'] + "/Toolchain/xilinx"), "/xilinx"
 
-  config.vm.provision :shell, path: (ENV['DEVROOT'] + "/hdl/xilinx/provision-vm.sh")
+  config.vm.provision :shell, path: (ENV['DEVROOT'] + "/Toolchain/xilinx/provision-vm.sh")
 
   config.ssh.forward_x11 = true
 
