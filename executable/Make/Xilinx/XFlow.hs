@@ -11,7 +11,7 @@ import System.Posix.Escape
 
 import Make.Config
 import Make.HDL
-import Make.Utils
+
 import Make.Vagrant
 
 xflowRules :: Rules ()
@@ -27,13 +27,12 @@ xflowRules = do
     let hdlExt = hdlExtension hdl
 
     -- fetch the HDL files that the clash compiler generated.
-    (Just clashEntity) <- getConfig "CLASH_ENTITY_NAME"
     need [ clashHdlD </> entityName <.> hdlExt ]
     clashHdlFs <- getDirectoryFiles "" [clashHdlD  </> "*" <.> hdlExt]
 
     -- fetch a clocking entity if one is specified
     (Just clockDir) <- getConfig "HDL_CLOCKS"
-    (Just entityD) <- getConfig "TOPLEVEL_ENTITIES"
+    (Just entityD) <- getConfig "HDL_ENTITIES"
     (Just configF) <- getConfig "ENTITY_CONFIG_SETTINGS"
     entityConstraints <- (liftIO . readConf) $ entityD </> entityName </> configF
     let maybeClockHdl = do
