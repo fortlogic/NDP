@@ -1,0 +1,25 @@
+* TODOs
+** Neccesities
+*** Update Clash Version
+    I want explicit clocking and reset lines.
+*** Move Clock Generation into Clash
+    Investigate creating the necessary primitives and whatnot necessary for
+    having the entire clock generation setup written in clash.
+** Niceties
+*** Move LPDDR Controller into Clash
+    Make the necessary primitives that let Clash instantiate the memory
+    controller. Ideally the entire thing could be configurable in clash, but it
+    might be necessary to generate the controller with the xilinx tools and make
+    it easy to instantiate the resulting wrapper inside clash.
+** Possibilities
+*** Dhall
+    Consider using the [[https://github.com/dhall-lang/dhall-lang][Dhall configuration language]] as an alternative to the
+    configuration language currently being used. There are a few places where it
+    might be a good substitute for the current arrangement.
+
+    - ~NDP.config~ :: A more structured configuration file would be nice, also the
+                      current syntax is kind of icky.
+    - Top level entity ~config.hs~ :: The current 'haskell subset that isn't quite
+         haskell' arrangement is a little squicky at times.
+    - Constraint files and ROM maps :: more structure, better type checking would
+         be nice. Somewhat less opaque errors would also be nice...
