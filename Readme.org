@@ -6,6 +6,16 @@
     Investigate creating the necessary primitives and whatnot necessary for
     having the entire clock generation setup written in clash.
 ** Niceties
+*** Make GHC plugin to generate Xilinx artefacts
+    Define a set of custom annotations that let the following artefacts be
+    defined inline:
+
+    - Constraints
+    - Clock related stuff?
+    - xflow's ~.prj~ files
+
+      A front-end GHC plugin can then read those annotations and generate the
+      correcte artefacts for the xilinx toolchain to consume.
 *** Move LPDDR Controller into Clash
     Make the necessary primitives that let Clash instantiate the memory
     controller. Ideally the entire thing could be configurable in clash, but it
