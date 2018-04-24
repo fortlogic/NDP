@@ -1,17 +1,18 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE TemplateHaskell #-}
-module Tests.TMDS (tmdsTests) where
+module NDP.Tests.TMDS (tmdsTests) where
 
 import CLaSH.Prelude
 import Formatting
 import Formatting.ShortFormatters
 import Test.Hspec
-import Test.Hspec.QuickCheck
+-- -- import Test.Hspec.QuickCheck
 import Test.QuickCheck
 
 import NDP.Video.TMDS
 
+tmdsTests :: String -> Spec
 tmdsTests name = describe name $ do
   it "xorEncode and xorDecode are inverses" $ property $
     \ byte -> (byte :: BitVector 16) == (xorEncode . xorDecode) byte
@@ -29,8 +30,8 @@ tmdsTests name = describe name $ do
   it "encodeByte and decodeByte are inverses" $ property $
     \ byte dc -> byte == (decodeByte $ snd $ encodeByte dc byte)
 
-itShouldDecode :: BitVector 10 -> Unsigned 8 -> SpecWith ()
+itShouldDecode :: BitVector 10 -> Unsigned 8 -> Spec
 itShouldDecode word byte = do
-  let label = formatToString ("should decode " % sh % " to " % sh) word byte
-  it label $ do
+  let lbl = formatToString ("should decode " % sh % " to " % sh) word byte
+  it lbl $ do
     (decodeByte word) `shouldBe` pack byte

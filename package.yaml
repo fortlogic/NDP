@@ -18,7 +18,7 @@ extra-source-files:
 - README.md
 - stack.yaml
 
-ghc-options: -Wall
+ghc-options: -Wall -Werror
 
 library:
   dependencies:
@@ -53,8 +53,8 @@ benchmarks:
     source-dirs: benchmark
     main: Main.hs
     dependencies:
-    - base
     - NDP
+    - base
     - criterion
     ghc-options:
     - -rtsopts
@@ -66,11 +66,14 @@ tests:
     source-dirs: test-suite
     main: Main.hs
     dependencies:
-    - base
     - NDP
+    - QuickCheck
+    - base
+    - clash-prelude
+    - formatting
+    - hspec
     - tasty
     - tasty-hspec
-    - QuickCheck
     ghc-options:
     - -rtsopts
     - -threaded

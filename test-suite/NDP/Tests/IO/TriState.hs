@@ -1,10 +1,11 @@
-module Tests.IO.TriState (tristateTests) where
+module NDP.Tests.IO.TriState (tristateTests) where
 
 import CLaSH.Prelude
 import Test.Hspec
 
 import NDP.IO.TriState
 
+tristateTests :: String -> Spec
 tristateTests name = describe name $ do
   describe "Datatypes" $ do
     describe "in2bit" $ do
