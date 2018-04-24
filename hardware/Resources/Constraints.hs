@@ -15,3 +15,4 @@ flattenNetParameter :: NetParameter -> NetParameter
 flattenNetParameter p@(NetKV _ _) = p
 flattenNetParameter p@(NetFlag _) = p
 flattenNetParameter (NetLoc l) = NetKV "LOC" ("\"" ++ l ++ "\"")
+

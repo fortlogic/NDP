@@ -14,8 +14,8 @@ as !!? a = if a < 0 then
              Nothing
            else
              search as a
-  where search (a:as) 0 = Just a
-        search (a:as) n = search as (n-1)
+  where search (x:_) 0 = Just x
+        search (_:xs) n = search xs (n-1)
         search []     _ = Nothing
 
 withPath :: ([FilePath] -> [FilePath]) -> FilePath -> FilePath
@@ -25,9 +25,9 @@ pathIdx :: FilePath -> Int -> FilePath
 pathIdx p i = (splitDirectories p) !! i
 
 pathIdx' :: FilePath -> Int -> FilePath
-pathIdx' p i = split !! (max - i)
+pathIdx' p i = split !! (top - i)
   where split = splitDirectories p
-        max = length split - 1
+        top = length split - 1
 
 withReverse :: ([a] -> [b]) -> [a] -> [b]
 withReverse f = reverse . f . reverse

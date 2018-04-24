@@ -1,11 +1,6 @@
 module Main where
 
-import Data.Maybe
 import Development.Shake
-import Development.Shake.Config
-import Development.Shake.FilePath
-import System.Environment
-
 
 import Make.Clash
 import Make.Config
@@ -13,7 +8,6 @@ import Make.GHDL
 import Make.Oracles
 import Make.Shortcuts
 import Make.TileROM
-import Make.Vagrant
 import Make.Xilinx.Constraints
 import Make.Xilinx.XFlow
 -- import qualified Tests.Main as T

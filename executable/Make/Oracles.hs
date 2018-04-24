@@ -18,10 +18,10 @@ import Make.Vagrant
 
 installOracles :: Rules ()
 installOracles = do
-  clashVersionAddOracle
-  osPlatformAddOracle
-  vagrantStatusAddOracle
-  cpuArchitectureAddOracle
+  _ <- clashVersionAddOracle
+  _ <- osPlatformAddOracle
+  _ <- vagrantStatusAddOracle
+  _ <- cpuArchitectureAddOracle
   return ()
 
 newtype ClashVersion = ClashVersion ()

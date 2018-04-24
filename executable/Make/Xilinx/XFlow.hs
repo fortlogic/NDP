@@ -10,9 +10,10 @@ import Development.Shake.FilePath
 import System.Posix.Escape
 
 import Make.Config
-import Make.Utils
+
 import Make.Vagrant
 
+xflowRules :: Rules ()
 xflowRules = do
   (Just xilinxD) <- liftIO $ getConfigIO "XILINX_OUT"
 

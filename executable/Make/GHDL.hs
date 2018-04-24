@@ -1,6 +1,6 @@
 module Make.GHDL (ghdlRules) where
 
-import Data.Char
+
 import Development.Shake
 import Development.Shake.Config
 import Development.Shake.FilePath
@@ -10,6 +10,7 @@ import Make.Config
 import Make.Utils
 
 
+ghdlRules :: Rules ()
 ghdlRules = do
   (Just ghdlDir) <- liftIO $ getConfigIO "GHDL_OUT"
 

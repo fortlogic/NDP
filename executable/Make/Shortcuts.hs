@@ -1,7 +1,5 @@
 module Make.Shortcuts (shortcutRules) where
 
-import Data.List
-import Data.Maybe
 import Development.Shake
 import Development.Shake.Config
 import Development.Shake.FilePath
@@ -10,14 +8,17 @@ import Make.Command
 import Make.Config
 import Make.Vagrant
 
+shortcutRules :: Rules ()
 shortcutRules = do
   installCommandTree $ commandGroup ":" [fpgaCommands, clashCommands]
 
+fpgaCommands :: CommandTree
 fpgaCommands = commandGroup "fpga:" [mkCommand "reset:" resetCmd
                                     ,mkCommand "build:" buildCmd
                                     ,mkCommand "load:" loadCmd
                                     ,mkCommand "burn:" burnCmd]
 
+clashCommands :: CommandTree
 clashCommands = mkCommand "clash:" buildClashCmd
 
 resetCmd :: String -> Action ()
@@ -52,12 +53,12 @@ burnCmd project = do
   need [container </> project -<.> "bit"]
 
   let vagrantBitfile = vmContainer </> project -<.> "bit"
-  let command = ["sudo", fpgaProg,
+  let burnCmdline = ["sudo", fpgaProg,
                  "-vf", vagrantBitfile,
                  "-b", burner,
                  "-sa", "-r"]
 
-  withVagrant $ vagrantSSH command
+  withVagrant $ vagrantSSH burnCmdline
 
 buildClashCmd :: String -> Action ()
 buildClashCmd project = do

@@ -10,10 +10,13 @@ import Development.Shake.Config
 import Development.Shake.FilePath
 
 import Make.Config
+import Resources.Constraints
 
 -- I want a shorter name for this
+utf8 :: String -> Builder
 utf8 = stringUtf8
 
+ucfRules :: Rules ()
 ucfRules = do
   (Just xilinxD) <- liftIO $ getConfigIO "XILINX_OUT"
 
@@ -23,7 +26,7 @@ ucfRules = do
     -- read config vars
     (Just masterConstraintsF) <- getConfig "FPGA_CONSTRAINTS"
     (Just entityD) <- getConfig "TOPLEVEL_ENTITIES"
-    (Just mainClashNameF) <- getConfig "TOPLEVEL_HS_FILE"
+    -- (Just mainClashNameF) <- getConfig "TOPLEVEL_HS_FILE"
     (Just constraintsF) <- getConfig "ENTITY_CONFIG_SETTINGS"
 
     need [masterConstraintsF,

@@ -5,7 +5,7 @@ module Make.Command (CommandTree (),
 
 import Control.Monad
 import Data.List
-import Data.Maybe
+
 import Development.Shake
 
 -- Represents a heiarchy of commands.
@@ -13,7 +13,7 @@ data CommandTree = Command (String -> Action ()) -- Command that takes an argume
                  | CommandSet String [CommandTree] -- a set of commands beginning with a name.
 
 mkCommand :: String -> (String -> Action ()) -> CommandTree
-mkCommand name command = CommandSet name [Command command]
+mkCommand name act = CommandSet name [Command act]
 
 commandGroup :: String -> [CommandTree] -> CommandTree
 commandGroup prefix commands = CommandSet prefix commands
@@ -35,7 +35,7 @@ prefixMatcher p (PM m) = PM $ \ input -> join $ m <$> stripPrefix p input
 
 -- Turns a command tree into a matcher
 commandTreeMatcher :: CommandTree -> PhonyMatcher
-commandTreeMatcher (Command action) = PM $ \ arg -> Just (action arg)
+commandTreeMatcher (Command act) = PM $ \ arg -> Just (act arg)
 commandTreeMatcher (CommandSet prefix cmds) = prefixMatcher prefix (mconcat children)
   where children = map commandTreeMatcher cmds
 

@@ -7,24 +7,19 @@ import Development.Shake.FilePath
 import Development.Shake.Util
 
 import Make.Config
-import Make.Oracles
-import Make.Utils
 
+clashExec :: String
 clashExec = "stack exec clash --"
 
 ghcFlags :: Action [String]
 ghcFlags = do
-  clashVer <- askOracleWith (ClashVersion ()) ""
   odir <- configFlag2 "-odir" "CLASH_ODIR"
   hidir <- configFlag2 "-hidir" "CLASH_HIDIR"
   idir <- configFlag "-i" "SRC"
   primDir <- configFlag "-i" "VHDL_PRIMITIVES"
   return (odir ++ hidir ++ [idir] ++ [primDir])
 
-hsDeps :: [(FilePath, [FilePath])] -> [FilePath]
-hsDeps = filter isHs . concat . map snd
-  where isHs = isSuffixOf ".hs"
-
+clashRules :: Rules ()
 clashRules = do
 
   -- This is cheating but since the locations of the targets are determined by
@@ -35,9 +30,10 @@ clashRules = do
   (clashOut </> "*/*.vhdl") %> \ vhdlF -> do
     let vhdlD = takeDirectory vhdlF
 
-    -- we depend on any VHDL primitives.
-    (Just primitiveD) <- getConfig "VHDL_PRIMITIVES"
-    primitiveFs <- getDirectoryFiles primitiveD ["*.json"]
+    -- TODO: we depend on any VHDL primitives.
+    -- (Just primitiveD) <- getConfig "VHDL_PRIMITIVES"
+    -- primitiveFs <- getDirectoryFiles primitiveD ["*.json"]
+
     -- getDirectoryFiles implicitly `need`s the results so we don't need to do
     -- it.
 
@@ -73,10 +69,7 @@ clashRules = do
     -- blob. Remove the previously generated VHDL files and put the new ones in
     -- their place.
     withTempDir $ \ tmpD -> do
-      (Just entityD) <- getConfig "TOPLEVEL_ENTITIES"
       (Just clashName) <- getConfig "CLASH_ENTITY_NAME"
-
-      flags <- ghcFlags
 
       -- generate the vhdl
       putNormal "Compiling CLaSH sources"

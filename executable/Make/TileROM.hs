@@ -4,7 +4,7 @@ module Make.TileROM (tileROMRules,
 
 import qualified Data.ByteString.Char8 as C
 import Data.Conf
-import Data.List
+
 import Data.Maybe
 import qualified Data.Vector.Storable as V
 import Development.Shake
@@ -14,8 +14,10 @@ import Graphics.Netpbm
 
 import Make.Config
 import Make.PPM
-import Make.Utils
 
+import Resources.ROM.Tiles
+
+tileROMRules :: Rules ()
 tileROMRules = do
   buildDir <- liftIO $ maybeConfigIO "BUILD" "build"
   (buildDir </> "ROM/tile/*.rom") %> \ rom -> do
@@ -25,23 +27,19 @@ tileROMRules = do
     buildTileROM tileMap mapName rom
 
 getTileMap :: String -> Conf -> Maybe TileMap
-getTileMap name conf = getConf name conf
-
-getTileMap :: String -> Conf -> Maybe TileMap
-getTileMap name conf = getConf name conf
+getTileMap mapName conf = getConf mapName conf
 
 buildTileROM :: FilePath -> String -> FilePath -> Action ()
 buildTileROM mapFile tileSet romPath = do
   -- parse the map file
-  raw <- liftIO $ readConf mapFile
   maybeMap <- getTileMap <$> pure tileSet <*> liftIO (readConf mapFile)
   case verifyMap <$> maybeMap of -- error if something is wrong
     Nothing -> error ("* " ++ mapFile ++ " : unable to parse")
     Just False -> error ("* " ++ mapFile ++ " : invalid tile map")
     _ -> return ()
   -- extract a list of tile data (for each character)
-  let map = fromJust maybeMap
-  let tilesContent = [ mapTile map idx | idx <- [0..255] ]
+  let tileMap = fromJust maybeMap
+  let tilesContent = [ mapTile tileMap idx | idx <- [0..255] ]
   -- grab the bytes and write them out
   liftIO $ do
     romBytes <- tiles2bytes (takeDirectory mapFile) tilesContent
@@ -53,8 +51,8 @@ tiles2bytes root ts = C.intercalate (C.pack "\n") <$> sequence tileBytes
   where tileBytes = map (tile2bytes root) ts
 
 tile2bytes :: FilePath -> TileData -> IO C.ByteString
-tile2bytes root td = C.intercalate (C.pack "\n") <$> lines
-  where lines = sequence [ tileDataLine root td ln | ln <- [0..7] ]
+tile2bytes root td = C.intercalate (C.pack "\n") <$> tileLines
+  where tileLines = sequence [ tileDataLine root td ln | ln <- [0..7] ]
 
 -- Returns ROM source file line given some TileData and a line index
 tileDataLine :: FilePath -> TileData -> Int -> IO C.ByteString

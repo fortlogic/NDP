@@ -29,10 +29,10 @@ vagrantStatusIO = do
     (return . dropWhile (==' ') . drop 7) line
 
 withVagrant :: Action a -> Action a
-withVagrant action = do
+withVagrant act = do
   vagrantStatus <- askOracleWith (VagrantStatus ()) (Just "")
   if statusRunning vagrantStatus
-    then action
+    then act
     else error "Unable to start Vagrant VM"
 
 statusRunning :: Maybe String -> Bool
