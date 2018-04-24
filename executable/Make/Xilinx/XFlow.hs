@@ -23,12 +23,11 @@ xflowRules = do
 
     (Just hdl) <- (readConfig @ HDL) "PREFERRED_HDL"
     (Just clashOutD) <- getConfig "CLASH_OUT"
-    let clashHdlD = clashOutD </> entityName </> hdlName hdl
+    let clashHdlD = clashOutD </> hdlName hdl </> entityName
     let hdlExt = hdlExtension hdl
 
     -- fetch the HDL files that the clash compiler generated.
     (Just clashEntity) <- getConfig "CLASH_ENTITY_NAME"
-    --need [clashHdlD </> ( map toLower clashEntity ++ "_topentity") <.> hdlExt]
     need [ clashHdlD </> entityName <.> hdlExt ]
     clashHdlFs <- getDirectoryFiles "" [clashHdlD  </> "*" <.> hdlExt]
 

@@ -37,8 +37,8 @@ clashRules = do
   -- the config file...
   clashOut <- getClashOut
 
-  (clashOut </> "*/vhdl/*.vhdl") %> buildHDL VHDL
-  (clashOut </> "*/verilog/*.v") %> buildHDL Verilog
+  (clashOut </> "vhdl/*/*.vhdl") %> buildHDL VHDL
+  (clashOut </> "verilog/*/*.v") %> buildHDL Verilog
 
 
 buildHDL :: HDL -> FilePath -> Action ()
@@ -63,7 +63,7 @@ buildHDL hdl hdlF = do
   -- rebuild.
 
   let mkF = hdlD <.> "mk"
-  (Just entityD) <- getConfig "TOPLEVEL_ENTITIES"
+  (Just entityD) <- getConfig "HDL_ENTITIES"
   (Just mainClashNameF) <- getConfig "TOPLEVEL_HS_FILE"
   let srcF = entityD </> takeBaseName mkF </> mainClashNameF -<.> "hs"
   flags <- ghcFlags

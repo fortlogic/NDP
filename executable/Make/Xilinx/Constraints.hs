@@ -27,7 +27,7 @@ ucfRules = do
 
     -- read config vars
     (Just masterConstraintsF) <- getConfig "FPGA_CONSTRAINTS"
-    (Just entityD) <- getConfig "TOPLEVEL_ENTITIES"
+    (Just entityD) <- getConfig "HDL_ENTITIES"
     (Just mainClashNameF) <- getConfig "TOPLEVEL_HS_FILE"
     (Just constraintsF) <- getConfig "ENTITY_CONFIG_SETTINGS"
 
