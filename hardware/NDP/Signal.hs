@@ -1,18 +1,18 @@
 {-# LANGUAGE Arrows #-}
 {-# LANGUAGE MagicHash #-}
+{-# LANGUAGE NoImplicitPrelude #-}
 module NDP.Signal (BoolS',
                    SignalA' (SA, sa),
                    SignalA,
                    delayA') where
 
 import CLaSH.Prelude hiding ((.), id)
-import CLaSH.Signal.Explicit
-import CLaSH.Signal.Internal
+import CLaSH.Prelude.Explicit
 import Control.Category
 import Control.Arrow
-import Data.Default
+import Data.Either
 import Data.Maybe
-import Prelude hiding ((.), id)
+-- import Prelude hiding ((.), id)
 
 type BoolS' clk = Signal' clk Bool
 
@@ -71,16 +71,8 @@ instance Category (SignalA' clk) where
 
 instance Arrow (SignalA' clk) where
   arr f = SA $ (<$>) f
-  first (SA f) = SA (\ inS -> let ~(l, r) = unbundle' undefined inS
-                              in bundle' undefined (f l, r))
-
-isLeft :: Either a b -> Bool
-isLeft (Left _) = True
-isLeft (Right _) = False
-
-isRight :: Either a b -> Bool
-isRight (Left _) = False
-isRight (Right _) = True
+  first (SA f) = SA (\ inS -> let ~(l, r) = unbundle inS
+                              in bundle (f l, r))
 
 fromLeft :: (Either a b) -> Maybe a
 fromLeft (Left a) = Just a
@@ -114,6 +106,6 @@ instance ArrowChoice (SignalA' clk) where
 -- second (loop f)             :=: loop (arr assoc >>> second f >>> arr unassoc)
 
 instance ArrowLoop (SignalA' clk) where
-  loop (SA f) = SA (\ b -> let ~(c, d) = unbundle' undefined (f (bundle' undefined (b, d)))
+  loop (SA f) = SA (\ b -> let ~(c, d) = unbundle (f (bundle (b, d)))
                            in c)
 

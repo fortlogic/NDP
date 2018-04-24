@@ -23,6 +23,8 @@ ghc-options: -Wall
 library:
   dependencies:
   - base
+  - clash-prelude
+  - data-default
   source-dirs: hardware
 
 executables:

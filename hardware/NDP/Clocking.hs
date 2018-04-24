@@ -16,11 +16,9 @@ module NDP.Clocking (RawClk,
 
 import CLaSH.Prelude
 import CLaSH.Prelude.Explicit
-import CLaSH.Sized.Internal.BitVector (shiftR#)
-
 
 -- The speed parameter for clocks is the frequency in Megahertz * 100
-type RawClk = Clk "Raw" 5000
+type RawClk = 'Clk "Raw" 5000
 
 rawClk :: SClock RawClk
 rawClk = sclock
@@ -28,8 +26,8 @@ rawClk = sclock
 type SignalRaw a = Signal' RawClk a
 
 -- TMDS clock is the x5 DDR clock
-type PixelClk = Clk "HDMI" 4000 -- Clock speeds are MHz*100, making this 40Mhz
-type Pixelx5Clk  = Clk "HDMI" 800
+type PixelClk = 'Clk "HDMI" 4000 -- Clock speeds are MHz*100, making this 40Mhz
+type Pixelx5Clk  = 'Clk "HDMI" 800
 
 pxClk :: SClock PixelClk
 pxClk = sclock
@@ -57,10 +55,10 @@ clockStrobe slowClk fastClk  = xor <$> fastOSC <*> fastOSC'
 
 -- Latches onto the input word at the start of every pixel clock cycle.
 pxTo5x :: SignalPx (BitVector 10) -> SignalPx5 (BitVector 2)
-pxTo5x tmdsIn = tail
+pxTo5x tmdsIn = tail'
   where tmds = unsafeSynchronizer pxClk px5Clk tmdsIn
         strobe = clockStrobe pxClk px5Clk
-        (body, tail) = unbundle $ split <$> mux strobe tmds body'
-        body' = register' px5Clk 0 $ (++#) <$> tail <*> (body :: SignalPx5 (BitVector 8))
+        (body, tail') = unbundle $ split <$> mux strobe tmds body'
+        body' = register' px5Clk 0 $ (++#) <$> tail' <*> (body :: SignalPx5 (BitVector 8))
 
 -- simulate pxTo5x [$$(bLit "0101010101"), $$(bLit "0111100001"), $$(bLit "1000011110")]

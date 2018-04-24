@@ -1,5 +1,8 @@
-module Resources.PipistrelloConstraints where
+module Resources.Constraints.Pipistrello where
 
+import Resources.Constraints
+
+requiredConstraints :: Constraints
 requiredConstraints = Constraints {
   rawConstraints = [
       "CONFIG VCCAUX = \"3.3\"",
@@ -11,6 +14,7 @@ requiredConstraints = Constraints {
       ]
   }
 
+audioNets :: Constraints
 audioNets = Constraints {
   rawConstraints = [],
   netConstraints = [
@@ -25,6 +29,7 @@ audioNets = Constraints {
       ]
   }
 
+builtinLEDNets :: Constraints
 builtinLEDNets = Constraints {
   rawConstraints = [],
   netConstraints = [
@@ -51,11 +56,13 @@ builtinLEDNets = Constraints {
       ]
   }
 
+builtinButtonNets :: Constraints
 builtinButtonNets = Constraints {
   rawConstraints = [],
   netConstraints = [ ("button(0)", [ NetLoc "N14", NetKV "IOSTANDARD" "LVTTL" ])]
   }
 
+sdCardSpiNets :: Constraints
 sdCardSpiNets = Constraints {
   rawConstraints = [],
   netConstraints = [
@@ -73,6 +80,7 @@ sdCardSpiNets = Constraints {
       ]
   }
 
+tmdsNets :: Constraints
 tmdsNets = Constraints {
   rawConstraints = [],
   netConstraints = [

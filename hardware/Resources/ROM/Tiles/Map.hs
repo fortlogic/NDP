@@ -2,6 +2,7 @@ module Resources.ROM.Tiles.Map where
 
 import Resources.ROM.Tiles
 
+cbm :: TileMap
 cbm = TileMap {
   defaultTile = Empty,
   tiles = [ Tile { name = "A", code = 0x01, content = File "A.pbm" },
@@ -31,6 +32,7 @@ cbm = TileMap {
             Tile { name = "Y", code = 0x19, content = File "Y.pbm" },
             Tile { name = "Z", code = 0x1A, content = File "Z.pbm" }]}
 
+ascii :: TileMap
 ascii = TileMap {
   defaultTile = Empty,
   tiles = [ Tile { name = "A", code = 0x41, content = File "A.pbm" } ]}

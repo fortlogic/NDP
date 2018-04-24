@@ -1,3 +1,4 @@
+{-# LANGUAGE DataKinds #-}
 module NDP.ADB.Raw where
 
 import CLaSH.Prelude

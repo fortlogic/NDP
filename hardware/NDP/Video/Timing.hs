@@ -36,8 +36,8 @@ data TimeRegion = ImageR
                 deriving (Show, Eq, Ord)
 
 data VideoTime = VidTime {
-  vTime :: Unsigned 10,
-  hTime :: Unsigned 11
+  vTime :: Index 628,
+  hTime :: Index 1056
   } deriving (Show, Eq, Ord)
 
 data VideoRegion = VidRegion {
@@ -49,17 +49,17 @@ videoTimeZero :: VideoTime
 videoTimeZero = VidTime 0 0
 
 vidTick :: VideoTime -> VideoTime
-vidTick (VidTime 627 1055) = VidTime 0     0
-vidTick (VidTime v   1055) = VidTime (v+1) 0
-vidTick (VidTime v   h)    = VidTime v     (h+1)
+vidTick (VidTime 627 1055) = VidTime 0       0
+vidTick (VidTime ver 1055) = VidTime (ver+1) 0
+vidTick (VidTime ver hori) = VidTime ver     (hori+1)
 
 vidRegion :: VideoTime -> VideoRegion
-vidRegion (VidTime v h) = VidRegion (horizontal h) (vertical v)
-  where horizontal h | h < 800  = ImageR
-        horizontal h | h < 840  = PreSyncR
-        horizontal h | h < 968  = SyncR
-        horizontal h | h < 1056 = PostSyncR
-        vertical v | v < 600 = ImageR
-        vertical v | v < 601 = PreSyncR
-        vertical v | v < 605 = SyncR
-        vertical v | v < 628 = PostSyncR
+vidRegion (VidTime vt hr) = VidRegion (horizontal hr) (vertical vt)
+  where horizontal hori | hori < 800  = ImageR
+        horizontal hori | hori < 840  = PreSyncR
+        horizontal hori | hori < 968  = SyncR
+        horizontal _    | otherwise   = PostSyncR
+        vertical vert | vert < 600 = ImageR
+        vertical vert | vert < 601 = PreSyncR
+        vertical vert | vert < 605 = SyncR
+        vertical _    | otherwise  = PostSyncR

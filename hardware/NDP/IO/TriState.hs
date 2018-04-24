@@ -16,6 +16,7 @@ in2bit HighI = high
 bit2in :: Bit -> In
 bit2in 0 = LowI
 bit2in 1 = HighI
+bit2in _ = error "illegal bit"
 
 -- Output going to a bidirectional IO pin
 data Out = LowO | HighO | SilentO deriving (Show, Eq, Ord)

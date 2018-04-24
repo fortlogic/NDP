@@ -9,14 +9,13 @@ module NDP.Video.PixelGenerator (PixelCoord (),
 
 import CLaSH.Prelude
 import CLaSH.Prelude.Explicit
-import qualified Prelude as P
 
 import NDP.Video.CBMColor
 import NDP.Clocking
 import NDP.Video.Timing
 
 -- (Row, Column) or (y,x)
-data PixelCoord = Px (Unsigned 10) (Unsigned 10)
+data PixelCoord = Px (Index 628) (Index 628)
                 deriving (Show, Eq)
 
 pixelCounter :: SignalPx VideoTime

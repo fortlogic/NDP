@@ -9,9 +9,9 @@ module NDP.Utils (int2Signed,
                   ) where
 
 import CLaSH.Prelude
-import Data.Proxy
-import Data.Type.Equality
-import qualified Prelude as P
+-- import Data.Proxy
+-- import Data.Type.Equality
+-- import qualified Prelude as P
 
 int2Signed :: KnownNat n => Int -> Signed n
 int2Signed = fromInteger . toInteger

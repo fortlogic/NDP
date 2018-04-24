@@ -1,6 +1,7 @@
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE MagicHash #-}
+{-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE TemplateHaskell #-}
 {-# LANGUAGE TypeOperators #-}
 module NDP.Video.TMDS (TMDS (TMDSData, TMDSControl),
@@ -15,8 +16,6 @@ module NDP.Video.TMDS (TMDS (TMDSData, TMDSControl),
 
 import CLaSH.Prelude
 import CLaSH.Prelude.Explicit
-import Data.Bits
-import qualified Prelude as P
 
 import NDP.Clocking
 import NDP.Utils
@@ -34,6 +33,7 @@ encodeTMDS dc (TMDSControl 0) = (0, $$(bLit "1101010100"))
 encodeTMDS dc (TMDSControl 1) = (0, $$(bLit "0010101011"))
 encodeTMDS dc (TMDSControl 2) = (0, $$(bLit "0101010100"))
 encodeTMDS dc (TMDSControl 3) = (0, $$(bLit "1010101011"))
+encodeTMDS _  (TMDSControl _) = error "impossible control word"
 
 xnor :: Bits a => a -> a -> a
 xnor a b = complement (xor a b)
@@ -56,7 +56,7 @@ transitionCount :: (KnownNat (2 ^ n),
                      KnownNat n) =>
                     BitVector (2 ^ n) -> Unsigned n
 transitionCount bv = (snd . foldl acc (msb bv, 0) . bv2v) bv
-  where acc (bit, sum) bit' = (bit', sum + if bit == bit' then 0 else 1)
+  where acc (b, total) b' = (b', total + if b == b' then 0 else 1)
 
 dcOffset :: (KnownNat (2 ^ n),
             KnownNat (n + 1)) =>
@@ -72,6 +72,7 @@ onesCount byte = fold (+) (map (extend . unpack) bits)
 bit2sign :: KnownNat n => Bit -> Signed n
 bit2sign 0 = 0
 bit2sign 1 = 1
+bit2sign _ = error "impossible bit"
 
 
 encodeByte :: Signed 4 -> BitVector 8 -> (Signed 4, BitVector 10)
