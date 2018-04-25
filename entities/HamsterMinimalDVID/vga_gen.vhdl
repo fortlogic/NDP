@@ -31,14 +31,17 @@ architecture Behavioral of vga_gen is
    constant h_sync_end   : natural := 800+40+128;
    constant h_max        : natural := 1056;
    signal   h_count      : unsigned(11 downto 0) := (others => '0');
-   signal   h_offset     : unsigned(7 downto 0) := (others => '0');
+   signal   h_offset     : unsigned(15 downto 0) := (others => '0');
 
    constant v_rez        : natural := 600;
    constant v_sync_start : natural := 600+1;
    constant v_sync_end   : natural := 600+1+4;
    constant v_max        : natural := 628;
    signal   v_count      : unsigned(11 downto 0) := x"250";
-   signal   v_offset     : unsigned(7 downto 0) := (others => '0');
+   signal   v_offset     : unsigned(15 downto 0) := (others => '0');
+
+   signal   offset_jmp   : unsigned(31 downto 0) := (others => '0');
+
    signal clk40 : std_logic;
 begin
 
@@ -53,8 +56,8 @@ process(clk40)
    begin
      if rising_edge(clk40) then
        if h_count < h_rez and v_count < v_rez then
-         red_p   <= std_logic_vector(h_count(7 downto 0)+h_offset); -- (7 => h_count(0), others => '0');
-         green_p <= std_logic_vector(v_count(7 downto 0)+v_offset);
+         red_p   <= std_logic_vector(h_count(7 downto 0)+h_offset(7 downto 0)); -- (7 => h_count(0), others => '0');
+         green_p <= std_logic_vector(v_count(7 downto 0)+v_offset(7 downto 0));
          blue_p  <= std_logic_vector(h_count(7 downto 0)+v_count(7 downto 0));
          blank   <= '0';
          if h_count = 0 or h_count = h_rez-1 then
@@ -88,9 +91,13 @@ process(clk40)
 
        if h_count = h_max then
          h_count <= (others => '0');
+         h_offset <= h_offset + offset_jmp(17 downto 2);
+         v_offset <= v_offset + offset_jmp(16 downto 1);
+
          if v_count = v_max then
-           h_offset <= h_offset + 1;
-           v_offset <= v_offset + 1;
+           h_offset <= (others => '0'); -- h_offset + 1;
+           v_offset <= (others => '0'); -- v_offset + 1;
+           offset_jmp <= offset_jmp + 1;
            v_count <= (others => '0');
          else
            v_count <= v_count+1;
