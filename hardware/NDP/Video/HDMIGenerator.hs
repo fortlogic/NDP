@@ -2,7 +2,7 @@
 {-# LANGUAGE NoImplicitPrelude #-}
 module NDP.Video.HDMIGenerator where
 
-import CLaSH.Prelude
+import Clash.Prelude
 
 import NDP.Video.CBMColor
 import NDP.Clocking

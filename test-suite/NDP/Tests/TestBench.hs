@@ -1,6 +1,6 @@
 module Tests.TestBench where
 
-import CLaSH.Prelude
+import Clash.Prelude
 
 topEntity :: Signal Bool -> Signal Bool
 topEntity s = not <$> s

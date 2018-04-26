@@ -4,7 +4,7 @@
 {-# OPTIONS_GHC -fplugin GHC.TypeLits.Normalise #-}
 module NDP.Processor.Registers where
 
-import CLaSH.Prelude
+import Clash.Prelude
 import Data.Singletons.Prelude
 
 

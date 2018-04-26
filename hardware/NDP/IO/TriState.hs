@@ -2,7 +2,7 @@ module NDP.IO.TriState where
 
 import Prelude()
 
-import CLaSH.Prelude
+import Clash.Prelude
 
 -- Input coming from a bidirectional IO pin
 data In = LowI | HighI deriving (Show, Eq, Ord)

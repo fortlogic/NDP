@@ -13,7 +13,7 @@ module PopCountTest.Main where
 
 import Data.Singletons.Prelude
 import Data.Word
-import CLaSH.Prelude
+import Clash.Prelude
 
 
 {-# ANN topEntity

@@ -1,6 +1,6 @@
 module HamsterMinimalDVID.Main where
 
-import CLaSH.Prelude
+import Clash.Prelude
 
 topEntity :: Signal () -> Signal ()
 topEntity _ = pure ()

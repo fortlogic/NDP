@@ -7,8 +7,8 @@ module NDP.Video.PixelGenerator (PixelCoord (),
                            pixelControl,
                            pixelGenerator) where
 
-import CLaSH.Prelude
-import CLaSH.Prelude.Explicit
+import Clash.Prelude
+import Clash.Prelude.Explicit
 
 import NDP.Video.CBMColor
 import NDP.Clocking

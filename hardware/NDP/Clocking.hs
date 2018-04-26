@@ -14,8 +14,8 @@ module NDP.Clocking (RawClk,
                      clockStrobe,
                      pxTo5x) where
 
-import CLaSH.Prelude
-import CLaSH.Prelude.Explicit
+import Clash.Prelude
+--import Clash.Prelude.Explicit
 
 -- The speed parameter for clocks is the frequency in Megahertz * 100
 type RawClk = 'Clk "Raw" 5000

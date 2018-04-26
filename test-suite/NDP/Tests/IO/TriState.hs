@@ -1,6 +1,6 @@
 module NDP.Tests.IO.TriState (tristateTests) where
 
-import CLaSH.Prelude
+import Clash.Prelude
 import Test.Hspec
 
 import NDP.IO.TriState

@@ -8,7 +8,7 @@ module NDP.Utils (int2Signed,
                   -- shuffleOutside
                   ) where
 
-import CLaSH.Prelude
+import Clash.Prelude
 -- import Data.Proxy
 -- import Data.Type.Equality
 -- import qualified Prelude as P

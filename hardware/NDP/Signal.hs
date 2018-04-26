@@ -6,8 +6,8 @@ module NDP.Signal (BoolS',
                    SignalA,
                    delayA') where
 
-import CLaSH.Prelude hiding ((.), id)
-import CLaSH.Prelude.Explicit
+import Clash.Prelude hiding ((.), id)
+import Clash.Prelude.Explicit
 import Control.Category
 import Control.Arrow
 import Data.Either

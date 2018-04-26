@@ -3,8 +3,8 @@
 {-# LANGUAGE TemplateHaskell #-}
 module SDCardTest.Main where
 
-import CLaSH.Prelude
-import CLaSH.Signal.Explicit
+import Clash.Prelude
+import Clash.Signal.Explicit
 
 import NDP.Clocking
 import NDP.IO.SDCard

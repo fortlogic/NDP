@@ -15,7 +15,7 @@ module NDP.Processor.ALU (ALUMode, ALUOp, alu) where
 
 import Data.Singletons.Prelude
 import Data.Word
-import CLaSH.Prelude
+import Clash.Prelude
 
 {-
 | Mode     | Description                             |

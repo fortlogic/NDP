@@ -2,8 +2,8 @@
 {-# LANGUAGE MagicHash #-}
 module NDP.IO.SDCard (sdController#) where
 
-import CLaSH.Prelude
-import CLaSH.Prelude.Explicit
+import Clash.Prelude
+import Clash.Prelude.Explicit
 
 sdController# :: SClock ('Clk clk speed) ->           -- (arg 0)
            SNat speed ->                              -- (arg 1)

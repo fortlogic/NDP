@@ -1,7 +1,7 @@
 {-# LANGUAGE MagicHash #-}
 module Tests.Clash.Primitives where
 
-import CLaSH.Prelude
+import Clash.Prelude
 
 topEntity :: Signal Bool -> Signal Bit -> Signal Bit -> Signal Bit
 topEntity a b c = primitiveMux# (not <$> a) b c

@@ -2,8 +2,8 @@
 {-# LANGUAGE DataKinds #-}
 module PureClashTest.Main where
 
-import CLaSH.Prelude
-import CLaSH.Signal.Explicit
+import Clash.Prelude
+import Clash.Signal.Explicit
 
 {-# ANN topEntity
   (defTop {
