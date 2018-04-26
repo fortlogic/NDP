@@ -1,8 +1,9 @@
+#+TODO: TODO INPROGRESS | DONE
 * TODOs
 ** Neccesities
-*** Update Clash Version
+*** INPROGRESS Update Clash Version
     I want explicit clocking and reset lines.
-*** Move Clock Generation into Clash
+*** TODO Move Clock Generation into Clash
     Investigate creating the necessary primitives and whatnot necessary for
     having the entire clock generation setup written in clash.
 ** Niceties
