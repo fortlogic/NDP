@@ -1,13 +1,14 @@
 #+TODO: TODO INPROGRESS | DONE
+#+PRIORITY: A E C
 * TODOs
 ** Neccesities
-*** INPROGRESS Update Clash Version
+*** INPROGRESS [#A] Update Clash Version
     I want explicit clocking and reset lines.
-*** TODO Move Clock Generation into Clash
+*** TODO [#C] Move Clock Generation into Clash
     Investigate creating the necessary primitives and whatnot necessary for
     having the entire clock generation setup written in clash.
 ** Niceties
-*** Make GHC plugin to generate Xilinx artefacts
+*** [#D] Make GHC plugin to generate Xilinx artefacts
     Define a set of custom annotations that let the following artefacts be
     defined inline:
 
@@ -17,13 +18,15 @@
 
       A front-end GHC plugin can then read those annotations and generate the
       correcte artefacts for the xilinx toolchain to consume.
-*** Move LPDDR Controller into Clash
+*** [#E] Move LPDDR Controller into Clash
     Make the necessary primitives that let Clash instantiate the memory
     controller. Ideally the entire thing could be configurable in clash, but it
     might be necessary to generate the controller with the xilinx tools and make
     it easy to instantiate the resulting wrapper inside clash.
+*** [#B] Move from HSpec to Tasty
+    Tasty looks fancy and I lust a bit for it. :p
 ** Possibilities
-*** Dhall
+*** [#C] Dhall
     Consider using the [[https://github.com/dhall-lang/dhall-lang][Dhall configuration language]] as an alternative to the
     configuration language currently being used. There are a few places where it
     might be a good substitute for the current arrangement.
