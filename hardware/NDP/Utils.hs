@@ -1,14 +1,17 @@
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE TypeOperators #-}
 module NDP.Utils (int2Signed,
                   bvXForm,
-                  swap
+                  swap,
+                  pulsar
                   -- shuffleInside,
                   -- shuffleOutside
                   ) where
 
 import Clash.Prelude
+import Clash.XException
 -- import Data.Proxy
 -- import Data.Type.Equality
 -- import qualified Prelude as P
@@ -22,6 +25,15 @@ bvXForm f = v2bv . f . bv2v
 
 swap :: (a, b) -> (b, a)
 swap (a, b) = (b, a)
+
+pulsar :: ( KnownNat period
+          , HiddenClockReset domain gated synchronous )
+        => SNat period
+        -> Index period
+        -> Signal domain Bool
+pulsar _ off = moore step (==0) off (pure (errorX "unused"))
+  where step 0 _ = maxBound
+        step n _ = n - 1
 
 -- -- "123456" -> "162534" -- ("123456" -> "16" "25" "34" -> "162534")
 -- shuffleOutside :: (KnownNat n,
