@@ -23,6 +23,22 @@ import NDP.Clocking.Domains
 topEntity :: Clock OutsideD Source
           -> Reset OutsideD Asynchronous
           -> Signal OutsideD (Bit, Bit, Bit, Bit, Bit)
-topEntity = exposeClockReset out
-  where out = register (high, low, high, low, high) (pure lights)
-        lights = (low, high, low, high, low)
+topEntity clk rst = inverter clk rst (low, high, low, high, low)
+  -- exposeClockReset out
+  -- where out = register (high, low, high, low, high) (pure lights)
+  --      lights = (low, high, low, high, low)
+
+
+{-# ANN inverter
+  (Synthesize
+    { t_name = "reset_inverter"
+    , t_inputs = [ PortName "values" ]
+    , t_output = PortName "reg_out"
+  }) #-}
+inverter :: Clock OutsideD Source
+         -> Reset OutsideD Asynchronous
+         -> (Bit, Bit, Bit, Bit, Bit)
+         -> Signal OutsideD (Bit, Bit, Bit, Bit, Bit)
+inverter clk rst a = (exposeClockReset register) clk rst initial (pure a)
+  where initial = (unpack . complement . pack) a
+{-# NOINLINE inverter #-}
