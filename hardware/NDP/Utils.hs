@@ -1,20 +1,38 @@
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE MagicHash #-}
 {-# LANGUAGE NoImplicitPrelude #-}
+{-# LANGUAGE TemplateHaskell #-}
+{-# LANGUAGE TypeFamilies #-}
 {-# LANGUAGE TypeOperators #-}
+{-# OPTIONS_GHC -fplugin GHC.TypeLits.Extra.Solver #-}
+{-# OPTIONS_GHC -fplugin GHC.TypeLits.KnownNat.Solver #-}
+{-# OPTIONS_GHC -fplugin GHC.TypeLits.Normalise #-}
 module NDP.Utils (int2Signed,
                   bvXForm,
                   swap,
-                  pulsar
+                  pulsar,
+                  highbv,
+                  lowbv,
+                  bvcons,
+                  bvsnoc,
+                  msbv,
+                  lsbv,
+                  msbv',
+                  lsbv',
+                  partitionbv,
+                  partitionbv'
                   -- shuffleInside,
                   -- shuffleOutside
                   ) where
 
 import Clash.Prelude
-import Clash.XException
+import Clash.Sized.Internal.BitVector (split#)
 -- import Data.Proxy
 -- import Data.Type.Equality
 -- import qualified Prelude as P
+
+import NDP.Utils.Explicit
 
 int2Signed :: KnownNat n => Int -> Signed n
 int2Signed = fromInteger . toInteger
@@ -31,9 +49,41 @@ pulsar :: ( KnownNat period
         => SNat period
         -> Index period
         -> Signal domain Bool
-pulsar _ off = moore step (==0) off (pure (errorX "unused"))
-  where step 0 _ = maxBound
-        step n _ = n - 1
+pulsar = hideClockReset pulsar#
+
+highbv :: BitVector 1
+highbv = $$(bLit "1")
+
+lowbv :: BitVector 1
+lowbv = $$(bLit "0")
+
+bvcons :: KnownNat n => Bit -> BitVector n -> BitVector (1+n)
+bvcons b bs = (pack b) ++# bs
+
+bvsnoc :: KnownNat n => BitVector n -> Bit -> BitVector (1+n)
+bvsnoc = flip bvcons
+
+msbv :: (BitPack a, KnownNat (BitSize a), KnownNat n, KnownNat m, (BitSize a) ~ (n+m) ) => SNat n -> a -> BitVector n
+msbv _ a = prefix
+  where (prefix, _) = split a
+
+msbv' :: (BitPack a, KnownNat (BitSize a), KnownNat m, (BitSize a) ~ (1+m)) => a -> BitVector 1
+msbv' = msbv SNat
+
+lsbv :: (BitPack a, KnownNat (BitSize a), KnownNat n, KnownNat m, (BitSize a) ~ (m+n) ) => SNat n -> a -> BitVector n
+lsbv _ a = suffix
+  where (_, suffix) = split a
+
+lsbv' :: (BitPack a, KnownNat (BitSize a), KnownNat m, (BitSize a) ~ (m+1)) => a -> BitVector 1
+lsbv' = lsbv SNat
+
+partitionbv :: (KnownNat n, KnownNat m) => BitVector (n*m) -> SNat n -> Vec n (BitVector m)
+partitionbv bv n = partitionbv' bv (toUNat n)
+
+partitionbv' :: (KnownNat n, KnownNat m) => BitVector (n*m) -> UNat n -> Vec n (BitVector m)
+partitionbv' _  UZero     = Nil
+partitionbv' bv (USucc n) = prefix :> (partitionbv' suffix n)
+  where (prefix, suffix) = split# bv
 
 -- -- "123456" -> "162534" -- ("123456" -> "16" "25" "34" -> "162534")
 -- shuffleOutside :: (KnownNat n,

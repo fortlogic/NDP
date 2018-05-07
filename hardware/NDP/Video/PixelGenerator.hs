@@ -3,33 +3,28 @@
 {-# LANGUAGE TemplateHaskell #-}
 module NDP.Video.PixelGenerator (PixelCoord (),
                            pixelCounter,
-                           pixelCounter',
                            pixelControl,
                            pixelGenerator) where
 
 import Clash.Prelude
-import Clash.Prelude.Explicit
 
 import NDP.Video.CBMColor
-import NDP.Clocking
+import NDP.Clocking.Domains
 import NDP.Video.Timing
 
 -- (Row, Column) or (y,x)
 data PixelCoord = Px (Index 628) (Index 628)
                 deriving (Show, Eq)
 
-pixelCounter :: SignalPx VideoTime
-pixelCounter = register' pxClk videoTimeZero step
+pixelCounter :: HiddenClockReset PixelD gated synchronous => Signal PixelD VideoTime
+pixelCounter = register videoTimeZero step
   where step = vidTick <$> pixelCounter
-
-pixelCounter' :: SignalPx a -> SignalPx VideoTime
-pixelCounter' _ = pixelCounter
 
 -- (Maybe (row, col), hSync, vSync)
 pixelControl :: VideoTime -> (Maybe PixelCoord, Bit, Bit)
 pixelControl t = (maybeCoord,
-                  boolToBV (hR == SyncR),
-                  boolToBV (vR == SyncR))
+                  bitCoerce (hR == SyncR),
+                  bitCoerce (vR == SyncR))
   where (VidRegion vR hR) = vidRegion t
         vT = vTime t
         hT = hTime t
@@ -44,5 +39,7 @@ staticPixelGenerator (Px y x) = if inFrameX && inFrameY
   where inFrameY = (y >= 44) && (y < 556)
         inFrameX = (x >= 144) && (x < 656)
 
-pixelGenerator :: SignalPx (Maybe PixelCoord) -> SignalPx (Maybe RGBColor)
+pixelGenerator :: Signal PixelD (Maybe PixelCoord) -> Signal PixelD (Maybe RGBColor)
 pixelGenerator coord = (staticPixelGenerator <$>) <$> coord
+
+-- stretchVecSlice'

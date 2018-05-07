@@ -13,7 +13,7 @@
 {-# OPTIONS_GHC -fplugin GHC.TypeLits.Normalise #-}
 module NDP.Processor.ALU (ALUMode, ALUOp, alu) where
 
-import Data.Singletons.Prelude
+import qualified Data.Singletons.Prelude as S
 import Data.Word
 import Clash.Prelude
 
@@ -122,11 +122,11 @@ bv2t = v2t . unpack
 u2w :: Unsigned 32 -> ALUWord
 u2w = bitCoerce
 
-data Width2Index (f :: TyFun Nat *) :: *
-type instance Apply Width2Index n = Index ((2^n)+1)
+data Width2Index (f :: S.TyFun Nat *) :: *
+type instance S.Apply Width2Index n = Index ((2^n)+1)
 
 popcount :: KnownNat n => BitVector (2 ^ n) -> Index ((2^n)+1)
-popcount bv = tdfold (Proxy @Width2Index) fromIntegral (\_ a b -> plus a b) rt
+popcount bv = tdfold (S.Proxy @Width2Index) fromIntegral (\_ a b -> plus a b) rt
   where rt = bv2t bv
 
 popcount' :: ALUWord -> ALUWord

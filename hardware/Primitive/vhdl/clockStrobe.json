@@ -1,0 +1,19 @@
+{ "BlackBox" :
+  { "name" : "NDP.Clocking.Explicit.clockStrobe#"
+  , "type" :
+"clockStrobe# :: ( HasCallStack                           -- ARG[0]
+                , KnownNat stretch                        -- ARG[1]
+                , KnownNat period )                       -- ARG[2]
+             => Clock ('Dom fast period) gated1           -- ARG[3]
+             -> Clock ('Dom slow (period*stretch)) gated2 -- ARG[4]
+             -> Index stretch                             -- ARG[5]
+             -> Signal ('Dom fast period) Bool"
+    , "templateD" :
+"-- clockStrobe begin
+~GENSYM[~COMPNAME_clockStrobe][0] : block
+
+begin
+end block;
+-- clockStrobe end
+  }
+}

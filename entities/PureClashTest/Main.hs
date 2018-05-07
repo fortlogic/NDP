@@ -1,30 +1,28 @@
-{-# LANGUAGE TemplateHaskell #-}
 {-# LANGUAGE DataKinds #-}
+{-# LANGUAGE NoImplicitPrelude #-}
+{-# LANGUAGE TemplateHaskell #-}
 module PureClashTest.Main where
 
 import Clash.Prelude
-import Clash.Signal.Explicit
+
+import NDP.Clocking.Domains
 
 {-# ANN topEntity
-  (defTop {
+  (Synthesize {
      t_name = "PureClashTest",
-     t_inputs = [],
-     t_outputs = ["led_hdmi_green",
-                  "led_hdmi_red",
-                  "led_sd_green",
-                  "led_sd_red",
-                  "led_usb_red"],
-     t_extraIn = [("clk_vec_in", 1),
-                  ("button", 1)],
-     t_clocks = [ ClockSource {
-       c_name = "dumb_clock",
-       c_inp = [("raw_clk", "clk_vec_in(0)")],
-       c_outp = [("main_clk", show (sclock :: SClock SystemClock))],
-       c_reset = Just ("reset", "button(0)"),
-       c_lock = "stable",
-       c_sync = False
-     } ]
+     t_inputs = [ PortName "clk_in"
+                , PortName "button" ],
+     t_output = PortProduct
+                   ""
+                   [ PortName "led_hdmi_green"
+                   , PortName "led_hdmi_red"
+                   , PortName "led_sd_green"
+                   , PortName "led_sd_red"
+                   , PortName "led_usb_red" ]
    }) #-}
-topEntity :: Signal (Bit, Bit, Bit, Bit, Bit)
-topEntity = register (high, low, high, low, high) (signal lights)
-  where lights = (low, high, low, high, low)
+topEntity :: Clock OutsideD Source
+          -> Reset OutsideD Asynchronous
+          -> Signal OutsideD (Bit, Bit, Bit, Bit, Bit)
+topEntity = exposeClockReset out
+  where out = register (high, low, high, low, high) (pure lights)
+        lights = (low, high, low, high, low)

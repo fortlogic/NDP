@@ -1,30 +1,25 @@
 {-# LANGUAGE Arrows #-}
 {-# LANGUAGE MagicHash #-}
 {-# LANGUAGE NoImplicitPrelude #-}
-module NDP.Signal (BoolS',
-                   SignalA' (SA, sa),
-                   SignalA,
-                   delayA') where
+module NDP.Signal ( SignalA (SA, sa)
+                  ) where
 
 import Clash.Prelude hiding ((.), id)
-import Clash.Prelude.Explicit
+import Clash.Explicit.Prelude
 import Control.Category
 import Control.Arrow
 import Data.Either
 import Data.Maybe
 -- import Prelude hiding ((.), id)
 
-type BoolS' clk = Signal' clk Bool
-
-newtype SignalA' clk i o = SA {
-  sa :: Signal' clk i -> Signal' clk o
+newtype SignalA domain i o = SA {
+  sa :: Signal domain i -> Signal domain o
   }
-type SignalA i o = SignalA' SystemClock i o
 
-delayA' :: a -> SignalA' clk a a
-delayA' d = SA (register' undefined d)
+-- delayA :: a -> SignalA domain a a
+-- delayA d = SA (register' undefined d)
 
-instance Category (SignalA' clk) where
+instance Category (SignalA clk) where
   id = SA (\ x -> x)
   (SA sa1) . (SA sa2) = SA (\ x -> sa1 (sa2 x))
 
@@ -69,18 +64,18 @@ instance Category (SignalA' clk) where
 -- (first f) >>> (arr (id *** g))    :=: (arr (id *** g)) >>> (first f)
 -- (first (first f)) >>> (arr assoc) :=: (arr assoc) >>> (first f)
 
-instance Arrow (SignalA' clk) where
+instance Arrow (SignalA clk) where
   arr f = SA $ (<$>) f
   first (SA f) = SA (\ inS -> let ~(l, r) = unbundle inS
                               in bundle (f l, r))
 
-fromLeft :: (Either a b) -> Maybe a
-fromLeft (Left a) = Just a
-fromLeft _ = Nothing
+mleft :: (Either a b) -> Maybe a
+mleft (Left a) = Just a
+mleft _ = Nothing
 
-fromRight :: (Either a b) -> Maybe b
-fromRight (Right b) = Just b
-fromRight _ = Nothing
+mright :: (Either a b) -> Maybe b
+mright (Right b) = Just b
+mright _ = Nothing
 
 -- TODO: Still to be proven
 -- ArrowChoice Laws:
@@ -90,10 +85,10 @@ fromRight _ = Nothing
 -- left f >>> arr (id +++ g)      :=: arr (id +++ g) >>> left f
 -- left (left f) >>> arr assocsum :=: arr assocsum >>> left f
 
-instance ArrowChoice (SignalA' clk) where
+instance ArrowChoice (SignalA clk) where
   left (SA f) = SA (\ inS ->
-                       let l = Left <$> f (fromJust <$> (fromLeft <$> inS))
-                           r = Right <$> (fromJust <$> (fromRight <$> inS))
+                       let l = Left <$> f (fromJust <$> (mleft <$> inS))
+                           r = Right <$> (fromJust <$> (mright <$> inS))
                            res = mux (isLeft <$> inS) l r
                        in res)
 
@@ -105,7 +100,7 @@ instance ArrowChoice (SignalA' clk) where
 -- loop (loop f)               :=: loop (arr unassoc >>> f >>> arr assoc)
 -- second (loop f)             :=: loop (arr assoc >>> second f >>> arr unassoc)
 
-instance ArrowLoop (SignalA' clk) where
+instance ArrowLoop (SignalA clk) where
   loop (SA f) = SA (\ b -> let ~(c, d) = unbundle (f (bundle (b, d)))
                            in c)
 
