@@ -37,8 +37,8 @@ clashRules = do
   -- the config file...
   clashOut <- getClashOut
 
-  (clashOut </> "vhdl/*/*.vhdl") %> buildHDL VHDL
-  (clashOut </> "verilog/*/*.v") %> buildHDL Verilog
+  (clashOut </> "vhdl/*/*/*.vhdl") %> buildHDL VHDL
+  (clashOut </> "verilog/*/*/*.v") %> buildHDL Verilog
 
 
 buildHDL :: HDL -> FilePath -> Action ()
@@ -85,9 +85,4 @@ buildHDL hdl hdlF = do
 
   -- generate the hdl
   putNormal "Compiling CLaSH sources"
-  () <- cmd clashExec flags "-clash-hdldir" clashOut (hdlFlag hdl) srcF
-
-  -- copy the additional HDL in the entities folder to the destination
-  let srcD = takeDirectory srcF
-  additionalVhdlFs <- getDirectoryFiles srcD [ "*." ++ hdlExtension hdl ]
-  mapM_ (\ f -> copyFile' (srcD </> f) (hdlD </> takeFileName f)) additionalVhdlFs
+  cmd clashExec flags "-outputdir" clashOut (hdlFlag hdl) srcF

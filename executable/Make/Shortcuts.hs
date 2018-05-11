@@ -72,4 +72,4 @@ buildClashCmd :: HDL -> String -> Action ()
 buildClashCmd hdl project = do
   buildDir <- maybeConfig "BUILD" "build"
   clashOut <- maybeConfig "CLASH_OUT" (buildDir </> "clash")
-  need [clashOut  </> hdlName hdl </> project </> project -<.> hdlExtension hdl]
+  need [clashOut  </> hdlName hdl </> project </> project </> project -<.> hdlExtension hdl]
