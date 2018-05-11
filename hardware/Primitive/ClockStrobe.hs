@@ -4,12 +4,12 @@
 {-# LANGUAGE TypeOperators #-}
 module Primitive.ClockStrobe where
 
-import Clash.Prelude
+import Clash.Explicit.Prelude
 import GHC.Stack
 
 import Primitive
 
-{-# ANN module (ndp_primitive VHDL "clockStrobe") #-}
+{-# ANN module (ndp_primitive VHDL) #-}
 
 clockStrobe# :: ( HasCallStack
                 , KnownNat stretch -- the number of fast cycles that fit in a slow one
@@ -18,5 +18,6 @@ clockStrobe# :: ( HasCallStack
              -> Clock ('Dom slow (period*stretch)) gated2 -- slow clock
              -> Index stretch -- pulse offset (0 is start of cycle)
              -> Signal ('Dom fast period) Bool
-clockStrobe# = undefined
+clockStrobe# fast slow offset = osc
+  where osc = delay fast (not <$> osc)
 {-# NOINLINE clockStrobe# #-}

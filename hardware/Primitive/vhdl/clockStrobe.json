@@ -1,6 +1,7 @@
-{ "BlackBox" :
-  { "name" : "NDP.Clocking.Explicit.clockStrobe#"
-  , "type" :
+[
+  { "BlackBox" :
+    { "name" : "Primitive.ClockStrobe.clockStrobe#"
+    , "type" :
 "clockStrobe# :: ( HasCallStack                           -- ARG[0]
                 , KnownNat stretch                        -- ARG[1]
                 , KnownNat period )                       -- ARG[2]
@@ -36,6 +37,7 @@ begin
     end if;
   end process
 end block;
--- clockStrobe end
+-- clockStrobe end"
+    }
   }
-}
+]

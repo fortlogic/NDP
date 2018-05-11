@@ -18,8 +18,8 @@ ghcFlags = do
   odir <- configFlag2 "-odir" "CLASH_ODIR"
   hidir <- configFlag2 "-hidir" "CLASH_HIDIR"
   idir <- configFlag "-i" "SRC"
-  primDir <- configFlag "-i" "HDL_PRIMITIVES"
-  return (odir ++ hidir ++ [idir] ++ [primDir])
+  
+  return (odir ++ hidir ++ [idir])
 
 getBuildDir :: MonadIO m => m String
 getBuildDir = liftIO $ maybeConfigIO "BUILD" "build"
@@ -46,8 +46,8 @@ buildHDL hdl hdlF = do
   clashOut <- getClashOut
 
   -- TODO: we depend on any HDL primitives.
-  -- (Just primitiveD) <- getConfig "VHDL_PRIMITIVES"
-  -- primitiveFs <- getDirectoryFiles primitiveD ["*.json"]
+  -- (Just primitiveD) <- getConfig "HDL_PRIMITIVES"
+  -- _ <- getDirectoryFiles primitiveD ["*.json"]
 
   -- getDirectoryFiles implicitly `need`s the results so we don't need to do
   -- it.
@@ -80,6 +80,9 @@ buildHDL hdl hdlF = do
   -- Actually include the dependencies.
   needMakefileDependencies mkF
 
+  -- Figure out where primitives live and generate the proper include flag
+  primFlags <- (</> hdlName hdl) <$> (configFlag "-i" "HDL_PRIMITIVES")
+
   -- generate the hdl
   putNormal "Compiling CLaSH sources"
-  cmd clashExec flags "-outputdir" clashOut (hdlFlag hdl) srcF
+  cmd clashExec flags primFlags "-outputdir" clashOut (hdlFlag hdl) srcF

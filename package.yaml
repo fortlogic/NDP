@@ -33,6 +33,7 @@ library:
     - ghc-typelits-natnormalise
     - singletons
   source-dirs: hardware
+  # generated-exposed-modules: Paths_NDP
   generated-other-modules: Paths_NDP
 
 data-files:
