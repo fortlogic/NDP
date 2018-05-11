@@ -37,3 +37,8 @@
          haskell' arrangement is a little squicky at times.
     - Constraint files and ROM maps :: more structure, better type checking would
          be nice. Somewhat less opaque errors would also be nice...
+* References
+  - QA 76.9 C62 E72 :: Digital Arithmetic
+  - QA 76.9 C62 P37 :: Computer Arithmetic: Algorithms and Hardware Designs
+  - QA 76.9 C643 H46 :: Computer Organization and Design
+  - QA 76.9 C643 S73 :: Computer Organization and Architecture
