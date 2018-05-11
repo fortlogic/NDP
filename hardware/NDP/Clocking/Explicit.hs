@@ -9,7 +9,6 @@ module NDP.Clocking.Explicit where
 
 import Clash.Explicit.Prelude
 
-import NDP.Utils.Explicit
 import Primitive.ClockStrobe
 
 
@@ -20,15 +19,15 @@ import Primitive.ClockStrobe
 
 clockStrobe :: ( KnownNat stretch -- the number of fast cycles that fit in a slow one
                , KnownNat period ) -- period of the fast clock
-            => Clock (Dom fast period) gated1 -- fast clock
-            -> Clock (Dom slow (period*stretch)) gated2 -- slow clock
-            -> Signal (Dom fast period) Bool
+            => Clock ('Dom fast period) gated1 -- fast clock
+            -> Clock ('Dom slow (period*stretch)) gated2 -- slow clock
+            -> Signal ('Dom fast period) Bool
 clockStrobe fastC slowC = clockStrobe# fastC slowC 0
 
 clockStrobeD :: ( KnownNat stretch -- the number of fast cycles that fit in a slow one
                 , KnownNat period ) -- period of the fast clock
-             => Clock (Dom fast period) gated1 -- fast clock
-             -> Clock (Dom slow (period*stretch)) gated2 -- slow clock
+             => Clock ('Dom fast period) gated1 -- fast clock
+             -> Clock ('Dom slow (period*stretch)) gated2 -- slow clock
              -> Index stretch -- pulse offset (0 is start of cycle)
-             -> Signal (Dom fast period) Bool
+             -> Signal ('Dom fast period) Bool
 clockStrobeD fastC slowC offset = clockStrobe# fastC slowC offset

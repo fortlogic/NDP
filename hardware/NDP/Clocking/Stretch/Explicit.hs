@@ -32,8 +32,8 @@ import NDP.Clocking.Explicit
 
 sampleHold :: ( KnownNat period
               , KnownNat stretch
-              , fast ~ Dom nameF period
-              , slow ~ Dom nameS (period*(1+stretch)) )
+              , fast ~ 'Dom nameF period
+              , slow ~ 'Dom nameS (period*(1+stretch)) )
            => Clock fast gated1
            -> Reset fast synchronous1
            -> Clock slow gated2
@@ -46,8 +46,8 @@ sampleHold fastC fastR slowC slow = stretchMealy inF iterF initial fastC fastR s
 
 sampleHoldD :: ( KnownNat period
                , KnownNat stretch
-               , fast ~ Dom nameF period
-               , slow ~ Dom nameS (period*(1+stretch)) )
+               , fast ~ 'Dom nameF period
+               , slow ~ 'Dom nameS (period*(1+stretch)) )
             => Clock fast gated1
             -> Reset fast synchronous1
             -> Clock slow gated2
@@ -61,8 +61,8 @@ sampleHoldD fastC fastR slowC initial offset slow = stretchMealyD inF iterF init
 
 stretchVec :: ( KnownNat period
               , KnownNat stretch
-              , fast ~ Dom nameF period
-              , slow ~ Dom nameS (period*(1+stretch)) )
+              , fast ~ 'Dom nameF period
+              , slow ~ 'Dom nameS (period*(1+stretch)) )
            => Clock fast gated1
            -> Reset fast synchronous1
            -> Clock slow gated2
@@ -79,8 +79,8 @@ stretchVec fastC fastR slowC slow = stretchMealy inF iterF initial fastC fastR s
 -- stretchVecSlice :: ( KnownNat period
 --                    , KnownNat stretch
 --                    , KnownNat sliceSize
---                    , fast ~ Dom nameF period
---                    , slow ~ Dom nameS (period*(1+stretch)) )
+--                    , fast ~ 'Dom nameF period
+--                    , slow ~ 'Dom nameS (period*(1+stretch)) )
 --                 => Clock fast gated1
 --                 -> Reset fast synchronous1
 --                 -> Clock slow gated2
@@ -91,8 +91,8 @@ stretchVec fastC fastR slowC slow = stretchMealy inF iterF initial fastC fastR s
 
 -- stretchBitVector :: ( KnownNat period
 --                     , KnownNat stretch
---                     , fast ~ Dom nameF period
---                     , slow ~ Dom nameS (period*(1+stretch)) )
+--                     , fast ~ 'Dom nameF period
+--                     , slow ~ 'Dom nameS (period*(1+stretch)) )
 --                  => Clock fast gated1
 --                  -> Reset fast synchronous1
 --                  -> Clock slow gated2
@@ -104,8 +104,8 @@ stretchVec fastC fastR slowC slow = stretchMealy inF iterF initial fastC fastR s
 stretchBitVectorSlice :: ( KnownNat period
                          , KnownNat stretch
                          , KnownNat sliceSize
-                         , fast ~ Dom nameF period
-                         , slow ~ Dom nameS (period*(1+stretch)) )
+                         , fast ~ 'Dom nameF period
+                         , slow ~ 'Dom nameS (period*(1+stretch)) )
                       => Clock fast gated1
                       -> Reset fast synchronous1
                       -> Clock slow gated2
@@ -123,8 +123,8 @@ stretchBitVectorSlice fastC fastR slowC slow = stretchVec fastC fastR slowC slow
 
 stretchMealy :: ( KnownNat period
                 , KnownNat stretch
-                , fast ~ Dom nameF period
-                , slow ~ Dom nameS (period*(1+stretch)) )
+                , fast ~ 'Dom nameF period
+                , slow ~ 'Dom nameS (period*(1+stretch)) )
              => (acc -> a -> (acc, b))
              -> (acc -> (acc, b))
              -> acc
@@ -137,8 +137,8 @@ stretchMealy inF iterF initial fastC fastR slowC slow = stretchMealyD inF iterF 
 
 stretchMealy' :: ( KnownNat period
                  , KnownNat stretch
-                 , fast ~ Dom nameF period
-                 , slow ~ Dom nameS (period*(1+stretch)) )
+                 , fast ~ 'Dom nameF period
+                 , slow ~ 'Dom nameS (period*(1+stretch)) )
               => (a -> (acc, b))
               -> (acc -> (acc, b))
               -> Clock fast gated1
@@ -150,8 +150,8 @@ stretchMealy' inF iterF fastC slowC slow = undefined
 
 stretchMealyD :: ( KnownNat period
                  , KnownNat stretch
-                 , fast ~ Dom nameF period
-                 , slow ~ Dom nameS (period*(1+stretch)) )
+                 , fast ~ 'Dom nameF period
+                 , slow ~ 'Dom nameS (period*(1+stretch)) )
               => (acc -> a -> (acc, b))
               -> (acc -> (acc, b))
               -> acc
@@ -171,8 +171,8 @@ stretchMealyD inF iterF initial fastC fastR slowC offset slow = fast
 
 stretchMoore :: ( KnownNat period
                 , KnownNat stretch
-                , fast ~ Dom nameF period
-                , slow ~ Dom nameS (period*(1+stretch)) )
+                , fast ~ 'Dom nameF period
+                , slow ~ 'Dom nameS (period*(1+stretch)) )
              => (acc -> a -> acc)
              -> (acc -> acc)
              -> (acc -> b)
@@ -186,8 +186,8 @@ stretchMoore inF iterF outF initial fastC fastR slowC slow = stretchMooreD inF i
 
 stretchMooreD :: ( KnownNat period
                 , KnownNat stretch
-                , fast ~ Dom nameF period
-                , slow ~ Dom nameS (period*(1+stretch)) )
+                , fast ~ 'Dom nameF period
+                , slow ~ 'Dom nameS (period*(1+stretch)) )
               => (acc -> a -> acc)
               -> (acc -> acc)
               -> (acc -> b)

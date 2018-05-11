@@ -5,7 +5,6 @@
 module NDP.Processor.Registers where
 
 import Clash.Prelude
-import qualified Data.Singletons.Prelude as S
 
 
 
