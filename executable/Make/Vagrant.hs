@@ -1,4 +1,5 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
+{-# LANGUAGE TypeFamilies #-}
 module Make.Vagrant (withVagrant,
                      VagrantStatus (..),
                      vagrantStatusAddOracle,
@@ -13,6 +14,7 @@ import System.Posix.Escape
 
 newtype VagrantStatus = VagrantStatus ()
                       deriving (Show, Typeable, Eq, Hashable, Binary, NFData)
+type instance RuleResult VagrantStatus = Maybe String
 
 vagrantStatusAddOracle :: Rules (VagrantStatus -> Action (Maybe String))
 vagrantStatusAddOracle = addOracle $ \ (VagrantStatus _) -> do

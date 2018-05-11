@@ -1,4 +1,5 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
+{-# LANGUAGE TypeFamilies #-}
 module Make.Oracles (installOracles,
                      ClashVersion (..),
                      clashVersionAddOracle,
@@ -26,6 +27,7 @@ installOracles = do
 
 newtype ClashVersion = ClashVersion ()
                      deriving (Show,Typeable,Eq,Hashable,Binary,NFData)
+type instance RuleResult ClashVersion = String
 
 clashVersionAddOracle :: Rules (ClashVersion -> Action String)
 clashVersionAddOracle = addOracle $ \ (ClashVersion _) ->
@@ -36,6 +38,7 @@ clashVersionIO = delete <$> pure '\n' <*> (fromStdout <$> cmd "clash --numeric-v
 
 newtype OSPlatform = OSPlatform ()
                deriving (Show, Typeable, Eq, Hashable, Binary, NFData)
+type instance RuleResult OSPlatform = String
 
 osPlatformAddOracle :: Rules (OSPlatform -> Action String)
 osPlatformAddOracle = addOracle $ \ (OSPlatform _) ->
@@ -46,6 +49,7 @@ osPlatformIO = delete '\n' <$> (fromStdout <$> cmd "uname")
 
 newtype CPUArchitecture = CPUArchitecture ()
                deriving (Show, Typeable, Eq, Hashable, Binary, NFData)
+type instance RuleResult CPUArchitecture = String
 
 cpuArchitectureAddOracle :: Rules (CPUArchitecture -> Action String)
 cpuArchitectureAddOracle = addOracle $ \ (CPUArchitecture _) ->

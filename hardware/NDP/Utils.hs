@@ -32,7 +32,7 @@ import Clash.Sized.Internal.BitVector (split#)
 -- import Data.Type.Equality
 -- import qualified Prelude as P
 
-import NDP.Utils.Explicit
+import qualified NDP.Utils.Explicit as E
 
 int2Signed :: KnownNat n => Int -> Signed n
 int2Signed = fromInteger . toInteger
@@ -49,7 +49,7 @@ pulsar :: ( KnownNat period
         => SNat period
         -> Index period
         -> Signal domain Bool
-pulsar = hideClockReset pulsar#
+pulsar = hideClockReset E.pulsar
 
 highbv :: BitVector 1
 highbv = $$(bLit "1")

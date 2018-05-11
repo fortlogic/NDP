@@ -25,6 +25,7 @@ library:
     - base
     - bytestring
     - clash-prelude
+    - constraints
     - data-default
     - filepath
     - ghc-typelits-extra

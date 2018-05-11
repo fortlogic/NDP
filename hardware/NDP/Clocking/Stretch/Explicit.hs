@@ -163,7 +163,7 @@ stretchMealyD :: ( KnownNat period
               -> Signal fast b
 stretchMealyD inF iterF initial fastC fastR slowC offset slow = fast
   where slow' = E.unsafeSynchronizer slowC fastC slow
-        sampleStrobe = clockStrobe fastC fastR slowC offset
+        sampleStrobe = clockStrobeD fastC slowC offset
         pulse = mux sampleStrobe (Just <$> slow') (pure Nothing)
         stepF acc Nothing = iterF acc
         stepF acc (Just i) = inF acc i
