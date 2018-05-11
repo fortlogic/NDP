@@ -16,7 +16,6 @@ module NDP.Video.TMDS (TMDS (TMDSData, TMDSControl),
 
 import Clash.Prelude
 
-import NDP.Clocking.Domains
 import NDP.Utils
 
 data TMDS = TMDSData (Unsigned 8)
@@ -68,8 +67,7 @@ dcOffset = foldl step 0 . map (/=low) . bv2v
 
 onesCount :: BitVector 8 -> Unsigned 4
 onesCount = foldl (+) 0 . map conv . bv2v
-  where conv 0 = 0
-        conv 1 = 1
+  where conv = fromInteger . toInteger
 
 bit2sign :: KnownNat n => Bit -> Signed n
 bit2sign 0 = 0

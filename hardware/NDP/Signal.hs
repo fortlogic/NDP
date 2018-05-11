@@ -5,7 +5,6 @@ module NDP.Signal ( SignalA (SA, sa)
                   ) where
 
 import Clash.Prelude hiding ((.), id)
-import Clash.Explicit.Prelude
 import Control.Category
 import Control.Arrow
 import Data.Either

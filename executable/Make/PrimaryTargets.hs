@@ -1,10 +1,9 @@
 module Make.PrimaryTargets (primaryRules) where
 
-import qualified Data.ByteString.Lazy as B
 import Development.Shake
 import Development.Shake.Config
-import Development.Shake.FilePath
 
+primaryRules :: Rules ()
 primaryRules = do
   phony "setup" $ do
     () <- cmd "stack setup"

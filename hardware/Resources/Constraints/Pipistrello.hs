@@ -101,6 +101,7 @@ tmdsNets = Constraints {
       ]
   }
 
+wings :: Constraints
 wings = Constraints {
   rawConstraints = [],
   netConstraints =

@@ -41,5 +41,3 @@ staticPixelGenerator (Px y x) = if inFrameX && inFrameY
 
 pixelGenerator :: Signal PixelD (Maybe PixelCoord) -> Signal PixelD (Maybe RGBColor)
 pixelGenerator coord = (staticPixelGenerator <$>) <$> coord
-
--- stretchVecSlice'

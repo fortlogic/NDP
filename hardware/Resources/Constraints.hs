@@ -2,9 +2,7 @@
 module Resources.Constraints where
 
 import Data.ByteString.Builder
-import qualified Data.ByteString.Lazy as B
 import Data.List as L
-import Data.Monoid
 
 data Constraints = Constraints {
   rawConstraints :: [String],
@@ -32,7 +30,7 @@ renderNet :: NetConstraint -> [Builder]
 renderNet (SingleNet name loc attrs) = [renderPrimNet (name <> "(0)") (locP : attrs)]
   where locP = NetKV "LOC" loc
 renderNet (SingleNetLocless name attrs) = [renderPrimNet (name <> "(0)") attrs]
-renderNet (BusNet name locs attrs) = zipWith mkSingle locs [0..]
+renderNet (BusNet name locs attrs) = zipWith mkSingle locs ([0..] :: [Int])
   where mkSingle loc idx = renderPrimNet (mkName idx) (NetKV "LOC" loc : attrs)
         mkName idx = name ++ "(" ++ show idx ++ ")"
 
@@ -50,4 +48,5 @@ renderAttribs attr = mconcat $ intersperse sep $ map renderNetParameter attr
   where sep = stringUtf8 " | "
 
 -- I want a shorter name for this
+utf8 :: String -> Builder
 utf8 = stringUtf8

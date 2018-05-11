@@ -9,8 +9,6 @@ import Development.Shake.Util
 
 import Make.Config
 import Make.HDL
-import Make.Oracles
-import Make.Utils
 
 clashExec :: String
 clashExec = "stack exec clash --"
@@ -44,7 +42,6 @@ clashRules = do
 buildHDL :: HDL -> FilePath -> Action ()
 buildHDL hdl hdlF = do
   let hdlD = takeDirectory hdlF
-  let baseD = takeDirectory hdlD
 
   clashOut <- getClashOut
 

@@ -6,9 +6,8 @@ module NDP.Video.HDMIGenerator where
 import Clash.Prelude
 
 import NDP.Video.CBMColor
-import NDP.Clocking.Domains
-import NDP.Video.PixelGenerator
 import NDP.Video.TMDS
+-- import NDP.Video.PixelGenerator
 
 tmdsLow :: TMDS
 tmdsLow = TMDSControl 0

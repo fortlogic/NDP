@@ -20,6 +20,7 @@ fpgaCommands = commandGroup "fpga:" [mkCommand "reset:" resetCmd
                                     ,mkCommand "burn:" burnCmd
                                     ,mkCommand "stage:" stageCmd]
 
+clashCommands :: CommandTree
 clashCommands = commandGroup "clash:" [ mkCommand "vhdl:" (buildClashCmd VHDL)
                                       , mkCommand "verilog:" (buildClashCmd Verilog)]
 

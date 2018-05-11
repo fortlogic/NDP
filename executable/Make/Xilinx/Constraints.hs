@@ -7,8 +7,6 @@ module Make.Xilinx.Constraints ( ucfRules
 import Data.ByteString.Builder
 import qualified Data.ByteString.Lazy as B
 import Data.Conf
-import Data.List as L
-import Data.Monoid
 import Development.Shake
 import Development.Shake.Config
 import Development.Shake.FilePath
@@ -16,9 +14,7 @@ import Development.Shake.FilePath
 import Make.Config
 import Resources.Constraints
 
--- I want a shorter name for this
-utf8 = stringUtf8
-
+ucfRules :: Rules ()
 ucfRules = do
   (Just xilinxD) <- liftIO $ getConfigIO "XILINX_OUT"
 
@@ -28,7 +24,6 @@ ucfRules = do
     -- read config vars
     (Just masterConstraintsF) <- getConfig "FPGA_CONSTRAINTS"
     (Just entityD) <- getConfig "HDL_ENTITIES"
-    (Just mainClashNameF) <- getConfig "TOPLEVEL_HS_FILE"
     (Just constraintsF) <- getConfig "ENTITY_CONFIG_SETTINGS"
 
     need [masterConstraintsF,
