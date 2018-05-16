@@ -41,6 +41,8 @@ packages:
     extra-dep: true
   - location: https://github.com/dented42/safe-globals/archive/master.zip
     extra-dep: true
+  - location: https://github.com/dented42/shake/archive/8e5e660a9ed9a9f675c7957d17db2775fa1379a8.zip
+    extra-dep: true
 
 # Dependency packages to be pulled from upstream that are not in the resolver
 # (e.g., acme-missiles-0.3)

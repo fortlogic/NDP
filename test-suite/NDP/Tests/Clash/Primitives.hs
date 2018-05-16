@@ -1,12 +1,12 @@
 {-# LANGUAGE MagicHash #-}
-module Tests.Clash.Primitives where
+module NDP.Tests.Clash.Primitives where
 
 import Clash.Prelude
 
-topEntity :: Signal Bool -> Signal Bit -> Signal Bit -> Signal Bit
+topEntity :: Signal domain Bool -> Signal domain Bit -> Signal domain Bit -> Signal domain Bit
 topEntity a b c = primitiveMux# (not <$> a) b c
 
-primitiveMux# :: Signal Bool -> Signal Bit -> Signal Bit -> Signal Bit
+primitiveMux# :: Signal domain Bool -> Signal domain Bit -> Signal domain Bit -> Signal domain Bit
 primitiveMux# cond t f = simpleIf <$> cond <*> t <*> f
   where simpleIf True  x _ = x
         simpleIf False _ x = x

@@ -23,4 +23,5 @@ module NDP.IO.SDCard where
 --                                     Bit,              -- spi clock
 --                                     Bit)              -- spi data (mosi)
 -- sdController# _ _ _ _ _ _ _ _ _ _ _ _ _ = pure (0, 0, 0, 0, 0, 0, 0)
-{- # NOINLINE sdController# #-}
+-- {-# NOINLINE sdController# #-}
+
