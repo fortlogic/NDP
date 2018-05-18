@@ -11,7 +11,7 @@ import Make.Vagrant
 
 shortcutRules :: Rules ()
 shortcutRules = do
-  installCommandTree $ commandGroup ":" [fpgaCommands, clashCommands]
+  installCommandTree $ commandGroup ":" [fpgaCommands, clashCommands, testbenchCommands]
 
 fpgaCommands :: CommandTree
 fpgaCommands = commandGroup "fpga:" [mkCommand "reset:" resetCmd
@@ -23,6 +23,9 @@ fpgaCommands = commandGroup "fpga:" [mkCommand "reset:" resetCmd
 clashCommands :: CommandTree
 clashCommands = commandGroup "clash:" [ mkCommand "vhdl:" (buildClashCmd VHDL)
                                       , mkCommand "verilog:" (buildClashCmd Verilog)]
+
+testbenchCommands :: CommandTree
+testbenchCommands = commandGroup "testbench:" [ mkCommand "vhdl:" (runHDLTestbench VHDL)]
 
 resetCmd :: String -> Action ()
 resetCmd _ = do
@@ -74,3 +77,7 @@ buildClashCmd hdl project = do
   buildDir <- maybeConfig "BUILD" "build"
   clashOut <- maybeConfig "CLASH_OUT" (buildDir </> "clash")
   need [ clashOut  </> hdlName hdl </> project </> "manifest" <.> "txt" ]
+
+runHDLTestbench :: HDL -> String -> Action ()
+runHDLTestbench hdl project = do
+  putNormal "This feature doesn't exist yet."

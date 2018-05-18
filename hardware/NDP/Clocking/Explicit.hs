@@ -9,7 +9,7 @@ module NDP.Clocking.Explicit where
 
 import Clash.Explicit.Prelude
 
-import Primitive.ClockStrobe
+import NDP.Primitive.ClockStrobe
 
 
 

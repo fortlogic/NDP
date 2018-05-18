@@ -1,6 +1,6 @@
 {-# LANGUAGE NoImplicitPrelude #-}
-module Primitive ( HDL (..)
-                 , ndp_primitive ) where
+module NDP.Primitive.Internal ( HDL (..)
+                              , ndp_primitive ) where
 
 import Clash.Annotations.Primitive
 import Paths_NDP

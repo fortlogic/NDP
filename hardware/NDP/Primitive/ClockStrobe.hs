@@ -30,16 +30,14 @@ import qualified Prelude as P
 clockStrobe# :: ( HasCallStack
                 , KnownNat period
                 , KnownNat stretch
-                , KnownNat offset
                 , fastDomain ~ ('Dom fast period)
-                , slowDomain ~ ('Dom slow (period*stretch))
-                , offset <= stretch )
-             => Clock ('Dom fast period) gated1 -- ^ The fast clock.
-             -> Clock ('Dom slow (period*(stretch))) gated2 -- ^ The slow clock.
-             -> SNat offset -- ^ The phase offset.
-             -> Signal ('Dom fast period) Bool -- ^ The synchronisation pulse.
+                , slowDomain ~ ('Dom slow (period*stretch)) )
+             => Clock fastDomain gated1 -- ^ The fast clock.
+             -> Clock slowDomain gated2 -- ^ The slow clock.
+             -> Index stretch -- ^ The phase offset.
+             -> Signal fastDomain Bool -- ^ The synchronisation pulse.
 clockStrobe# fast slow offset = (fromList . (offsetList P.++) . P.cycle . toList) $ strobeCycle fast slow
-  where offsetList = P.replicate ((fromInteger . snatToInteger) offset) False
+  where offsetList = P.replicate ((fromInteger . toInteger) offset) False
 {-# NOINLINE clockStrobe# #-}
 
 strobeCycle :: ( KnownNat stretch

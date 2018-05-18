@@ -1,52 +1,42 @@
 [
   { "BlackBox" :
-    { "name" : "Primitive.ClockStrobe.clockStrobe#"
+    { "name" : "NDP.Primitive.ClockStrobe.clockStrobe#"
     , "type" :
-"clockStrobe# :: ( HasCallStack                           -- ARG[0]
-                , KnownNat stretch                        -- ARG[1]
-                , KnownNat period )                       -- ARG[2]
-             => Clock ('Dom fast period) gated1           -- ARG[3]
-             -> Clock ('Dom slow (period*stretch)) gated2 -- ARG[4]
-             -> Index stretch                             -- ARG[5]
-             -> Signal ('Dom fast period) Bool"
+"clockStrobe# :: ( HasCallStack                              -- ARG[0]
+                 , KnownNat period                           -- ARG[1]
+                 , KnownNat stretch                          -- ARG[2]
+                 , fastDomain ~ ('Dom fast period)           -- ARG[3]
+                 , slowDomain ~ ('Dom slow (period*stretch)) -- ARG[4]
+              => Clock fastDomain gated1                     -- ARG[5]
+              -> Clock slowDomain  gated2                    -- ARG[6]
+              -> SNat offset                                 -- ARG[7]
+              -> Signal fastDomain Bool
     , "templateD" :
-"-- clockStrobe begin
+"-- clockStrobe# begin
 ~GENSYM[~COMPNAME_clockStrobe][0] : block
-  signal ~GENSYM[strobe_counter][1] : ~TYP[5];
-  signal ~GENSYM[prev_~ARG[4]][2] : ~TYP[4];
+  signal ~GENSYM[synced_~ARG[6]][1] : ~TYP[6];
+  signal ~GENSYM[prev_~ARG[6]][2] : ~TYP[6];
 begin
-  -- make delayed version of the slow clock (~ARG[4])
-  process(~ARG[3])
+  -- synchronise the slow clock
+  process(~ARG[5])
   begin
-    if rising_edge(~ARG[3]) then
-      ~SYM[2] <= ~ARG[4];
+    if rising_edge(~ARG[5]) then
+      ~SYM[1] <= ~ARG[6];
+    enf if;
+  end process;
+
+  -- delay the slow clock
+  process(~ARG[5])
+  begin
+    if rising_edge(~ARG[5] then
+      ~SYM[2] <= ~SYM[1];
     end if;
   end process;
 
-  process(~ARG[3], ~ARG[4])
-  begin
-    -- reset the strobe counter when the slow clock is high
-    if rising_edge(~ARG[4]) then
-      ~SYM[1] <= ~LIT[5];
-    end if;
-    -- on a fast clock tick
-    if rising_edge(~ARG[3]) then
-      -- if the strobe counter is zero
-      if ~SYM[1] = 0 then
-        -- pulse
-        ~RESULT <= true;
-        -- reset the counter to it's maximum value
-        ~SYM[1] <= ~LIT[1];
-      else
-        -- unpulse
-        ~RESULT <= false;
-        -- decrement
-        ~SYM[1] <= ~SYM[1] - 1;
-      end if;
-    end if;
-  end process;
+  -- find the rising edge
+  ~RESULT <= (NOT ~SYM[2]) AND ~SYM[1];
 end block;
--- clockStrobe end"
+-- clockStrobe# end"
     }
   }
 ]

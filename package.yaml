@@ -37,7 +37,7 @@ library:
   generated-other-modules: Paths_NDP
 
 data-files:
-  - hardware/Primitive/vhdl/clockStrobe.json
+  - hardware/NDP/Primitive/vhdl/clockStrobe.json
 
 executables:
   ndp:
