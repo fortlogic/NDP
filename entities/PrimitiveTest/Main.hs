@@ -1,8 +1,13 @@
 {-# LANGUAGE MagicHash #-}
 {-# LANGUAGE NoImplicitPrelude #-}
+{-# LANGUAGE TemplateHaskell #-}
+{-# LANGUAGE DataKinds #-}
+{-# LANGUAGE TypeApplications #-}
 module PrimitiveTest.Main where
 
 import Clash.Annotations.TopEntity
+import Clash.Explicit.Signal
+import Clash.Explicit.Testbench
 import Clash.Prelude
 
 import Primitive.ClockStrobe
@@ -14,7 +19,13 @@ strobeTest :: Clock OutsideD Source -> Clock (StretchDomain OutsideD 5) Source -
 strobeTest fast slow = clockStrobe# fast slow 3
 
 strobeTestBench :: Signal OutsideD Bool
-strobeTestBench = undefined
-  where expectOutput = undefined
-        fastClk = tbClockGen @OutsideD
-        slowClk = undefined
+strobeTestBench = strobeTest fastClk slowClk -- done
+  where expectOutput = outputVerifier fastClk fastRst $(listToVecTH [ False :: Bool, False, False,
+                                                                  True, False, False, False, False,
+                                                                  True, False, False, False, False,
+                                                                  True, False, False, False, False,
+                                                                  True, False, False, False, False ])
+        done = expectOutput (strobeTest fastClk slowClk)
+        fastClk = tbClockGen @OutsideD (not <$> done)
+        slowClk = tbClockGen @(StretchDomain OutsideD 5) (unsafeSynchronizer fastClk slowClk (not <$> done))
+        fastRst = asyncResetGen @OutsideD

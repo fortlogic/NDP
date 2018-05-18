@@ -1,6 +1,7 @@
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE MagicHash #-}
 {-# LANGUAGE NoImplicitPrelude #-}
+{-# LANGUAGE TypeFamilies #-}
 {-# LANGUAGE TypeOperators #-}
 {-# OPTIONS_GHC -fplugin GHC.TypeLits.Extra.Solver #-}
 {-# OPTIONS_GHC -fplugin GHC.TypeLits.KnownNat.Solver #-}
@@ -15,15 +16,30 @@ import qualified Prelude as P
 
 -- {-# ANN module (ndp_primitive VHDL) #-}
 
+-- | Generate a synchronisation pulse in one clock domain that coincides with
+-- the rising edge of another clock whose frequency is an integer multiple of
+-- the first.
+--
+-- Note: In the event that the rising edge of the slow clock doesn't occur
+-- during the first cycle of the fast clock, the offset is determined by the
+-- offset variable. This offset is only used when simulating within Haskell and
+-- is completely ignored by the HDL that Clash generates. Therefore this
+-- parameter should not be used to offset the synchronisation pulse from the
+-- rising edge of the slow clock, only to measure the *actual* phase offset of
+-- the two clocks.
 clockStrobe# :: ( HasCallStack
-                , KnownNat stretch -- the number of fast cycles that fit in a slow one
-                , KnownNat period ) -- period of the fast clock
-             => Clock ('Dom fast period) gated1 -- fast clock
-             -> Clock ('Dom slow (period*(stretch))) gated2 -- slow clock
-             -> Index stretch -- pulse offset (0 is start of cycle)
-             -> Signal ('Dom fast period) Bool
+                , KnownNat period
+                , KnownNat stretch
+                , KnownNat offset
+                , fastDomain ~ ('Dom fast period)
+                , slowDomain ~ ('Dom slow (period*stretch))
+                , offset <= stretch )
+             => Clock ('Dom fast period) gated1 -- ^ The fast clock.
+             -> Clock ('Dom slow (period*(stretch))) gated2 -- ^ The slow clock.
+             -> SNat offset -- ^ The phase offset.
+             -> Signal ('Dom fast period) Bool -- ^ The synchronisation pulse.
 clockStrobe# fast slow offset = (fromList . (offsetList P.++) . P.cycle . toList) $ strobeCycle fast slow
-  where offsetList = P.replicate ((fromInteger . toInteger) offset) False
+  where offsetList = P.replicate ((fromInteger . snatToInteger) offset) False
 {-# NOINLINE clockStrobe# #-}
 
 strobeCycle :: ( KnownNat stretch
