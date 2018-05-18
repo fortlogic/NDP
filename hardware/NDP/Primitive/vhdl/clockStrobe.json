@@ -12,30 +12,39 @@
     , "templateD" :
 "-- clockStrobe begin
 ~GENSYM[~COMPNAME_clockStrobe][0] : block
-  signal ~GENSYM[strobe_counter][1] : ~TYP[4];
+  signal ~GENSYM[strobe_counter][1] : ~TYP[5];
+  signal ~GENSYM[prev_~ARG[4]][2] : ~TYP[4];
 begin
+  -- make delayed version of the slow clock (~ARG[4])
+  process(~ARG[3])
+  begin
+    if rising_edge(~ARG[3]) then
+      ~SYM[2] <= ~ARG[4];
+    end if;
+  end process;
+
   process(~ARG[3], ~ARG[4])
   begin
     -- reset the strobe counter when the slow clock is high
     if rising_edge(~ARG[4]) then
-      ~SYM[1] <= ~LIT[5]
+      ~SYM[1] <= ~LIT[5];
     end if;
     -- on a fast clock tick
     if rising_edge(~ARG[3]) then
       -- if the strobe counter is zero
       if ~SYM[1] = 0 then
         -- pulse
-        ~RESULT <= '1';
-        -- reset the counter
+        ~RESULT <= true;
+        -- reset the counter to it's maximum value
         ~SYM[1] <= ~LIT[1];
       else
         -- unpulse
-        ~RESULT <= '0';
+        ~RESULT <= false;
         -- decrement
         ~SYM[1] <= ~SYM[1] - 1;
       end if;
     end if;
-  end process
+  end process;
 end block;
 -- clockStrobe end"
     }
