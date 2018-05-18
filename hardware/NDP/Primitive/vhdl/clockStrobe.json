@@ -10,12 +10,12 @@
               => Clock fastDomain gated1                     -- ARG[5]
               -> Clock slowDomain  gated2                    -- ARG[6]
               -> SNat offset                                 -- ARG[7]
-              -> Signal fastDomain Bool
+              -> Signal fastDomain Bool"
     , "templateD" :
 "-- clockStrobe# begin
 ~GENSYM[~COMPNAME_clockStrobe][0] : block
-  signal ~GENSYM[synced_~ARG[6]][1] : ~TYP[6];
-  signal ~GENSYM[prev_~ARG[6]][2] : ~TYP[6];
+  signal ~GENSYM[synced_clk][1] : ~TYP[6];
+  signal ~GENSYM[prev_clk][2] : ~TYP[6];
 begin
   -- synchronise the slow clock
   process(~ARG[5])
