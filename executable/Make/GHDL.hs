@@ -1,6 +1,6 @@
 module Make.GHDL (ghdlRules) where
 
-
+import Control.Monad.IO.Class
 import Development.Shake
 import Development.Shake.Config
 import Development.Shake.FilePath
@@ -8,7 +8,22 @@ import System.Directory
 
 import Make.Config
 import Make.Utils
+import Make.HDL
 
+getBuildDir :: MonadIO m => m String
+getBuildDir = liftIO $ maybeConfigIO "BUILD" "build"
+
+getGHDLOut :: MonadIO m => m String
+getGHDLOut = getBuildDir >>= fetch
+  where fetch buildDir = liftIO $ maybeConfigIO "GHDL_OUT" (buildDir </> "clash")
+
+validTestbenchOutput :: Rules (FilePath -> Bool)
+validTestbenchOutput = do
+  ghdlOut <- getGHDLOut
+  (Just entityD) <- liftIO $ getConfigIO "HDL_ENTITIES"
+  entities <- liftIO $ getDirectoryDirsIO entityD
+  return (\ testbenchF -> let testbenchF' = makeRelative ghdlOut testbenchF in
+                      elem testbenchF' (map (\ entity -> entity </> "manifest" <.> "txt") entities))
 
 ghdlRules :: Rules ()
 ghdlRules = do
