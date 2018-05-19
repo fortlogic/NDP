@@ -16,7 +16,7 @@ import Make.Vagrant
 
 xflowRules :: Rules ()
 xflowRules = do
-  (Just xilinxD) <- liftIO $ getConfigIO "XILINX_OUT"
+  (Just xilinxD) <- getXilinxDir
 
   (xilinxD </> "*.prj") %> \ prjF -> do
     let entityName = takeBaseName prjF

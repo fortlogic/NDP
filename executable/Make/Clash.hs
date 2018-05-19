@@ -1,4 +1,5 @@
-module Make.Clash (clashRules) where
+module Make.Clash ( clashRules
+                  , getClashOut ) where
 
 import Control.Monad.IO.Class
 import Data.List
@@ -18,11 +19,7 @@ ghcFlags = do
   odir <- configFlag2 "-odir" "CLASH_ODIR"
   hidir <- configFlag2 "-hidir" "CLASH_HIDIR"
   idir <- configFlag "-i" "SRC"
-  
   return (odir ++ hidir ++ [idir])
-
-getBuildDir :: MonadIO m => m String
-getBuildDir = liftIO $ maybeConfigIO "BUILD" "build"
 
 getClashOut :: MonadIO m => m String
 getClashOut = getBuildDir >>= fetch
@@ -40,17 +37,9 @@ validEntityOutput hdl = do
 clashRules :: Rules ()
 clashRules = do
 
-  -- This is cheating but since the locations of the targets are determined by
-  -- the config file...
-  -- clashOut <- getClashOut
-
---  (pure VHDL >>= validEntityOutput) ?> build
-
   hdlRule VHDL
   hdlRule Verilog
 
---  (clashOut </> "vhdl/*/*/*.vhdl") %> buildHDL VHDL
---  (clashOut </> "verilog/*/*/*.v") %> buildHDL Verilog
 
 hdlRule :: HDL -> Rules ()
 hdlRule hdl = validEntityOutput hdl >>= (?> buildHDL hdl)
@@ -64,13 +53,6 @@ buildHDL :: HDL -> FilePath -> Action ()
 buildHDL hdl manifestF = do
   let hdlD = takeDirectory manifestF
   clashOut <- getClashOut
-
-  -- TODO: we depend on any HDL primitives.
-  -- (Just primitiveD) <- getConfig "HDL_PRIMITIVES"
-  -- _ <- getDirectoryFiles primitiveD ["*.json"]
-
-  -- getDirectoryFiles implicitly `need`s the results so we don't need to do
-  -- it.
 
   -- GHC has the capability to take a haskell source tree and spit out an old
   -- fashioned makefile for compiling any file in that tree. This lets us make

@@ -1,11 +1,13 @@
-module Make.Utils ((!!?),
-                  withPath,
-                  pathIdx,
-                  pathIdx',
-                  withReverse,
-                  getDirectoryFilesWithExt) where
+module Make.Utils ( (!!?)
+                  , withPath,
+                  pathIdx
+                  , pathIdx'
+                  , withReverse
+                  , getDirectoryFilesWithExt
+                  , stripSuffix
+                  , splitBy ) where
 
-
+import Data.List
 import Development.Shake.FilePath
 import System.Directory
 
@@ -37,3 +39,11 @@ getDirectoryFilesWithExt dir ext = do
   files <- getDirectoryContents dir
   let files' = filter ((==ext) . takeExtension) files
   return $ map (dir </>) files'
+
+stripSuffix :: Eq a => [a] -> [a] -> Maybe [a]
+stripSuffix suffix = (reverse <$>) . stripPrefix (reverse suffix) . reverse
+
+splitBy :: (a -> Bool) -> [a] -> [[a]]
+splitBy pred ls = case break pred ls of
+                    (prefix, []) -> [prefix]
+                    (prefix, _:ls') -> prefix : splitBy pred ls'

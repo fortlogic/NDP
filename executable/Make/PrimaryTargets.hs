@@ -3,6 +3,8 @@ module Make.PrimaryTargets (primaryRules) where
 import Development.Shake
 import Development.Shake.Config
 
+import Make.Config
+
 primaryRules :: Rules ()
 primaryRules = do
   phony "setup" $ do
@@ -12,14 +14,14 @@ primaryRules = do
     return ()
 
   phony "clean" $ do
-    (Just buildD) <- getConfig "BUILD"
+    buildD <- getBuildDir
     cmd "rm -rvf" buildD
 
   -- phony "archive" $ do
   --   (Stdout rawDate) <- cmd "date -u +UTC-%Y-%m-%d-%H%M%S"
   --   let date = filter (/= '\n') rawDate
 
-  --   (Just buildD) <- getConfig "BUILD"
+  --   buildD <- getBuildDir
   --   (Just archiveD) <- getConfig "ARCHIVE"
 
   --   withTempFile $ \ tmpF -> do

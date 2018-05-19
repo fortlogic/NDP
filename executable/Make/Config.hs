@@ -10,17 +10,25 @@ module Make.Config (setupConfig
                    , getConfigIO
                    , maybeConfigIO
                    , readConfigIO
-                   , maybeReadConfigIO ) where
+                   , maybeReadConfigIO
+
+                   , getBuildDir
+                   , getClashDir
+                   , getGHDLDir
+                   , getXilinxDir
+                   , getVMXilinxDir ) where
 
 import Control.Concurrent.MVar
+import Control.Monad.IO.Class
 import Data.Global
 import Data.List (intercalate)
 import Data.Maybe
-import qualified Data.HashMap.Strict as H
 import Development.Shake
 import Development.Shake.Config
-import qualified System.Environment as E
+import Development.Shake.FilePath
 import Text.Read
+import qualified Data.HashMap.Strict as H
+import qualified System.Environment as E
 
 import Make.Oracles
 
@@ -42,6 +50,7 @@ initialConfig = do
 
 setupConfig :: FilePath -> Rules ()
 setupConfig configFile = do
+  want [configFile]
   inits <- initialConfig
   config <- liftIO $ readConfigFileWithEnv inits configFile
   liftIO $ putMVar configV config
@@ -99,3 +108,28 @@ configFlag2 flagName configKey = do
   return $ case maybeVal of
     Nothing -> []
     Just val -> [flagName, val]
+
+-- useful shorthands
+
+-- TODO: make shake give out a warning for all of these anytime the config
+-- variable can't be found and the default is used instead. In fact maybe make
+-- that a thing that the above things do as well? If that involves overriding
+-- stuff in Development.Shake.Config then have this export everything it does,
+-- and make sure everything else includes this module instead.
+
+getBuildDir :: MonadIO m => m String
+getBuildDir = liftIO $ maybeConfigIO "BUILD_OUT" "build"
+
+getClashDir :: MonadIO m => m String
+getClashDir = getBuildDir >>= fetch
+  where fetch buildDir = liftIO $ maybeConfigIO "CLASH_OUT" (buildDir </> "clash")
+
+getGHDLDir :: MonadIO m => m String
+getGHDLDir = getBuildDir >>= fetch
+  where fetch buildDir = liftIO $ maybeConfigIO "GHDL_OUT" (buildDir </> "clash")
+
+getXilinxDir :: MonadIO m => m (Maybe String)
+getXilinxDir = liftIO $ getConfigIO "XILINX_OUT"
+
+getVMXilinxDir :: MonadIO m => m String
+getVMXilinxDir = liftIO $ maybeConfigIO "VM_XILINX_OUT" "/xilinx"

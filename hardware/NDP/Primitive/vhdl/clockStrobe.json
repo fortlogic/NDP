@@ -22,13 +22,13 @@ begin
   begin
     if rising_edge(~ARG[5]) then
       ~SYM[1] <= ~ARG[6];
-    enf if;
+    end if;
   end process;
 
   -- delay the slow clock
   process(~ARG[5])
   begin
-    if rising_edge(~ARG[5] then
+    if rising_edge(~ARG[5]) then
       ~SYM[2] <= ~SYM[1];
     end if;
   end process;

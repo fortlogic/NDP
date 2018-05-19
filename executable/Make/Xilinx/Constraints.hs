@@ -16,7 +16,7 @@ import Resources.Constraints
 
 ucfRules :: Rules ()
 ucfRules = do
-  (Just xilinxD) <- liftIO $ getConfigIO "XILINX_OUT"
+  (Just xilinxD) <- getXilinxDir
 
   (xilinxD </> "*.ucf") %> \ ucF -> do
     let entityName = takeBaseName ucF

@@ -6,12 +6,14 @@ import Development.Shake.FilePath
 
 import Make.Command
 import Make.Config
+import Make.GHDL
 import Make.HDL
+import Make.Utils
 import Make.Vagrant
 
 shortcutRules :: Rules ()
 shortcutRules = do
-  installCommandTree $ commandGroup ":" [fpgaCommands, clashCommands, testbenchCommands]
+  installCommandTree $ commandGroup ":" [fpgaCommands, clashCommands, simulateCommands]
 
 fpgaCommands :: CommandTree
 fpgaCommands = commandGroup "fpga:" [mkCommand "reset:" resetCmd
@@ -24,8 +26,10 @@ clashCommands :: CommandTree
 clashCommands = commandGroup "clash:" [ mkCommand "vhdl:" (buildClashCmd VHDL)
                                       , mkCommand "verilog:" (buildClashCmd Verilog)]
 
-testbenchCommands :: CommandTree
-testbenchCommands = commandGroup "testbench:" [ mkCommand "vhdl:" (runHDLTestbench VHDL)]
+simulateCommands :: CommandTree
+simulateCommands = commandGroup "simulate:" [ simCommands VHDL
+                                            {-, simCommands Verilog-} ]
+  where simCommands hdl@VHDL = commandGroup (hdlName hdl ++ ":") [ mkCommand "build:" ghdlBuildCmd ]
 
 resetCmd :: String -> Action ()
 resetCmd _ = do
@@ -34,13 +38,13 @@ resetCmd _ = do
 
 buildCmd :: String -> Action ()
 buildCmd project = do
-  (Just container) <- getConfig "XILINX_OUT"
+  (Just container) <- getXilinxDir
   need [container </> project -<.> "bit"]
 
 loadCmd :: String -> Action ()
 loadCmd project = do
-  (Just container) <- getConfig "XILINX_OUT"
-  (Just vmContainer) <- getConfig "VM_XILINX_OUT"
+  (Just container) <- getXilinxDir
+  vmContainer <- getVMXilinxDir
   (Just fpgaProg) <- getConfig "FPGAPROG"
 
   need [container </> project -<.> "bit"]
@@ -51,8 +55,8 @@ loadCmd project = do
 
 burnCmd :: String -> Action ()
 burnCmd project = do
-  (Just container) <- getConfig "XILINX_OUT"
-  (Just vmContainer) <- getConfig "VM_XILINX_OUT"
+  (Just container) <- getXilinxDir
+  vmContainer <- getVMXilinxDir
   (Just fpgaProg) <- getConfig "FPGAPROG"
   (Just burner) <- getConfig "FPGA_BURNER"
 
@@ -68,16 +72,18 @@ burnCmd project = do
 
 stageCmd :: String -> Action ()
 stageCmd project = do
-  (Just container) <- getConfig "XILINX_OUT"
+  (Just container) <- getXilinxDir
   need [ container </> project -<.> "prj"
        , container </> project -<.> "ucf"]
 
 buildClashCmd :: HDL -> String -> Action ()
 buildClashCmd hdl project = do
-  buildDir <- maybeConfig "BUILD" "build"
-  clashOut <- maybeConfig "CLASH_OUT" (buildDir </> "clash")
+  buildDir <- getBuildDir
+  clashOut <- getClashDir
   need [ clashOut  </> hdlName hdl </> project </> "manifest" <.> "txt" ]
 
-runHDLTestbench :: HDL -> String -> Action ()
-runHDLTestbench hdl project = do
-  putNormal "This feature doesn't exist yet."
+
+ghdlBuildCmd :: String -> Action ()
+ghdlBuildCmd spec = do
+  let (Just spec') = parseGHDLSpec spec
+  generateExecutableFiles spec'
