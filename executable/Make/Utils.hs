@@ -5,7 +5,8 @@ module Make.Utils ( (!!?)
                   , withReverse
                   , getDirectoryFilesWithExt
                   , stripSuffix
-                  , splitBy ) where
+                  , splitBy
+                  , fieldEq ) where
 
 import Data.List
 import Development.Shake.FilePath
@@ -47,3 +48,6 @@ splitBy :: (a -> Bool) -> [a] -> [[a]]
 splitBy pred ls = case break pred ls of
                     (prefix, []) -> [prefix]
                     (prefix, _:ls') -> prefix : splitBy pred ls'
+
+fieldEq :: Eq b => (a -> b) -> a -> a -> Bool
+fieldEq f x1 x2 = (f x1) == (f x2)

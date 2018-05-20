@@ -1,5 +1,4 @@
-module Make.Clash ( clashRules
-                  , getClashOut ) where
+module Make.Clash ( clashRules ) where
 
 import Control.Monad.IO.Class
 import Data.List
@@ -10,6 +9,7 @@ import Development.Shake.Util
 
 import Make.Config
 import Make.HDL
+import Make.Utils
 
 clashExec :: String
 clashExec = "stack exec clash --"
@@ -21,13 +21,9 @@ ghcFlags = do
   idir <- configFlag "-i" "SRC"
   return (odir ++ hidir ++ [idir])
 
-getClashOut :: MonadIO m => m String
-getClashOut = getBuildDir >>= fetch
-  where fetch buildDir = liftIO $ maybeConfigIO "CLASH_OUT" (buildDir </> "clash")
-
 validEntityOutput :: HDL -> Rules (FilePath -> Bool)
 validEntityOutput hdl = do
-  clashOut <- getClashOut
+  clashOut <- getClashDir
   (Just entityD) <- liftIO $ getConfigIO "HDL_ENTITIES"
   entities <- liftIO $ getDirectoryDirsIO entityD
   return (\ hdlD -> let hdlD' = makeRelative (clashOut </> hdlName hdl) hdlD in
@@ -36,7 +32,6 @@ validEntityOutput hdl = do
 
 clashRules :: Rules ()
 clashRules = do
-
   hdlRule VHDL
   hdlRule Verilog
 
@@ -52,7 +47,7 @@ hdlRule hdl = validEntityOutput hdl >>= (?> buildHDL hdl)
 buildHDL :: HDL -> FilePath -> Action ()
 buildHDL hdl manifestF = do
   let hdlD = takeDirectory manifestF
-  clashOut <- getClashOut
+  clashOut <- getClashDir
 
   -- GHC has the capability to take a haskell source tree and spit out an old
   -- fashioned makefile for compiling any file in that tree. This lets us make
@@ -97,4 +92,13 @@ buildHDL hdl manifestF = do
   -- and the top level entity spec is removed then as long as the build
   -- directory isn't cleaned the manifest will still list the entity even though
   -- it's no longer being built. Fix this.
-  liftIO $ (unlines <$> getDirectoryDirsIO hdlD) >>= writeFile manifestF
+  (show <$> mkManifest hdlD) >>= (liftIO . (writeFile manifestF))
+
+mkManifest :: FilePath -> Action [(FilePath, String)]
+mkManifest projectD = do
+  liftIO (getDirectoryDirsIO projectD) >>= mapM getDirectoryHash
+  where getDirectoryHash library = do
+          let libraryDir = projectD </> library
+          (Stdout tar) <- cmd "tar" "-c" libraryDir
+          (Stdout hash) <- cmd "md5" (Stdin tar)
+          return (libraryDir, mconcat $ lines hash)
