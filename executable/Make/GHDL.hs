@@ -1,8 +1,4 @@
-module Make.GHDL ( ghdlRules
-                 , GHDLSpec (..)
-                 , parseGHDLSpec
-                 , generateIncludeFiles
-                 , generateExecutableFiles ) where
+module Make.GHDL ( ghdlRules ) where
 
 import Control.Monad.IO.Class
 import Data.List
@@ -18,15 +14,6 @@ import Make.Utils
 
 -- ghdl -i --workdir=build/i386_Darwin/ghdl/PrimitiveTest --work=clockStrobe build/i386_Darwin/clash/vhdl/PrimitiveTest/clockStrobe/*.vhdl
 
-
--- validTestbenchOutput :: Rules (FilePath -> Bool)
--- validTestbenchOutput = do
---   ghdlDir <- getGHDLDir
---   (Just entityD) <- liftIO $ getConfigIO "HDL_ENTITIES"
---   entities <- liftIO $ getDirectoryDirsIO entityD
---   return (\ testbenchF -> let testbenchF' = makeRelative ghdlOut testbenchF in
---                       elem testbenchF' (map (\ entity -> entity </> "manifest" <.> "txt") entities))
-
 ghdlRules :: Rules ()
 ghdlRules = do
   ghdlDir <- getGHDLDir
@@ -35,7 +22,7 @@ ghdlRules = do
     let path = stripPrefix ghdlDir incF
     let projectName = (takeFileName . takeDirectory) incF
     let (Just libName) = (stripSuffix "-obj93.cf" . takeFileName) incF
-    generateIncludeFiles (GHDLLibrary projectName libName)
+    generateIncludeFile projectName libName
 
 
   -- (ghdlDir </> "*/work-obj93.cf") %> \ incF -> do
@@ -62,45 +49,12 @@ ghdlRules = do
     --             "-o", workD </> "testbench",
     --             "ndp_testbench"]
 
-data GHDLSpec = GHDLEverything
-              | GHDLProject String
-              | GHDLLibrary String String
-              | GHDLEntity String String String
-              deriving (Read, Show, Eq)
-
-ghdlSpecProject :: GHDLSpec -> Maybe String
-ghdlSpecProject (GHDLProject p) = Just p
-ghdlSpecProject (GHDLLibrary p _) = Just p
-ghdlSpecProject (GHDLEntity p _ _) = Just p
-ghdlSpecProject _ = Nothing
-
-ghdlSpecLibrary :: GHDLSpec -> Maybe String
-ghdlSpecLibrary (GHDLLibrary _ l) = Just l
-ghdlSpecLibrary (GHDLEntity _ l _) = Just l
-ghdlSpecLibrary _ = Nothing
-
-ghdlSpecEntity :: GHDLSpec -> Maybe String
-ghdlSpecEntity (GHDLEntity p _ _) = Just p
-ghdlSpecEntity _ = Nothing
-
-parseGHDLSpec :: String -> Maybe GHDLSpec
-parseGHDLSpec s = case splitBy (=='-') s of
-                    [] -> Just GHDLEverything
-                    ["*"] -> Just GHDLEverything
-                    [p] -> Just (GHDLProject p)
-                    [p, "*"] -> Just (GHDLProject p)
-                    [p, l] -> Just (GHDLLibrary p l)
-                    [p, l, "*"] -> Just (GHDLLibrary p l)
-                    [p, l, e] -> Just (GHDLEntity p l e)
-                    _ -> Nothing
-
--- needs project and library
--- TODO: Currently can't handle GHDLEverything or GHDLProject because they aren't specific
-{-# WARNING generateIncludeFiles "Need to be able to figure out what projects/librarys can exist before I can parse any wildcards" #-}
-generateIncludeFiles :: GHDLSpec -> Action ()
-generateIncludeFiles (GHDLLibrary p l) = generateIncludeFile p l
-generateIncludeFiles (GHDLEntity p l _) = generateIncludeFile p l
-generateIncludeFiles _ = putQuiet "I need more specificity" >> fail "oops"
+getGHDLLibraries :: String -> Action [String]
+getGHDLLibraries project = do
+  manifest <- manifestPath VHDL project
+  need [manifest]
+  let vhdlD = takeDirectory manifest
+  map takeFileName <$> getDirectoryDirs vhdlD
 
 generateIncludeFile :: String -> String -> Action ()
 generateIncludeFile project library = do
@@ -112,11 +66,6 @@ generateIncludeFile project library = do
              , "--work=" ++ library
              , "--workdir=" ++ ghdlOut </> project
              ]
-
-{-# WARNING generateExecutableFiles "can't do wildcards yet." #-}
-generateExecutableFiles :: GHDLSpec -> Action ()
-generateExecutableFiles (GHDLEntity p l e) = generateExecutableFile p l e
-generateExecutableFiles _ = putQuiet "haven't written this yet"
 
 generateExecutableFile :: String -> String -> String -> Action ()
 generateExecutableFile project library entity = do

@@ -1,7 +1,12 @@
-module Make.Clash ( clashRules ) where
+module Make.Clash ( clashRules
+                  , getProjects
+                  , getTargets
+                  , getTargets'
+                  , manifestPath ) where
 
 import Control.Monad.IO.Class
 import Data.List
+import Data.Maybe
 import Development.Shake
 import Development.Shake.Config
 import Development.Shake.FilePath
@@ -21,14 +26,38 @@ ghcFlags = do
   idir <- configFlag "-i" "SRC"
   return (odir ++ hidir ++ [idir])
 
-validEntityOutput :: HDL -> Rules (FilePath -> Bool)
-validEntityOutput hdl = do
+validProjectManifest :: HDL -> Rules (FilePath -> Bool)
+validProjectManifest hdl = do
   clashOut <- getClashDir
-  (Just entityD) <- liftIO $ getConfigIO "HDL_ENTITIES"
-  entities <- liftIO $ getDirectoryDirsIO entityD
+  (Just projectsD) <- liftIO $ getConfigIO "HDL_PROJECTS"
+  projects <- liftIO $ getDirectoryDirsIO projectsD
   return (\ hdlD -> let hdlD' = makeRelative (clashOut </> hdlName hdl) hdlD in
-                      elem hdlD' (map (\ entity -> entity </> "manifest" <.> "txt") entities))
+                      elem hdlD' (map getManifest projects))
+    where getManifest project = project </> "manifest.txt"
 
+manifestPath :: HDL -> String -> Action FilePath
+manifestPath hdl project = (</> hdlName hdl </> project </> "manifest.txt") <$> getClashDir
+
+getProjects :: Action [(String, FilePath)]
+getProjects = do
+  (Just projectsD) <- getConfig "HDL_PROJECTS"
+  projectDs <- getDirectoryDirs projectsD
+  return $ map (\ proj -> (takeFileName proj, proj)) projectDs
+
+getTargets :: String -> Action [(String, FilePath)]
+getTargets project = do
+  (Just hdl) <- getPreferredHDL
+  getTargets' hdl project
+
+-- TODO: There should be a better way to get the list of targets, having to
+-- build the projects to get the list means the project can't have any errors.
+getTargets' :: HDL -> String -> Action [(String, FilePath)]
+getTargets' hdl project = do
+  manifest <- manifestPath hdl project
+  let hdlD = takeDirectory manifest
+  need [manifest]
+  targetDs <- getDirectoryDirs hdlD
+  return $ map (\ t -> (takeFileName t, t)) targetDs
 
 clashRules :: Rules ()
 clashRules = do
@@ -37,7 +66,7 @@ clashRules = do
 
 
 hdlRule :: HDL -> Rules ()
-hdlRule hdl = validEntityOutput hdl >>= (?> buildHDL hdl)
+hdlRule hdl = validProjectManifest hdl >>= (?> buildHDL hdl)
 
 
 -- technically this builds a manifest, a text file for which each line is the
@@ -57,9 +86,9 @@ buildHDL hdl manifestF = do
   -- rebuild.
 
   let mkF = hdlD <.> "mk"
-  (Just entityD) <- getConfig "HDL_ENTITIES"
+  (Just projectsD) <- getConfig "HDL_PROJECTS"
   (Just mainClashNameF) <- getConfig "TOPLEVEL_HS_FILE"
-  let srcF = entityD </> takeBaseName hdlD </> mainClashNameF
+  let srcF = projectsD </> takeBaseName hdlD </> mainClashNameF
   flags <- ghcFlags
 
   -- We need to muck about with the makefile after clash spits it out, so

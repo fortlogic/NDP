@@ -23,8 +23,8 @@ ucfRules = do
 
     -- read config vars
     (Just masterConstraintsF) <- getConfig "FPGA_CONSTRAINTS"
-    (Just entityD) <- getConfig "HDL_ENTITIES"
-    (Just constraintsF) <- getConfig "ENTITY_CONFIG_SETTINGS"
+    (Just entityD) <- getConfig "HDL_PROJECTS"
+    (Just constraintsF) <- getConfig "HD_PROJECT_CONFIG_FILE"
 
     need [masterConstraintsF,
           entityD </> entityName </> constraintsF]

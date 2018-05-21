@@ -12,6 +12,7 @@ module Make.Config (setupConfig
                    , readConfigIO
                    , maybeReadConfigIO
 
+                   , getPreferredHDL
                    , getBuildDir
                    , getClashDir
                    , getGHDLDir
@@ -30,6 +31,7 @@ import Text.Read
 import qualified Data.HashMap.Strict as H
 import qualified System.Environment as E
 
+import Make.HDL
 import Make.Oracles
 
 declareEmptyMVar "configV" [t| (H.HashMap String String) |]
@@ -117,19 +119,22 @@ configFlag2 flagName configKey = do
 -- stuff in Development.Shake.Config then have this export everything it does,
 -- and make sure everything else includes this module instead.
 
-getBuildDir :: MonadIO m => m String
+getPreferredHDL :: MonadIO m => m (Maybe HDL)
+getPreferredHDL = liftIO $ parseHDL <$> (fromMaybe "vhdl" <$> getConfigIO "PREFERRED_HDL")
+
+getBuildDir :: MonadIO m => m FilePath
 getBuildDir = liftIO $ maybeConfigIO "BUILD_OUT" "build"
 
-getClashDir :: MonadIO m => m String
+getClashDir :: MonadIO m => m FilePath
 getClashDir = getBuildDir >>= fetch
   where fetch buildDir = liftIO $ maybeConfigIO "CLASH_OUT" (buildDir </> "clash")
 
-getGHDLDir :: MonadIO m => m String
+getGHDLDir :: MonadIO m => m FilePath
 getGHDLDir = getBuildDir >>= fetch
   where fetch buildDir = liftIO $ maybeConfigIO "GHDL_OUT" (buildDir </> "clash")
 
-getXilinxDir :: MonadIO m => m (Maybe String)
+getXilinxDir :: MonadIO m => m (Maybe FilePath)
 getXilinxDir = liftIO $ getConfigIO "XILINX_OUT"
 
-getVMXilinxDir :: MonadIO m => m String
+getVMXilinxDir :: MonadIO m => m FilePath
 getVMXilinxDir = liftIO $ maybeConfigIO "VM_XILINX_OUT" "/xilinx"

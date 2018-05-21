@@ -32,8 +32,8 @@ xflowRules = do
 
     -- fetch a clocking entity if one is specified
     (Just clockDir) <- getConfig "HDL_CLOCKS"
-    (Just entityD) <- getConfig "HDL_ENTITIES"
-    (Just configF) <- getConfig "ENTITY_CONFIG_SETTINGS"
+    (Just entityD) <- getConfig "HDL_PROJECTS"
+    (Just configF) <- getConfig "HDL_PROJECT_CONFIG_FILE"
     entityConstraints <- (liftIO . readConf) $ entityD </> entityName </> configF
     let maybeClockHdl = do
           clockFile <- (getConf "clock" entityConstraints) :: Maybe String
