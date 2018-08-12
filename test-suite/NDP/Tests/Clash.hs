@@ -1,4 +1,4 @@
-module NDP.Tests.Clash (clashTests) where
+module NDP.Tests.Clash ( clashTests ) where
 
 import Test.Hspec
 

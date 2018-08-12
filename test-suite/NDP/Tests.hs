@@ -3,10 +3,12 @@ module NDP.Tests where
 import Test.Hspec
 
 import NDP.Tests.Clash
+import NDP.Tests.Primitives
 
 ndpTests :: Spec
 ndpTests = do
-  clashTests "CLaSH Tests"
+  primitiveTests "Clash Primitives"
+  clashTests "Clash"
   describe "CLaSH Testbenches" $ do
     it "should run hardware testbenches in Haskell" $ do
       pendingWith "waiting on testbenches"
