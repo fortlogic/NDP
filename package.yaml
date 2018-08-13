@@ -87,6 +87,7 @@ tests:
       - hspec
       - tasty
       - tasty-hspec
+      - template-haskell
     ghc-options:
       - -rtsopts
       - -threaded

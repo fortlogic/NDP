@@ -1,17 +1,13 @@
+{-# LANGUAGE MagicHash #-}
+{-# LANGUAGE TemplateHaskell #-}
 module NDP.Tests.Primitives ( primitiveTests ) where
 
 import Test.Hspec
 
+import NDP.Primitive.ClockStrobe
+import NDP.Tests.Primitive.TH
+import NDP.Tests.Primitive.ClockStrobe
+
 primitiveTests :: String -> Spec
 primitiveTests name = describe name $ do
-  describe "Clash Simulation" $ do
-    it "should simulate stuff correctly" $ do
-      pendingWith "TODO"
-  describe "Generated VHDL" $ do
-    it "should generate VHDL" $ do
-      pendingWith "TODO"
-    it "should simulated generated VHDL correctly" $ do
-      pendingWith "TODO"
-  it "should have tests" $ do
-    pendingWith "TODO"
-
+  $(testPrimitiveNamed 'clockStrobe#)
