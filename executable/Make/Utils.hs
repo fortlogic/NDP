@@ -45,9 +45,9 @@ stripSuffix :: Eq a => [a] -> [a] -> Maybe [a]
 stripSuffix suffix = (reverse <$>) . stripPrefix (reverse suffix) . reverse
 
 splitBy :: (a -> Bool) -> [a] -> [[a]]
-splitBy pred ls = case break pred ls of
-                    (prefix, []) -> [prefix]
-                    (prefix, _:ls') -> prefix : splitBy pred ls'
+splitBy p ls = case break p ls of
+                 (prefix, []) -> [prefix]
+                 (prefix, _:ls') -> prefix : splitBy p ls'
 
 fieldEq :: Eq b => (a -> b) -> a -> a -> Bool
 fieldEq f x1 x2 = (f x1) == (f x2)

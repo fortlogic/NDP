@@ -1,15 +1,11 @@
 module Make.GHDL ( ghdlRules ) where
 
-import Control.Monad.IO.Class
-import Data.List
 import Development.Shake
-import Development.Shake.Config
 import Development.Shake.FilePath
-import System.Directory
 
-import Make.Clash
+-- import Make.Clash
 import Make.Config
-import Make.HDL
+-- import Make.HDL
 import Make.Utils
 
 -- ghdl -i --workdir=build/i386_Darwin/ghdl/PrimitiveTest --work=clockStrobe build/i386_Darwin/clash/vhdl/PrimitiveTest/clockStrobe/*.vhdl
@@ -19,7 +15,6 @@ ghdlRules = do
   ghdlDir <- getGHDLDir
 
   (ghdlDir </> "*/*-obj93.cf") %> \ incF -> do
-    let path = stripPrefix ghdlDir incF
     let projectName = (takeFileName . takeDirectory) incF
     let (Just libName) = (stripSuffix "-obj93.cf" . takeFileName) incF
     generateIncludeFile projectName libName
@@ -37,6 +32,7 @@ ghdlRules = do
 
   (ghdlDir </> "*/testbench") %> \ tbF -> do
     putQuiet "OOPS"
+    putQuiet ("Should probably do something about " ++ tbF)
     -- TODO: instead of all the junk below, generate a GHDLSpec
     -- then pass it to generateExecutableFiles
 
@@ -49,12 +45,12 @@ ghdlRules = do
     --             "-o", workD </> "testbench",
     --             "ndp_testbench"]
 
-getGHDLLibraries :: String -> Action [String]
-getGHDLLibraries project = do
-  manifest <- manifestPath VHDL project
-  need [manifest]
-  let vhdlD = takeDirectory manifest
-  map takeFileName <$> getDirectoryDirs vhdlD
+-- getGHDLLibraries :: String -> Action [String]
+-- getGHDLLibraries project = do
+--   manifest <- manifestPath VHDL project
+--   need [manifest]
+--   let vhdlD = takeDirectory manifest
+--   map takeFileName <$> getDirectoryDirs vhdlD
 
 generateIncludeFile :: String -> String -> Action ()
 generateIncludeFile project library = do
@@ -67,7 +63,7 @@ generateIncludeFile project library = do
              , "--workdir=" ++ ghdlOut </> project
              ]
 
-generateExecutableFile :: String -> String -> String -> Action ()
-generateExecutableFile project library entity = do
-  putQuiet "NOT FINISHED WRITING THIS, needs to dispatch back to shake"
-  generateIncludeFile project library
+-- generateExecutableFile :: String -> String -> String -> Action ()
+-- generateExecutableFile project library entity = do
+--   putQuiet "NOT FINISHED WRITING THIS, needs to dispatch back to shake"
+--   generateIncludeFile project library

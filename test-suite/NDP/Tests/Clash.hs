@@ -4,7 +4,7 @@ import Test.Hspec
 
 import NDP.Tests.TMDS
 import NDP.Tests.IO.TriState
-import NDP.Tests.ALU
+-- import NDP.Tests.ALU
 
 clashTests :: String -> Spec
 clashTests name = describe name $ do

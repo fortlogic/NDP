@@ -1,8 +1,13 @@
-module NDP.Tests.Primitive.ClockStrobe ( qc ) where
+module NDP.Tests.Primitive.ClockStrobe ( properties ) where
 
+-- import Clash.Prelude
 import Test.Hspec
 
-qc :: String -> Spec
-qc name = describe name $ do
+-- import NDP.Primitive.ClockStrobe
+
+-- type SlowD = 'Dom "Slow"
+
+properties :: String -> Spec
+properties name = describe name $ do
   it "does stuff" $ do
     pendingWith "huh"

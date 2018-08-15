@@ -1,3 +1,3 @@
 module NDP.Tests.ALU where
 
-import NDP.Processor.ALU
+-- import NDP.Processor.ALU

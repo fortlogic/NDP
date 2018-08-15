@@ -45,5 +45,5 @@ strobeCycle :: ( KnownNat stretch
             => Clock ('Dom fast period) gated1
             -> Clock ('Dom slow (period*stretch)) gated2
             -> Vec stretch Bool
-strobeCycle fast slow = replace 0 True lows
+strobeCycle _ _ = replace (0 :: Integer) True lows
   where lows = replicate SNat False

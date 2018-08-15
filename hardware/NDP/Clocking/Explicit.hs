@@ -9,10 +9,6 @@ module NDP.Clocking.Explicit where
 
 import Clash.Explicit.Prelude
 
-import NDP.Primitive.ClockStrobe
-
-
-
 -- The fast clock speed must be an integer multiple of the slow in addition to
 -- sharing a common origin. The resulting fast signal pulses true at the
 -- beginning of every slow clock cycle.
@@ -22,8 +18,7 @@ clockStrobe :: ( KnownNat stretch -- the number of fast cycles that fit in a slo
             => Clock ('Dom fast period) gated1 -- fast clock
             -> Clock ('Dom slow (period*stretch)) gated2 -- slow clock
             -> Signal ('Dom fast period) Bool
-clockStrobe fastC slowC = undefined -- clockStrobe# fastC slowC 0
-{-# WARNING clockStrobe "Write me" #-}
+clockStrobe = undefined -- fastC slowC = undefined -- clockStrobe# fastC slowC 0
 
 clockStrobeD :: ( KnownNat stretch -- the number of fast cycles that fit in a slow one
                 , KnownNat period ) -- period of the fast clock
@@ -31,5 +26,4 @@ clockStrobeD :: ( KnownNat stretch -- the number of fast cycles that fit in a sl
              -> Clock ('Dom slow (period*stretch)) gated2 -- slow clock
              -> Index stretch -- pulse offset (0 is start of cycle)
              -> Signal ('Dom fast period) Bool
-clockStrobeD fastC slowC offset = undefined -- clockStrobe# fastC slowC offset
-{-# WARNING clockStrobeD "write me" #-}
+clockStrobeD = undefined -- fastC slowC offset = undefined -- clockStrobe# fastC slowC offset

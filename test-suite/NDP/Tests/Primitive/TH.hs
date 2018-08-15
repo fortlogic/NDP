@@ -5,8 +5,8 @@ import Data.Maybe
 import Language.Haskell.TH
 
 qualified :: Name -> Lit
-qualified n = StringL (mod ++ "." ++ nameBase n)
-  where mod = fromMaybe "" (nameModule n)
+qualified n = StringL (moduleName ++ "." ++ nameBase n)
+  where moduleName = fromMaybe "" (nameModule n)
 
 mkTestName :: Name -> (String -> Name)
 mkTestName orig n = mkName (mconcat ["NDP.Tests.Primitive.", modName, ".", n])
@@ -15,7 +15,7 @@ mkTestName orig n = mkName (mconcat ["NDP.Tests.Primitive.", modName, ".", n])
 testPrimitiveNamed :: Name -> Q Exp
 testPrimitiveNamed n = let mkName' = mkTestName n in
   [| describe $(litE (qualified n)) $ do
-      $(varE (mkName' "qc")) "QuickCheck Invariants"
+      $(varE (mkName' "properties")) "QuickCheck Invariants"
       describe "Clash Testbench" $ do
         it "should do stuff" $ pendingWith "TODO: finish template haskell"
       describe "VHDL Generation" $ do

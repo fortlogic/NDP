@@ -145,8 +145,8 @@ stretchMealy' :: ( KnownNat period
               -> Clock slow gated2
               -> Signal slow a
               -> Signal fast b
-stretchMealy' inF iterF fastC slowC slow = undefined
-  where slow' = E.unsafeSynchronizer slowC fastC slow
+-- stretchMealy' inF iterF fastC slowC slow = undefined
+stretchMealy' = undefined
 
 stretchMealyD :: ( KnownNat period
                  , KnownNat stretch

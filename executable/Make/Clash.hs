@@ -6,7 +6,6 @@ module Make.Clash ( clashRules
 
 import Control.Monad.IO.Class
 import Data.List
-import Data.Maybe
 import Development.Shake
 import Development.Shake.Config
 import Development.Shake.FilePath
@@ -14,7 +13,6 @@ import Development.Shake.Util
 
 import Make.Config
 import Make.HDL
-import Make.Utils
 
 clashExec :: String
 clashExec = "stack exec clash --"

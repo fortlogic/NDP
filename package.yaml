@@ -84,6 +84,9 @@ tests:
       - base
       - clash-prelude
       - formatting
+      - ghc-typelits-extra
+      - ghc-typelits-knownnat
+      - ghc-typelits-natnormalise
       - hspec
       - tasty
       - tasty-hspec

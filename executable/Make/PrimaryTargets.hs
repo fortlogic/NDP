@@ -1,7 +1,6 @@
 module Make.PrimaryTargets (primaryRules) where
 
 import Development.Shake
-import Development.Shake.Config
 
 import Make.Config
 
@@ -16,15 +15,3 @@ primaryRules = do
   phony "clean" $ do
     buildD <- getBuildDir
     cmd "rm -rvf" buildD
-
-  -- phony "archive" $ do
-  --   (Stdout rawDate) <- cmd "date -u +UTC-%Y-%m-%d-%H%M%S"
-  --   let date = filter (/= '\n') rawDate
-
-  --   buildD <- getBuildDir
-  --   (Just archiveD) <- getConfig "ARCHIVE"
-
-  --   withTempFile $ \ tmpF -> do
-  --     () <- cmd "tar -cvf" tmpF buildD
-  --     (Stdout bzip) <- cmd "bzip2 -cz" tmpF
-  --     writeFile' (archiveD </> date <.> "bz2") bzip

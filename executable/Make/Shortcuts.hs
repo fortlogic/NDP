@@ -8,7 +8,6 @@ import Development.Shake.FilePath
 import Make.Clash
 import Make.Command
 import Make.Config
-import Make.GHDL
 import Make.HDL
 import Make.Utils
 import Make.Vagrant
@@ -32,10 +31,8 @@ clashCommands = commandGroup "clash:" [ mkCommand "vhdl:" (buildClashCmd VHDL)
                                             , mkCommand "targets:" listTargetsClashCmd ]
 
 simulateCommands :: CommandTree
-simulateCommands = commandGroup "simulate:" [ simCommands VHDL
-                                            {-, simCommands Verilog-} ]
-  where simCommands hdl@VHDL = commandGroup (hdlName hdl ++ ":") [ mkCommand "build:" ghdlBuildCmd
-                                                                 , mkCommand "list:" ghdlListCmd]
+simulateCommands = commandGroup "simulate:" [ commandGroup "vhdl:" [ mkCommand "build:" ghdlBuildCmd
+                                                                   , mkCommand "list:" ghdlListCmd ]]
 
 resetCmd :: String -> Action ()
 resetCmd _ = do
@@ -84,7 +81,6 @@ stageCmd project = do
 
 buildClashCmd :: HDL -> String -> Action ()
 buildClashCmd hdl project = do
-  buildDir <- getBuildDir
   clashOut <- getClashDir
   need [ clashOut  </> hdlName hdl </> project </> "manifest" <.> "txt" ]
 
@@ -102,12 +98,12 @@ type GHDLSpec = (Maybe String, Maybe String, Maybe String)
 -- project, library, entity
 -- Nothing means wildcard
 parseGHDLSpec :: String -> Maybe GHDLSpec
-parseGHDLSpec s = case splitBy (=='-') s of
-                    [] -> Just (Nothing, Nothing, Nothing)
-                    [p] -> Just (parseWild p, Nothing, Nothing)
-                    [p, l] -> Just (parseWild p, parseWild l, Nothing)
-                    [p, l, e] -> Just (parseWild p, parseWild l, parseWild e)
-                    _ -> Nothing
+parseGHDLSpec spec = case splitBy (=='-') spec of
+                       [] -> Just (Nothing, Nothing, Nothing)
+                       [p] -> Just (parseWild p, Nothing, Nothing)
+                       [p, l] -> Just (parseWild p, parseWild l, Nothing)
+                       [p, l, e] -> Just (parseWild p, parseWild l, parseWild e)
+                       _ -> Nothing
   where parseWild "*" = Nothing
         parseWild s = Just s
 
@@ -115,7 +111,7 @@ parseGHDLSpec s = case splitBy (=='-') s of
 
 ghdlListCmd :: String -> Action ()
 ghdlListCmd _ = do
-  projects <- getProjects
+  -- projects <- getProjects
   putQuiet "NOT DONE"
   -- parse the GHDL spec, build all the clash stuff that needs to be built,
   -- create the necessary vhdl libraries, and have ghdl list the contents of the
@@ -124,6 +120,7 @@ ghdlListCmd _ = do
 ghdlBuildCmd :: String -> Action ()
 ghdlBuildCmd spec = do
   let (Just spec') = parseGHDLSpec spec
-  ghdlDir <- getGHDLDir
+  -- ghdlDir <- getGHDLDir
   putQuiet "NOT DONE"
+  putQuiet ("should probably do something about " ++ show spec')
   -- depend on the entity executable

@@ -3,7 +3,7 @@ module NDP.Tests where
 import Test.Hspec
 
 import NDP.Tests.Clash
-import NDP.Tests.Primitives
+import NDP.Tests.Primitive
 
 ndpTests :: Spec
 ndpTests = do
