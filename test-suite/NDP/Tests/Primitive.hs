@@ -13,8 +13,8 @@ import Xilinx.Primitive
 
 primitiveTests :: String -> Spec
 primitiveTests name = describe name $ do
-  describe "Xilinx Primitives" $ do
-    $(testPrimitiveNamed 'dcm_clkgen#)
-    $(testPrimitiveNamed 'dcm_sp#)
-  describe "Custom VHDL Primitives" $ do
-    $(testPrimitiveNamed 'clockStrobe#)
+  $(mkPrimitiveTestSuite "Xilinx Primitives"
+     [ 'dcm_clkgen#
+     , 'dcm_sp# ])
+  $(mkPrimitiveTestSuite "Custom VHDL Primitives"
+     [ 'clockStrobe# ])

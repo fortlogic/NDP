@@ -62,6 +62,7 @@ import GHC.Stack
 -- + The spread spectrum mode attribute will be hidden though this may change in
 --   the future.
 
+-- ^ DCM_CLKGEN primitive.
 dcm_clkgen# :: ( HasCallStack
                , (i*m) ~ (o*d)
                , o' ~ (o*d') )
@@ -71,10 +72,10 @@ dcm_clkgen# :: ( HasCallStack
             -> Clock ('Dom dom0 i) gated -- ^ CLKIN
             -> Reset ('Dom dom0 i) 'Asynchronous -- ^ RST
             -> Signal ('Dom dom1 o) Bool -- ^ FREEZEDCM (can be driven by LOCKED)
-            -> ( Clock ('Dom dom1 o) gated -- ^ CLKFX
-               , Clock ('Dom dom2 o') gated -- ^ CLKFXDV
-               , Clock ('Dom dom3 o) gated -- ^ CLKFX180
-               , Signal ('Dom dom1 o) Bool -- ^ LOCKED
+            -> ( Clock ('Dom dom1 o) gated --  CLKFX
+               , Clock ('Dom dom2 o') gated --  CLKFXDV
+               , Clock ('Dom dom3 o) gated --  CLKFX180
+               , Signal ('Dom dom1 o) Bool --  LOCKED
                , Signal ('Dom dom1 o) (BitVector 2)) -- ^ STATUS
 -- dcm_clkgen# _ _ _ clkIn rstIn freeze = undefined
 dcm_clkgen# = undefined
