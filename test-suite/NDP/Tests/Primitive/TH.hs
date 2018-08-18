@@ -28,35 +28,22 @@ mkPrimitiveTest :: Name -> Q Exp
 mkPrimitiveTest n = do
   nameLit <- qualifiedLit n
   maybeQCName <- mkQualifiedName n "properties"
+  maybeTBName <- mkQualifiedName n "testbench"
   [|
     describe $(pure nameLit) $ do
       it "should have QuickCheck suite" $(boolE (isJust maybeQCName))
       ($(case maybeQCName of
            Nothing -> [| return () |]
            Just qcName -> [| $(varE qcName) "QuickCheck invariants" |] ))
-      it "should have a testbench?" $ do
-        pendingWith "in an ideal world maybe..."
+      it "should have a testbench?" $(boolE (isJust maybeTBName))
       it "should run the testbench with clash?" $ do
         pendingWith "in an ideal world maybe..."
       it "should be able to generate a VHDL testbench?" $ do
         pendingWith "in an ideal world maybe..."
       it "should run the testbench with ghdl?" $ do
         pendingWith "in an ideal world maybe..."
-      it "should be able to generate a Verilog testbench?" $ do
+     {- it "should be able to generate a Verilog testbench?" $ do
         pendingWith "in an ideal world maybe..."
       it "should have run the testbench with icarus?" $ do
-        pendingWith "in an ideal world maybe..." |]
+        pendingWith "in an ideal world maybe..."-} |]
 
--- let mkName' = mkTestName n
-  -- -- (Just name) <- mkName' (nameBase n)
-  -- -- (Just propsName) <- mkName' "properties"
-  -- [|
-  --  return $ do
-  --     -- describe $(litE (qualified name)) $ do
-  --     --   $(varE propsName) "QuickCheck Invariants"
-  --     describe "Clash Testbench" $ do
-  --       it "should do stuff" $ pendingWith "TODO: finish template haskell"
-  --     describe "VHDL Generation" $ do
-  --       it "should do stuff" $ pendingWith "TODO: finish template haskell"
-  --     describe "VHDL Testbench" $ do
-  --       it "should do stuff" $ pendingWith "TODO: finish template haskell" |]
