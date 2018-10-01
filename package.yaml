@@ -15,7 +15,7 @@ extra-source-files:
 - CHANGELOG.md
 - LICENSE.md
 - package.yaml
-- README.md
+- README.org
 - stack.yaml
 
 ghc-options: -Wall
