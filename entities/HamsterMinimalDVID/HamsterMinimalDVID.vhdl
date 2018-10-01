@@ -2,7 +2,7 @@ library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 
 Entity HamsterMinimalDVID is
-    Port ( clk_in         : in  STD_LOGIC;
+    Port ( clk_vec_in         : in  STD_LOGIC_VECTOR(0 downto 0);
 
            tmds_p : out  STD_LOGIC_VECTOR(3 downto 0);
            tmds_n : out  STD_LOGIC_VECTOR(3 downto 0));
@@ -53,7 +53,7 @@ begin
 -- Generate a 800x600 VGA test pattern
 ---------------------------------------
 Inst_vga_gen: vga_gen PORT MAP(
-      clk50 => clk_in,
+      clk50           => clk_vec_in(0),
       pixel_clock     => pixel_clock,
       red_p           => red_p,
       green_p         => green_p,

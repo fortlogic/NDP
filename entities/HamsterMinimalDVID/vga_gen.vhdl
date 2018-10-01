@@ -39,6 +39,7 @@ architecture Behavioral of vga_gen is
    constant v_max        : natural := 628;
    signal   v_count      : unsigned(11 downto 0) := x"250";
    signal   v_offset     : unsigned(7 downto 0) := (others => '0');
+
    signal clk40 : std_logic;
 begin
 
