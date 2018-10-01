@@ -1,7 +1,7 @@
 {-# LANGUAGE DataKinds #-}
 module NDP.ADB.Raw where
 
-import CLaSH.Prelude
+import Clash.Prelude
 
 data TriOut = LowO | HighO | SilentO
 

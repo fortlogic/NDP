@@ -19,7 +19,7 @@ import Resources.ROM.Tiles
 
 tileROMRules :: Rules ()
 tileROMRules = do
-  buildDir <- liftIO $ maybeConfigIO "BUILD" "build"
+  buildDir <- getBuildDir
   (buildDir </> "ROM/tile/*.rom") %> \ rom -> do
     let mapName = takeBaseName rom
     tileMap <- fromJust <$> getConfig "TILE_MAP"

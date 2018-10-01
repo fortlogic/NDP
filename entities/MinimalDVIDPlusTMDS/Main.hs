@@ -2,9 +2,9 @@
 {-# LANGUAGE DataKinds #-}
 module MinimalDVIDPlusTMDS.Main where
 
-import CLaSH.Prelude
-import CLaSH.Prelude.Explicit
-import CLaSH.Prelude.Synchronizer
+import Clash.Prelude
+import Clash.Prelude.Explicit
+import Clash.Prelude.Synchronizer
 
 import NDP.Clocking
 import NDP.Video.TMDS

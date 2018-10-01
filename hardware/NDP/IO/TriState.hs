@@ -2,7 +2,7 @@ module NDP.IO.TriState where
 
 import Prelude()
 
-import CLaSH.Prelude
+import Clash.Prelude
 
 -- Input coming from a bidirectional IO pin
 data In = LowI | HighI deriving (Show, Eq, Ord)
@@ -22,17 +22,17 @@ bit2in _ = error "illegal bit"
 data Out = LowO | HighO | SilentO deriving (Show, Eq, Ord)
 
 -- The Xilinx IOBUF primitive
-type IOBUF = Signal (Bool, Bit) -> Signal Bit
+type IOBUF domain = Signal domain (Bool, Bit) -> Signal domain Bit
 
 -- A tri-state IO pin
-type Tri = Signal Out -> Signal In
+type Tri domain = Signal domain Out -> Signal domain In
 
 -- A tri-state IO pin that only returns input when it knows that it's the only
 -- person on the bus talking. Note that an error is only signalled if another
 -- party is driving the bus in a different direction than we are. We cannot
 -- detect conflict if another person is driving the bus in the same direction as
 -- we are.
-type ErrorTri = Signal Out -> Signal (Maybe In)
+type ErrorTri domain = Signal domain Out -> Signal domain (Maybe In)
 
 iobufInput :: Out -> (Bool, Bit)
 iobufInput LowO    = (True, low)
@@ -40,10 +40,10 @@ iobufInput HighO   = (True, high)
 iobufInput SilentO = (False, undefined)
 
 -- Turn an IOBUF into a Tristate signal.
-mkTri :: IOBUF -> Tri
+mkTri :: IOBUF domain -> Tri domain
 mkTri buf tIn = bit2in <$> buf (iobufInput <$> tIn)
 
-errorTri :: Tri -> ErrorTri
+errorTri :: Tri domain -> ErrorTri domain
 errorTri tri out = mkErr <$> out <*> input
   where input = tri out
         mkErr LowO  HighI  = Nothing

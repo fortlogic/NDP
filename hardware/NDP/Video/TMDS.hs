@@ -14,18 +14,18 @@ module NDP.Video.TMDS (TMDS (TMDSData, TMDSControl),
                  xorDecode,
                  xnorDecode) where
 
-import CLaSH.Prelude
-import CLaSH.Prelude.Explicit
+import Clash.Prelude
 
-import NDP.Clocking
 import NDP.Utils
 
 data TMDS = TMDSData (Unsigned 8)
           | TMDSControl (BitVector 2)
           deriving (Show, Eq)
 
-tmdsEncoder :: SignalPx TMDS -> SignalPx (BitVector 10)
-tmdsEncoder = mealy' pxClk encodeTMDS 0
+tmdsEncoder :: HiddenClockReset domain gated synchronous
+            => Signal domain TMDS
+            -> Signal domain (BitVector 10)
+tmdsEncoder = mealy encodeTMDS 0
 
 encodeTMDS :: Signed 4 -> TMDS -> (Signed 4, BitVector 10)
 encodeTMDS dc (TMDSData byte) = encodeByte dc (pack byte)
@@ -61,13 +61,13 @@ transitionCount bv = (snd . foldl acc (msb bv, 0) . bv2v) bv
 dcOffset :: (KnownNat (2 ^ n),
             KnownNat (n + 1)) =>
             BitVector (2 ^ n) -> Signed (n + 1)
-dcOffset bv = (offsetOnes . foldr (+) 0 . map (resize . unpack) . bv2v) bv
-  where offsetOnes ones = (2 * ones) - (int2Signed $ size# bv)
+dcOffset = foldl step 0 . map (/=low) . bv2v
+  where step acc True = acc+1
+        step acc False = acc-1
 
 onesCount :: BitVector 8 -> Unsigned 4
-onesCount byte = fold (+) (map (extend . unpack) bits)
-  where bits :: Vec 8 Bit
-        bits = unpack byte
+onesCount = foldl (+) 0 . map conv . bv2v
+  where conv = fromInteger . toInteger
 
 bit2sign :: KnownNat n => Bit -> Signed n
 bit2sign 0 = 0
@@ -78,15 +78,15 @@ bit2sign _ = error "impossible bit"
 encodeByte :: Signed 4 -> BitVector 8 -> (Signed 4, BitVector 10)
 encodeByte dc byte =  if (wordDc == 0) || (dc == 0)
                       then if msb word == 1
-                           then (dc + wordDc, low ++# word)
-                           else (dc - wordDc, high ++# low ++# word8Inv)
+                           then (dc + wordDc, lowbv ++# word)
+                           else (dc - wordDc, highbv ++# lowbv ++# word8Inv)
                       else if dc == wordDc
-                           then (dc + (bit2sign . msb) word - wordDc, high ++# msb word ++# word8Inv)
-                           else (dc - (bit2sign . msb) wordInv + wordDc, low ++# word)
+                           then (dc + (bit2sign . msb) word - wordDc, highbv ++# (msbv' word) ++# word8Inv)
+                           else (dc - (bit2sign . msb) wordInv + wordDc, lowbv ++# word)
   where ones = onesCount byte
         word = if (ones > 4) || ((ones == 4) && (lsb byte == 0))
-                then low ++# xnorEncode byte
-                else high ++# xorEncode byte
+                then lowbv ++# xnorEncode byte
+                else highbv ++# xorEncode byte
         wordInv = complement word
         wordDc = (dcOffset word8) - 4
         word8 :: BitVector 8
@@ -97,7 +97,7 @@ encodeByte dc byte =  if (wordDc == 0) || (dc == 0)
 decodeByte :: BitVector 10 -> BitVector 8
 decodeByte word = byte''
   where (header, byte) = split word :: (BitVector 2, BitVector 8)
-        invert = unpack $ msb header
-        gate = unpack $ lsb header
+        invert = unpack $ msbv' header
+        gate = unpack $ lsbv' header
         byte' = if invert then complement byte else byte
         byte'' = (if gate then xorDecode else xnorDecode) byte'

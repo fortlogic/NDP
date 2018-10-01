@@ -3,7 +3,7 @@
 {-# LANGUAGE TemplateHaskell #-}
 module NDP.Tests.TMDS (tmdsTests) where
 
-import CLaSH.Prelude
+import Clash.Prelude
 import Formatting
 import Formatting.ShortFormatters
 import Test.Hspec

@@ -9,7 +9,7 @@ module NDP.Video.Timing (TimeRegion (..),
                         vidTick,
                         vidRegion) where
 
-import CLaSH.Prelude
+import Clash.Prelude
 
 -- 40MHz Pixel clock
 

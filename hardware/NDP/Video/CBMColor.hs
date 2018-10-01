@@ -3,7 +3,7 @@ module NDP.Video.CBMColor (RGBColor (..),
                      CBMColor (..),
                      cbmToRGB) where
 
-import CLaSH.Prelude
+import Clash.Prelude
 
 data RGBColor = RGB (Unsigned 8) (Unsigned 8) (Unsigned 8)
                 deriving (Show, Eq)

@@ -18,63 +18,80 @@ extra-source-files:
 - README.md
 - stack.yaml
 
-ghc-options: -Wall -Werror
+ghc-options: -Wall
 
 library:
   dependencies:
-  - base
-  - clash-prelude
-  - data-default
+    - base
+    - bytestring
+    - clash-prelude
+    - constraints
+    - data-default
+    - filepath
+    - ghc-typelits-extra
+    - ghc-typelits-knownnat
+    - ghc-typelits-natnormalise
+    - singletons
   source-dirs: hardware
+  # generated-exposed-modules: Paths_NDP
+  generated-other-modules: Paths_NDP
+
+data-files:
+  - hardware/NDP/Primitive/vhdl/clockStrobe.json
 
 executables:
   ndp:
     source-dirs: executable
     main: Make/Main.hs
     dependencies:
-    - NDP
-    - base
-    - bytestring
-    - conf
-    - directory
-    - netpbm
-    - posix-escape
-    - safe-globals
-    - shake
-    - unordered-containers
-    - vector
+      - NDP
+      - base
+      - bytestring
+      - clash-ghc
+      - conf
+      - directory
+      - netpbm
+      - posix-escape
+      - safe-globals
+      - shake
+      - unordered-containers
+      - vector
     ghc-options:
-    - -rtsopts
-    - -threaded
-    - -with-rtsopts=-N
+      - -rtsopts
+      - -threaded
+      - -with-rtsopts=-N
 
 benchmarks:
   NDP-benchmarks:
     source-dirs: benchmark
     main: Main.hs
     dependencies:
-    - NDP
-    - base
-    - criterion
+      - NDP
+      - base
+      - criterion
     ghc-options:
-    - -rtsopts
-    - -threaded
-    - -with-rtsopts=-N
+      - -rtsopts
+      - -threaded
+      - -with-rtsopts=-N
 
 tests:
   NDP-test-suite:
     source-dirs: test-suite
     main: Main.hs
     dependencies:
-    - NDP
-    - QuickCheck
-    - base
-    - clash-prelude
-    - formatting
-    - hspec
-    - tasty
-    - tasty-hspec
+      - NDP
+      - QuickCheck
+      - base
+      - clash-prelude
+      - formatting
+      - ghc-typelits-extra
+      - ghc-typelits-knownnat
+      - ghc-typelits-natnormalise
+      - hspec
+      - tasty
+      - tasty-hspec
+      - template-haskell
     ghc-options:
-    - -rtsopts
-    - -threaded
-    - -with-rtsopts=-N
+      - -rtsopts
+      - -threaded
+      - -with-rtsopts=-N
