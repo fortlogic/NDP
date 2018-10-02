@@ -37,11 +37,11 @@ resolver: lts-12.11
 # will not be run. This is useful for tweaking upstream packages.
 packages:
   - '.'
-  - location: https://github.com/dented42/haskell-conf/archive/52459d28598aa99e9b31e9a9d3004a8705fd8ad7.zip
+  - location: https://github.com/fortlogic/haskell-conf/archive/52459d28598aa99e9b31e9a9d3004a8705fd8ad7.zip
     extra-dep: true
-  - location: https://github.com/dented42/safe-globals/archive/master.zip
+  - location: https://github.com/fortlogic/safe-globals/archive/master.zip
     extra-dep: true
-  - location: https://github.com/dented42/shake/archive/8e5e660a9ed9a9f675c7957d17db2775fa1379a8.zip
+  - location: https://github.com/fortlogic/shake/archive/8e5e660a9ed9a9f675c7957d17db2775fa1379a8.zip
     extra-dep: true
 
 # Dependency packages to be pulled from upstream that are not in the resolver
