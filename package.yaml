@@ -45,6 +45,7 @@ executables:
     main: Make/Main.hs
     dependencies:
       - NDP
+      - SHA
       - base
       - bytestring
       - clash-ghc
