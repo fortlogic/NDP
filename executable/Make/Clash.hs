@@ -117,9 +117,10 @@ buildHDL hdl manifestF = do
   -- TODO: technically this doesn't create a manifest of the top level entities
   -- that were just synthesised, it's a manifest of all the directories hdl
   -- output directory. If a top level entity is specified, the HDL is generated,
-  -- and the top level entity spec is removed then as long as the build
-  -- directory isn't cleaned the manifest will still list the entity even though
-  -- it's no longer being built. Fix this.
+  -- and the top level entity spec is subsequently removed then as long as the
+  -- build directory isn't cleaned the manifest will still list the entity in
+  -- future builds even though it no longer exists and is not being built. Fix
+  -- this.
   (show <$> mkManifest hdlD) >>= (liftIO . (writeFile manifestF))
 
 mkManifest :: FilePath -> Action [(FilePath, Integer)]
