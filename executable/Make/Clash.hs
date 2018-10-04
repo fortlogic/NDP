@@ -5,6 +5,7 @@ module Make.Clash ( clashRules
                   , manifestPath ) where
 
 import Control.Monad.IO.Class
+import Data.Digest.Pure.SHA
 import Data.List
 import Development.Shake
 import Development.Shake.Config
@@ -121,11 +122,10 @@ buildHDL hdl manifestF = do
   -- it's no longer being built. Fix this.
   (show <$> mkManifest hdlD) >>= (liftIO . (writeFile manifestF))
 
-mkManifest :: FilePath -> Action [(FilePath, String)]
+mkManifest :: FilePath -> Action [(FilePath, Integer)]
 mkManifest projectD = do
   liftIO (getDirectoryDirsIO projectD) >>= mapM getDirectoryHash
   where getDirectoryHash library = do
           let libraryDir = projectD </> library
-          (Stdout tar) <- cmd "tar" "-c" libraryDir
-          (Stdout hash) <- cmd "md5" (Stdin tar)
-          return (libraryDir, mconcat $ lines hash)
+          (Stdout tar) <- (command [BinaryPipes] "tar" ["-c", libraryDir])
+          return (libraryDir, integerDigest (sha256 tar))
