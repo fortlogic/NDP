@@ -113,7 +113,7 @@ buildHDL hdl manifestF = do
   () <- cmd clashExec flags primFlags "-outputdir" clashOut (hdlFlag hdl) srcF
 
   -- put together the manifest.
-  --
+
   -- TODO: technically this doesn't create a manifest of the top level entities
   -- that were just synthesised, it's a manifest of all the directories hdl
   -- output directory. If a top level entity is specified, the HDL is generated,
