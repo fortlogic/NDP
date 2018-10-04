@@ -2,6 +2,8 @@
 #+PRIORITY: A E C
 * TODOs
 ** Neccesities
+*** TODO [#D] Actually write a proper README
+    Only having TODOs is tacky. :p
 *** INPROGRESS [#A] Update Clash Version
     I want explicit clocking and reset lines.
 *** TODO [#C] Move Clock Generation into Clash
