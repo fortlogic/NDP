@@ -87,6 +87,8 @@ tests:
       - ghc-typelits-natnormalise
       - hspec
       - tasty
+      - tasty-ant-xml
+      - tasty-expected-failure
       - tasty-hspec
       - template-haskell
     ghc-options:

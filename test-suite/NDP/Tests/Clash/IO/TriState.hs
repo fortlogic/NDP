@@ -1,4 +1,4 @@
-module NDP.Tests.IO.TriState (tristateTests) where
+module NDP.Tests.Clash.IO.TriState (tristateTests) where
 
 import Clash.Prelude
 import Test.Hspec
