@@ -36,8 +36,6 @@ library:
   # generated-exposed-modules: Paths_NDP
   generated-other-modules: Paths_NDP
 
-data-files:
-
 executables:
   ndp:
     source-dirs: executable
