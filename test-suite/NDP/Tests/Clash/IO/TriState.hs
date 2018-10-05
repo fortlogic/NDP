@@ -1,21 +1,26 @@
-module NDP.Tests.Clash.IO.TriState (tristateTests) where
+module NDP.Tests.Clash.IO.TriState ( tristateTests ) where
 
 import Clash.Prelude
-import Test.Hspec
+import Test.Tasty
+import Test.Tasty.HUnit
+import Test.Tasty.Pending
 
 import NDP.IO.TriState
 
-tristateTests :: String -> Spec
-tristateTests name = describe name $ do
-  describe "Datatypes" $ do
-    describe "in2bit" $ do
-      it "LowI" $ do
-        in2bit LowI `shouldBe` low
-      it "HighI" $ do
-        in2bit HighI `shouldBe` high
-  describe "Tristate <---> IOBUF interface" $ do
-    it "should have tests" $ do
-      pending
-  describe "Error checking" $ do
-    it "should have tests" $ do
-      pending
+tristateTests :: TestTree
+tristateTests = testGroup "Tristate IO"
+  [ in2bitTests
+  , tristateIOBUFTests
+  , errorCheckingTests ]
+
+in2bitTests :: TestTree
+in2bitTests = testGroup "in2bit"
+  [ testCase "LowI" (in2bit LowI @?= low)
+  , testCase "HighI" (in2bit HighI @?= high)
+  ]
+
+tristateIOBUFTests :: TestTree
+tristateIOBUFTests = "Tristate <---> IOBUF interface" `pending` "Need to write test cases"
+
+errorCheckingTests :: TestTree
+errorCheckingTests = "Error checking" `pending` "Need to write test cases"

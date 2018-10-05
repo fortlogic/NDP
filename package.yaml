@@ -90,6 +90,8 @@ tests:
       - tasty-ant-xml
       - tasty-expected-failure
       - tasty-hspec
+      - tasty-hunit
+      - tasty-quickcheck
       - template-haskell
     ghc-options:
       - -rtsopts
