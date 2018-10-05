@@ -2,9 +2,10 @@
 #+PRIORITY: A E C
 * TODOs
 ** Neccesities
-*** TODO [#D] Actually write a proper README
+*** INPROGRESS [#C] Actually write a proper README
     Only having TODOs is tacky. :p
-*** INPROGRESS [#A] Update Clash Version
+*** DONE [#A] Update Clash Version
+    CLOSED: [2018-10-05 Fri 16:36]
     I want explicit clocking and reset lines.
 *** TODO [#C] Move Clock Generation into Clash
     Investigate creating the necessary primitives and whatnot necessary for
@@ -25,7 +26,7 @@
     controller. Ideally the entire thing could be configurable in clash, but it
     might be necessary to generate the controller with the xilinx tools and make
     it easy to instantiate the resulting wrapper inside clash.
-*** [#B] Move from HSpec to Tasty
+*** INPROGRESS [#B] Move from HSpec to Tasty
     Tasty looks fancy and I lust a bit for it. :p
 ** Possibilities
 *** [#C] Dhall
