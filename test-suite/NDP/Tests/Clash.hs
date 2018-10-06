@@ -1,15 +1,16 @@
 module NDP.Tests.Clash ( clashTests ) where
 
-import Test.Hspec
+import Test.Tasty
 
-import NDP.Tests.TMDS
-import NDP.Tests.IO.TriState
--- import NDP.Tests.ALU
+import NDP.Tests.Clash.Clocking
+import NDP.Tests.Clash.IO.TriState
+import NDP.Tests.Clash.TMDS
 
-clashTests :: String -> Spec
-clashTests name = describe name $ do
-  tmdsTests "TMDS"
-  tristateTests "Tri-state IO"
-  describe "Clocking" $ do
-    it "should have tests" $ do
-      pendingWith "Procrastination"
+clashTests :: TestTree
+clashTests = testGroup "Clash"
+  [ tmdsTests
+  , tristateTests
+  , clockingTests ]
+  -- describe "Clocking" $ do
+  --   it "should have tests" $ do
+  --     pendingWith "Procrastination"

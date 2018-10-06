@@ -2,12 +2,14 @@
 {-# LANGUAGE TemplateHaskell #-}
 module NDP.Tests where
 
-import Test.Hspec
+import Test.Tasty
 
 import NDP.Tests.Clash
+import NDP.Tests.HDL
 
-ndpTests :: Spec
-ndpTests = do
-  clashTests "Clash"
+ndpTests :: TestTree
+ndpTests = testGroup "NDP"
+  [ clashTests
+  , hdlTests ]
 
 
