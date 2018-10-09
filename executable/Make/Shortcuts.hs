@@ -80,8 +80,10 @@ stageCmd project = do
        , container </> project -<.> "ucf"]
 
 buildClashCmd :: HDL -> String -> Action ()
+buildClashCmd hdl "" = (map fst <$> getProjects) >>= mapM (buildClashCmd hdl) >> return ()
 buildClashCmd hdl project = do
   clashOut <- getClashDir
+  putNormal $ "building " ++ project ++ " (" ++ hdlName hdl ++ ")"
   need [ clashOut  </> hdlName hdl </> project </> "manifest" <.> "txt" ]
 
 listProjectsClashCmd :: String -> Action ()
