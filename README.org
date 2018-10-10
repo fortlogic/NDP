@@ -1,5 +1,10 @@
 #+TODO: TODO INPROGRESS | DONE
 #+PRIORITY: A E C
+* NDP
+[[https://fortlogic.visualstudio.com/NDP/NDP%20Team/_build?definitionId=3][file:https://fortlogic.visualstudio.com/NDP/_apis/build/status/NDP-develop?.svg]]
+
+FPGA based computer inspired by the C128, PDP-11, and Macintosh
+
 * TODOs
 ** Neccesities
 *** INPROGRESS [#C] Actually write a proper README
