@@ -14,21 +14,35 @@ import Make.Vagrant
 
 shortcutRules :: Rules ()
 shortcutRules = do
-  installCommandTree $ commandGroup ":" [fpgaCommands, clashCommands, simulateCommands]
+  installCommandTree $ commandGroup ":" [ generalCommands
+                                        , fpgaCommands
+                                        , clashCommands
+                                        , simulateCommands
+                                        ]
+
+generalCommands :: CommandTree
+generalCommands = commandGroup "" [ mkCommand' "setup" setupCmd
+                                    -- actually tbh I'm not really sure why 'setup' exists...
+                                  , mkCommand' "clean" cleanCmd
+                                  ]
+  where setupCmd = cmd "stack build clash-ghc"
+        cleanCmd = getBuildDir >>= (flip removeFilesAfter [ "//*" ])
 
 fpgaCommands :: CommandTree
-fpgaCommands = commandGroup "fpga:" [mkCommand "reset:" resetCmd
-                                    ,mkCommand "build:" buildCmd
-                                    ,mkCommand "load:" loadCmd
-                                    ,mkCommand "burn:" burnCmd
-                                    ,mkCommand "stage:" stageCmd]
+fpgaCommands = commandGroup "fpga:" [ mkCommand "reset:" resetCmd
+                                    , mkCommand "build:" buildCmd
+                                    , mkCommand "load:" loadCmd
+                                    , mkCommand "burn:" burnCmd
+                                    , mkCommand "stage:" stageCmd
+                                    ]
 
 clashCommands :: CommandTree
 clashCommands = commandGroup "clash:" [ mkCommand "vhdl:" (buildClashCmd VHDL)
                                       , mkCommand "verilog:" (buildClashCmd Verilog)
                                       , listCommands ]
   where listCommands = commandGroup "list:" [ mkCommand "projects:" listProjectsClashCmd
-                                            , mkCommand "targets:" listTargetsClashCmd ]
+                                            , mkCommand "targets:" listTargetsClashCmd
+                                            ]
 
 simulateCommands :: CommandTree
 simulateCommands = commandGroup "simulate:" [ commandGroup "vhdl:" [ mkCommand "build:" ghdlBuildCmd
