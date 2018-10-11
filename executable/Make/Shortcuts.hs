@@ -21,12 +21,8 @@ shortcutRules = do
                                         ]
 
 generalCommands :: CommandTree
-generalCommands = commandGroup "" [ mkCommand' "setup" setupCmd
-                                    -- actually tbh I'm not really sure why 'setup' exists...
-                                  , mkCommand' "clean" cleanCmd
-                                  ]
-  where setupCmd = cmd "stack build clash-ghc"
-        cleanCmd = getBuildDir >>= (flip removeFilesAfter [ "//*" ])
+generalCommands = commandGroup "" [ mkCommand' "clean" cleanCmd ]
+  where cleanCmd = getBuildDir >>= (flip removeFilesAfter [ "//*" ])
 
 fpgaCommands :: CommandTree
 fpgaCommands = commandGroup "fpga:" [ mkCommand "reset:" resetCmd
