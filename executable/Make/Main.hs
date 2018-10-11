@@ -19,12 +19,6 @@ main = shakeArgs shakeOptions $ do
   installOracles
   setupConfig "NDP.config"
 
-  phony "setup" $ do
-    cmd "stack build clash-ghc"
-
-  phony "clean" $ do
-    cmd "rm -rvf build"
-
   -- phony "test" $ do
   --   liftIO $ do
   --     (_:args) <- getArgs

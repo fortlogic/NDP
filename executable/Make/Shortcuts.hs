@@ -14,21 +14,31 @@ import Make.Vagrant
 
 shortcutRules :: Rules ()
 shortcutRules = do
-  installCommandTree $ commandGroup ":" [fpgaCommands, clashCommands, simulateCommands]
+  installCommandTree $ commandGroup ":" [ generalCommands
+                                        , fpgaCommands
+                                        , clashCommands
+                                        , simulateCommands
+                                        ]
+
+generalCommands :: CommandTree
+generalCommands = commandGroup "" [ mkCommand' "clean" cleanCmd ]
+  where cleanCmd = getBuildDir >>= (flip removeFilesAfter [ "//*" ])
 
 fpgaCommands :: CommandTree
-fpgaCommands = commandGroup "fpga:" [mkCommand "reset:" resetCmd
-                                    ,mkCommand "build:" buildCmd
-                                    ,mkCommand "load:" loadCmd
-                                    ,mkCommand "burn:" burnCmd
-                                    ,mkCommand "stage:" stageCmd]
+fpgaCommands = commandGroup "fpga:" [ mkCommand "reset:" resetCmd
+                                    , mkCommand "build:" buildCmd
+                                    , mkCommand "load:" loadCmd
+                                    , mkCommand "burn:" burnCmd
+                                    , mkCommand "stage:" stageCmd
+                                    ]
 
 clashCommands :: CommandTree
 clashCommands = commandGroup "clash:" [ mkCommand "vhdl:" (buildClashCmd VHDL)
                                       , mkCommand "verilog:" (buildClashCmd Verilog)
                                       , listCommands ]
   where listCommands = commandGroup "list:" [ mkCommand "projects:" listProjectsClashCmd
-                                            , mkCommand "targets:" listTargetsClashCmd ]
+                                            , mkCommand "targets:" listTargetsClashCmd
+                                            ]
 
 simulateCommands :: CommandTree
 simulateCommands = commandGroup "simulate:" [ commandGroup "vhdl:" [ mkCommand "build:" ghdlBuildCmd
@@ -80,8 +90,10 @@ stageCmd project = do
        , container </> project -<.> "ucf"]
 
 buildClashCmd :: HDL -> String -> Action ()
+buildClashCmd hdl "" = (map fst <$> getProjects) >>= mapM (buildClashCmd hdl) >> return ()
 buildClashCmd hdl project = do
   clashOut <- getClashDir
+  putNormal $ "building " ++ project ++ " (" ++ hdlName hdl ++ ")"
   need [ clashOut  </> hdlName hdl </> project </> "manifest" <.> "txt" ]
 
 listProjectsClashCmd :: String -> Action ()
