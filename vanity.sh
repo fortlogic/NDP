@@ -1,5 +1,5 @@
 gource --seconds-per-day 1 --max-file-lag 0.5 --camera-mode overview \
-       --disable-bloom --hide filenames \
+       --multi-sampling -800x600 --disable-bloom --hide filenames \
        --auto-skip-seconds 0.5 --key --title "NDP" -o - \
 | \
 ffmpeg -y -r 60 -f image2pipe -vcodec ppm -i - -vcodec libx264 -preset veryslow \
