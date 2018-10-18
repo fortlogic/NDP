@@ -47,6 +47,7 @@ executables:
       - bytestring
       - clash-ghc
       - conf
+      - dhall
       - directory
       - netpbm
       - posix-escape
