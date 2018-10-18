@@ -14,6 +14,8 @@ data NDPConfiguration = NDPConfig
   }
   deriving (Generic, Show)
 
+instance Interpret NDPConfiguration
+
 data ClashConfiguration = ClashConfig
   { componentsDir :: FilePath
   , defaultHDL :: HDL
@@ -26,14 +28,20 @@ data ClashConfiguration = ClashConfig
   }
   deriving (Generic, Show)
 
+instance Interpret ClashConfiguration
+
 data GHDLConfiguration = GHDLConfig
   { artefactsDir :: FilePath }
   deriving (Generic, Show)
+
+instance Interpret GHDLConfiguration
 
 data ROMConfiguration = ROMConfig
   { tileDir :: FilePath
   }
   deriving (Generic, Show)
+
+instance Interpret ROMConfiguration
 
 data FPGAConfiguration = FPGAConfig
   { vm :: Maybe VMConfiguration
@@ -44,6 +52,8 @@ data FPGAConfiguration = FPGAConfig
   }
   deriving (Generic, Show)
 
+instance Interpret FPGAConfiguration
+
 data HDLSynthesisConfiguration = XilinxConfig
   { shellProfile :: FilePath -- settings64.sh
   , xstOptFile :: FilePath
@@ -52,7 +62,11 @@ data HDLSynthesisConfiguration = XilinxConfig
   }
   deriving (Generic, Show)
 
+instance Interpret HDLSynthesisConfiguration
+
 data VMConfiguration = VMConfig
   { projectRootDir :: FilePath
   }
   deriving (Generic, Show)
+
+instance Interpret VMConfiguration

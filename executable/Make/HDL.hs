@@ -1,3 +1,4 @@
+{-# LANGUAGE DeriveGeneric #-}
 module Make.HDL ( HDL (..)
                 , parseHDL
                 , hdlFlag
@@ -5,8 +6,13 @@ module Make.HDL ( HDL (..)
                 , hdlExtension ) where
 
 import Data.Char
+import Dhall
 
-data HDL = VHDL | Verilog deriving (Read, Show, Eq)
+data HDL = VHDL
+         | Verilog
+         deriving (Read, Show, Eq, Generic)
+
+instance Interpret HDL
 
 parseHDL :: String -> Maybe HDL
 parseHDL = parseHDL' . map toLower
