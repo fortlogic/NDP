@@ -3,25 +3,36 @@
 module MinimalDVIDPlusTMDS.Main where
 
 import Clash.Prelude
-import Clash.Prelude.Explicit
-import Clash.Prelude.Synchronizer
+import Clash.Explicit.Synchronizer
 
-import NDP.Clocking
+import NDP.Clocking.Domains
 import NDP.Video.TMDS
 
-{-# ANN topEntity
-  (defTop {
-     t_name = "tmds_encoder",
-     t_inputs = ["blank_en", "ctl_in", "px_in"],
-     t_outputs = ["tmds_out"]
-   }) #-}
+{-# ANN topEntity Synthesize
+          { t_name = "tmds_encoder"
+          , t_inputs = [ PortName "HDMI4000"
+                       , PortName "HDMI4000_rstn"
+                       , PortName "blank_en"
+                       , PortName "ctl_in"
+                       , PortName "px_in" ]
+          , t_output = PortName "tmds_out"
+          } #-}
 
-topEntity :: SignalPx Bool ->          -- ctl enable
-             SignalPx (BitVector 2) -> -- control
-             SignalPx (Unsigned 8) ->  -- pixel
-             SignalPx (BitVector 10)   -- tmds word
-topEntity cEn ctl px = registerPx 0 $ tmdsEncoder tmdsIn
-  where tmdsIn = bitsToTMDS <$> registerPx True cEn <*> registerPx 0 ctl <*> registerPx 0 px
+topEntity :: Clock PixelD Source ->
+             Reset PixelD Asynchronous ->
+             Signal PixelD Bool ->
+             Signal PixelD (BitVector 2) ->
+             Signal PixelD (Unsigned 8) ->
+             Signal PixelD (BitVector 10)
+topEntity = exposeClockReset hdmiEncoder
+
+hdmiEncoder :: (HiddenClockReset domain gated synchronous) =>
+               Signal domain Bool ->          -- ctl enable
+               Signal domain (BitVector 2) -> -- control
+               Signal domain (Unsigned 8) ->  -- pixel
+               Signal domain (BitVector 10)   -- tmds word
+hdmiEncoder cEn ctl px = register 0 $ tmdsEncoder tmdsIn
+  where tmdsIn = bitsToTMDS <$> register True cEn <*> register 0 ctl <*> register 0 px
 
 
 bitsToTMDS :: Bool ->
