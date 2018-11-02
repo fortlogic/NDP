@@ -1,7 +1,7 @@
 {-# LANGUAGE LambdaCase #-}
 {-# LANGUAGE TemplateHaskell #-}
 {-# LANGUAGE TupleSections #-}
-module Make.Config (setupConfig
+module Make.Config ( setupConfig
                    , maybeConfig
                    , readConfig
                    , maybeReadConfig
@@ -36,8 +36,8 @@ import Make.Oracles
 
 declareEmptyMVar "configV" [t| (H.HashMap String String) |]
 
-getConfigIO :: String -> IO (Maybe String)
-getConfigIO key = H.lookup key <$> readMVar configV
+getConfigIO :: MonadIO m => String -> m (Maybe String)
+getConfigIO key = liftIO $ H.lookup key <$> readMVar configV
 
 initialConfig :: Rules [(String, String)]
 initialConfig = do
@@ -80,21 +80,21 @@ readConfig key = getConfig key >>= \case
 maybeReadConfig :: Read a => String -> a -> Action a
 maybeReadConfig key fallback = (fromMaybe fallback) <$> readConfig key
 
-maybeConfigIO :: String -> String -> IO String
+maybeConfigIO :: MonadIO m => String -> String -> m String
 maybeConfigIO key fallback = do
   getConfigIO key >>= \case
     Nothing -> do
       -- complain if the key isn't present.
-      putStrLn $ missingMsg key fallback
+      (liftIO . putStrLn) $ missingMsg key fallback
       return fallback
     Just val -> return val
 
-readConfigIO :: Read a => String -> IO (Maybe a)
+readConfigIO :: (MonadIO m, Read a) => String -> m (Maybe a)
 readConfigIO key = getConfigIO key >>= \case
   Nothing -> return Nothing
   (Just str) -> return (readMaybe str)
 
-maybeReadConfigIO :: Read a => String -> a -> IO a
+maybeReadConfigIO :: (MonadIO m, Read a) => String -> a -> m a
 maybeReadConfigIO key fallback = (fromMaybe fallback) <$> readConfigIO key
 
 configFlag :: String -> String -> Action String
