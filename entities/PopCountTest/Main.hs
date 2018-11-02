@@ -11,17 +11,17 @@
 {-# OPTIONS_GHC -fplugin GHC.TypeLits.Normalise #-}
 module PopCountTest.Main where
 
-import Data.Singletons.Prelude
+import Data.Singletons
 import Data.Word
 import Clash.Prelude
 
 
-{-# ANN topEntity
-  (defTop {
-     t_name = "PopCountTest",
-     t_inputs = ["wing_a", "wing_b"],
-     t_outputs = ["wing_c"]
-   }) #-}
+{-# ANN topEntity Synthesize
+          { t_name = "PopCountTest"
+          , t_inputs = [ PortName "wing_a"
+                       , PortName "wing_b" ]
+          , t_output = PortName "wing_c"
+          } #-}
 
 topEntity :: Word16 -> Word16 -> BitVector 16
 topEntity a b = (pack popa) ++# (pack popb)

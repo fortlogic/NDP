@@ -2,5 +2,5 @@ module HamsterMinimalDVID.Main where
 
 import Clash.Prelude
 
-topEntity :: Signal () -> Signal ()
-topEntity _ = pure ()
+topEntity :: Signal System Bool
+topEntity = pure True

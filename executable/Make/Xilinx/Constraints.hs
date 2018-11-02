@@ -12,7 +12,7 @@ import Development.Shake.Config
 import Development.Shake.FilePath
 
 import Make.Config
-import Resources.Constraints
+import Constraints
 
 ucfRules :: Rules ()
 ucfRules = do

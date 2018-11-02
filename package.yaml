@@ -41,7 +41,6 @@ executables:
     source-dirs: executable
     main: Make/Main.hs
     dependencies:
-      - NDP
       - SHA
       - base
       - bytestring
