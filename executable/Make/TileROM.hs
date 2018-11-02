@@ -14,8 +14,7 @@ import Graphics.Netpbm
 
 import Make.Config
 import Make.PPM
-
-import Resources.ROM.Tiles
+import ROM.Tiles
 
 tileROMRules :: Rules ()
 tileROMRules = do

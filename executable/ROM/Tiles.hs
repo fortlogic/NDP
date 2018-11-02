@@ -1,4 +1,4 @@
-module Resources.ROM.Tiles where
+module ROM.Tiles where
 
 import Data.List
 import Data.Maybe

@@ -1,5 +1,5 @@
 {-# LANGUAGE OverloadedStrings #-}
-module Resources.Constraints where
+module Constraints where
 
 import Data.ByteString.Builder
 import Data.List as L

@@ -1,6 +1,6 @@
-module Resources.Constraints.Pipistrello where
+module Constraints.Pipistrello where
 
-import Resources.Constraints
+import Constraints
 
 requiredConstraints :: Constraints
 requiredConstraints = Constraints {

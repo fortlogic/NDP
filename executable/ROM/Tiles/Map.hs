@@ -1,6 +1,6 @@
-module Resources.ROM.Tiles.Map where
+module ROM.Tiles.Map where
 
-import Resources.ROM.Tiles
+import ROM.Tiles
 
 cbm :: TileMap
 cbm = TileMap {
