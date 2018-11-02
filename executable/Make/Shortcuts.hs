@@ -18,6 +18,7 @@ shortcutRules = do
                                         , fpgaCommands
                                         , clashCommands
                                         , simulateCommands
+                                        , romCommands
                                         ]
 
 generalCommands :: CommandTree
@@ -43,6 +44,8 @@ clashCommands = commandGroup "clash:" [ mkCommand "vhdl:" (buildClashCmd VHDL)
 simulateCommands :: CommandTree
 simulateCommands = commandGroup "simulate:" [ commandGroup "vhdl:" [ mkCommand "build:" ghdlBuildCmd
                                                                    , mkCommand "list:" ghdlListCmd ]]
+romCommands :: CommandTree
+romCommands = commandGroup "rom:" [ mkCommand "tileset:" romBuildTilesetCmd ]
 
 resetCmd :: String -> Action ()
 resetCmd _ = do
@@ -136,3 +139,8 @@ ghdlBuildCmd spec = do
   putQuiet "NOT DONE"
   putQuiet ("should probably do something about " ++ show spec')
   -- depend on the entity executable
+
+romBuildTilesetCmd :: String -> Action ()
+romBuildTilesetCmd tileset = do
+  (Just tileOut) <- getConfigIO "TILE_OUT"
+  need [ tileOut </> tileset ]

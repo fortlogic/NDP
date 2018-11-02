@@ -22,7 +22,7 @@ ghcFlags :: Action [String]
 ghcFlags = do
   odir <- configFlag2 "-odir" "CLASH_ODIR"
   hidir <- configFlag2 "-hidir" "CLASH_HIDIR"
-  idir <- configFlag "-i" "SRC"
+  idir <- configFlag "-i" "HW_SRC"
   return (odir ++ hidir ++ [idir])
 
 validProjectManifest :: HDL -> Rules (FilePath -> Bool)
