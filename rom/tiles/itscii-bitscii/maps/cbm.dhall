@@ -3,13 +3,11 @@
 , default = < Fill = 0 | File : Text >
 , tiles =
   let mkLetter : ∀( l : Text ) → ∀( c : Natural ) →
-                   { name : Text, code : Natural, data : < Fill : Natural | File : Text > }
+                   { code : Natural, data : < Fill : Natural | File : Text > }
                = λ( l : Text ) → λ( c : Natural ) →
-                   { name = l
-                   , code = c
-                   , data = < Fill : Natural | File = l ++ ".pbm" > }
+                   { code = c, data = < Fill : Natural | File = l ++ ".pbm" > }
   in
-    [ { name = "Empty", code = 0x00, data = < Fill = 0 | File : Text > }
+    [ { code = 0x00, data = < Fill = 0 | File : Text > }
     , mkLetter "A" 0x01
     , mkLetter "B" 0x02
     , mkLetter "C" 0x03
