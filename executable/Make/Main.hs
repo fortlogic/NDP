@@ -15,7 +15,7 @@ import Make.Xilinx.Constraints
 import Make.Xilinx.XFlow
 
 main :: IO ()
-main = execParser (info (commands <**> helper) mempty) >>= (putStrLn . show)
+main = execParser (info (commandOptionP <**> helper) mempty) >>= (putStrLn . show)
 
 -- customise the command line arguments shakeMain sees using `withArgs`.
 shakeMain :: IO ()
