@@ -48,6 +48,7 @@ executables:
       - conf
       - directory
       - netpbm
+      - optparse-applicative
       - posix-escape
       - safe-globals
       - shake
