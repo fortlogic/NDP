@@ -74,7 +74,6 @@ bit2sign 0 = 0
 bit2sign 1 = 1
 bit2sign _ = error "impossible bit"
 
-
 encodeByte :: Signed 4 -> BitVector 8 -> (Signed 4, BitVector 10)
 encodeByte dc byte =  if (wordDc == 0) || (dc == 0)
                       then if msb word == 1

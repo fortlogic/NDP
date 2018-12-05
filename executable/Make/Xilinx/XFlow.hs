@@ -27,7 +27,7 @@ xflowRules = do
     let hdlExt = hdlExtension hdl
 
     -- fetch the HDL files that the clash compiler generated.
-    need [ clashHdlD </> entityName <.> hdlExt ]
+    need [ clashHdlD </> "manifest.txt" ]
     clashHdlFs <- getDirectoryFiles "" [clashHdlD  </> "*" <.> hdlExt]
 
     -- fetch a clocking entity if one is specified
