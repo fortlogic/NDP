@@ -1,14 +1,14 @@
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 
-Entity MinimalDVIDPlusTMDS is
+Entity HamsterDVIDPlusTMDS is
     Port ( clk_vec_in         : in  STD_LOGIC_VECTOR(0 downto 0);
 
            tmds_p : out  STD_LOGIC_VECTOR(3 downto 0);
            tmds_n : out  STD_LOGIC_VECTOR(3 downto 0));
-end MinimalDVIDPlusTMDS;
+end HamsterDVIDPlusTMDS;
 
-architecture Behavioral of MinimalDVIDPlusTMDS is
+architecture Behavioral of HamsterDVIDPlusTMDS is
 
    COMPONENT vga_gen
    PORT(
