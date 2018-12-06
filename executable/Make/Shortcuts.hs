@@ -19,6 +19,7 @@ shortcutRules = do
                                         , clashCommands
                                         , simulateCommands
                                         , romCommands
+                                        , dhallCommands
                                         ]
 
 generalCommands :: CommandTree
@@ -46,6 +47,9 @@ simulateCommands = commandGroup "simulate:" [ commandGroup "vhdl:" [ mkCommand "
                                                                    , mkCommand "list:" ghdlListCmd ]]
 romCommands :: CommandTree
 romCommands = commandGroup "rom:" [ mkCommand "tileset:" romBuildTilesetCmd ]
+
+dhallCommands :: CommandTree
+dhallCommands = commandGroup "dhall:" [ mkCommand "normalise:" dhallNormaliseCommand ]
 
 resetCmd :: String -> Action ()
 resetCmd _ = do
@@ -144,3 +148,7 @@ romBuildTilesetCmd :: String -> Action ()
 romBuildTilesetCmd tileset = do
   (Just tileOut) <- getConfigIO "TILE_OUT"
   need [ tileOut </> tileset ]
+
+dhallNormaliseCommand :: String -> Action ()
+dhallNormaliseCommand file = do
+  cmd (Cwd $ takeDirectory file) (FileStdin file) "dhall"
