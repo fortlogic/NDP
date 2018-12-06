@@ -52,6 +52,7 @@ executables:
       - posix-escape
       - safe-globals
       - shake
+      - text
       - unordered-containers
       - vector
     ghc-options:

@@ -15,14 +15,16 @@ import Data.List
 import Development.Shake
 import Development.Shake.Classes
 
+import Make.Dhall.Hardware
 import Make.Vagrant
 
 installOracles :: Rules ()
 installOracles = do
   _ <- clashVersionAddOracle
+  _ <- cpuArchitectureAddOracle
+  _ <- hardwareProjectsAddOracle
   _ <- osPlatformAddOracle
   _ <- vagrantStatusAddOracle
-  _ <- cpuArchitectureAddOracle
   return ()
 
 newtype ClashVersion = ClashVersion ()

@@ -32,7 +32,7 @@ vagrantStatusIO = do
 
 withVagrant :: Action a -> Action a
 withVagrant act = do
-  vagrantStatus <- askOracleWith (VagrantStatus ()) (Just "")
+  vagrantStatus <- askOracle (VagrantStatus ())
   if statusRunning vagrantStatus
     then act
     else error "Unable to start Vagrant VM"
