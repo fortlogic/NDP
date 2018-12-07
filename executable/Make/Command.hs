@@ -4,38 +4,38 @@ import Data.Semigroup ((<>))
 import Development.Shake (Verbosity (..))
 import Options.Applicative as Opt
 
-import Make.HDL
+import Make.Command.Clash
+import Make.Command.FPGA
+import Make.Command.Xilinx
 
 data Options = Options
   { verbosity :: Verbosity
   , command :: Command
   } deriving ( Show )
 
-data Command = VersionCommand VersionOptions
-             | ClashCommand ClashOptions
+data Command = Version VersionCommand
+             | Clash ClashCommand
+             | FPGA FPGACommand
+             | Xilinx XilinxCommand
              deriving (Show)
 
-data VersionOptions = VersionOptions
+data VersionCommand = VersionOptions
   { machineReadable :: Bool
   } deriving (Show)
 
-data ClashOptions = ClashOptions
-  { hdl :: Maybe HDL
-  } deriving (Show)
 
 commandOptionP :: Parser Options
 commandOptionP = Options <$> verbosityP <*> commandP
 
 commandP :: Parser Command
 commandP = printVersionP <|> commandsP
-  where commandsP = hsubparser (clashCmd)
-        clashCmd = Opt.command "clash"
-                   (info (ClashCommand <$> clashOptionsP)
-                     (progDesc "Compile Haskell to an HDL using Clash"))
+  where commandsP = hsubparser ((clashCommand Clash)
+                                <> (fpgaCommand FPGA)
+                                <> (xilinxCommand Xilinx))
 
 printVersionP :: Parser Command
-printVersionP = (VersionCommand (VersionOptions False) <$ humanFlag)
-                <|> (VersionCommand (VersionOptions True) <$ machineFlag)
+printVersionP = (Version (VersionOptions False) <$ humanFlag)
+                <|> (Version (VersionOptions True) <$ machineFlag)
   where humanFlag   = flag' () ( long "version"
                                  <> help "Print version.")
         machineFlag = flag' () ( long "numeric-version"
@@ -62,9 +62,3 @@ mkVerbosity   1 = Loud
 mkVerbosity   2 = Chatty
 mkVerbosity   3 = Diagnostic
 mkVerbosity   n = if n > 0 then Diagnostic else Silent
-
-hdlP :: Parser (Maybe HDL)
-hdlP = parseHDL <$> strOption (long "hdl" <> short 'l' <> help "Use the specified HDL")
-
-clashOptionsP :: Parser ClashOptions
-clashOptionsP = ClashOptions <$> hdlP

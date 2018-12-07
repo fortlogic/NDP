@@ -1,5 +1,6 @@
 module Make.HDL ( HDL (..)
                 , parseHDL
+                , parseHDL'
                 , hdlFlag
                 , hdlName
                 , hdlExtension ) where
@@ -9,10 +10,15 @@ import Data.Char
 data HDL = VHDL | Verilog deriving (Read, Show, Eq)
 
 parseHDL :: String -> Maybe HDL
-parseHDL = parseHDL' . map toLower
-  where parseHDL' "vhdl" = Just VHDL
-        parseHDL' "verilog" = Just Verilog
-        parseHDL' _ = Nothing
+parseHDL = parse . map toLower
+  where parse "vhdl" = Just VHDL
+        parse "verilog" = Just Verilog
+        parse _ = Nothing
+
+parseHDL' :: String -> Either String HDL
+parseHDL' = parse . parseHDL
+  where parse Nothing = Left "expected 'vhdl' or 'verilog'"
+        parse (Just hdl) = Right hdl
 
 hdlFlag :: HDL -> String
 hdlFlag VHDL = "--vhdl"
