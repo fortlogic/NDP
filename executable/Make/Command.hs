@@ -14,6 +14,7 @@ data Options = Options
   } deriving ( Show )
 
 data Command = Version VersionCommand
+             | Clean
              | Clash ClashCommand
              | FPGA FPGACommand
              | Xilinx XilinxCommand
@@ -23,15 +24,17 @@ data VersionCommand = VersionOptions
   { machineReadable :: Bool
   } deriving (Show)
 
-
 commandOptionP :: Parser Options
 commandOptionP = Options <$> verbosityP <*> commandP
 
 commandP :: Parser Command
 commandP = printVersionP <|> commandsP
-  where commandsP = hsubparser ((clashCommand Clash)
-                                <> (fpgaCommand FPGA)
-                                <> (xilinxCommand Xilinx))
+  where commandsP = hsubparser (cleanCommand
+                                 <> (clashCommand Clash)
+                                 <> (fpgaCommand FPGA)
+                                 <> (xilinxCommand Xilinx))
+        cleanCommand = Opt.command "clean" (info (pure Clean)
+                                             (progDesc "Remove build products"))
 
 printVersionP :: Parser Command
 printVersionP = (Version (VersionOptions False) <$ humanFlag)
@@ -45,10 +48,10 @@ verbosityP :: Parser Verbosity
 verbosityP = silentP <|> ((mkVerbosity . sum) <$> many (verboseP <|> quietP))
   where verboseP = flag'   1  ( long "verbose"
                                 <> short 'v'
-                                <> help "Print more (pass repeatedly for emphasis)")
+                                <> help "Print more (repeat for emphasis)")
         quietP   = flag' (-1) ( long "quiet"
                                 <> short 'q'
-                                <> help "Print less (pass repeatedly for emphasis)")
+                                <> help "Print less (repeat for emphasis)")
 
         silentP  = flag' Silent ( long "silent"
                                   <> short 's'
