@@ -2,15 +2,15 @@
 {-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TypeFamilies#-}
-module Make.Dhall.Hardware ( Project (..)
-                           , Target (..)
-                           , HDLIncludes (..)
-                           , HardwareProjects (..)
-                           , hardwareProjectsAddOracle
-                           , projectNamed
-                           , projectRoot'
-                           , targetNamed
-                           ) where
+module Dhall.Hardware ( Project (..)
+                      , Target (..)
+                      , HDLIncludes (..)
+                      , HardwareProjects (..)
+                      , hardwareProjectsAddOracle
+                      , projectNamed
+                      , projectRoot'
+                      , targetNamed
+                      ) where
 
 import Data.List
 import qualified Data.Text as T

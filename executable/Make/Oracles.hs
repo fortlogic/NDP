@@ -15,7 +15,7 @@ import Data.List
 import Development.Shake
 import Development.Shake.Classes
 
-import Make.Dhall.Hardware
+import Dhall.Hardware
 import Make.Vagrant
 
 installOracles :: Rules ()

@@ -1,6 +1,6 @@
 {-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE OverloadedStrings #-}
-module Make.Dhall.Config () where
+module Dhall.Config () where
 
 import Dhall
 
