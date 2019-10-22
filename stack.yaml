@@ -15,7 +15,7 @@
 # resolver:
 #  name: custom-snapshot
 #  location: "./custom-snapshot.yaml"
-resolver: lts-12.26
+resolver: lts-14.11
 
 # User packages to be built.
 # Various formats can be used as shown in the example below.
@@ -41,6 +41,9 @@ packages:
 # Dependency packages to be pulled from upstream that are not in the resolver
 # (e.g., acme-missiles-0.3)
 extra-deps:
+  - clash-ghc-1.0.1
+  - clash-lib-1.0.1
+  - clash-prelude-1.0.1
   - netpbm-1.0.2
   - posix-escape-0.1
   - git: https://github.com/fortlogic/haskell-conf.git
