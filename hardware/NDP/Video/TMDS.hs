@@ -22,7 +22,7 @@ data TMDS = TMDSData (Unsigned 8)
           | TMDSControl (BitVector 2)
           deriving (Show, Eq)
 
-tmdsEncoder :: HiddenClockReset domain gated synchronous
+tmdsEncoder :: HiddenClockResetEnable domain
             => Signal domain TMDS
             -> Signal domain (BitVector 10)
 tmdsEncoder = mealy encodeTMDS 0

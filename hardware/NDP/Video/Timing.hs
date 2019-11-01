@@ -1,4 +1,6 @@
 {-# LANGUAGE DataKinds #-}
+{-# LANGUAGE DeriveAnyClass #-}
+{-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 module NDP.Video.Timing (TimeRegion (..),
                         VideoTime,
@@ -38,7 +40,7 @@ data TimeRegion = ImageR
 data VideoTime = VidTime {
   vTime :: Index 628,
   hTime :: Index 1056
-  } deriving (Show, Eq, Ord)
+  } deriving (Show, Eq, Ord, Generic, NFDataX)
 
 data VideoRegion = VidRegion {
   vRegion :: TimeRegion,

@@ -16,16 +16,9 @@ module NDP.Clocking.Domains ( Builtin
                             , vTMDS
                             ) where
 
--- import Clash.Prelude
---import Data.Singletons.TH
-
 -- import NDP.Utils.Type
 import NDP.Clocking.Domains.Builtin
 import NDP.Clocking.Domains.Pixel
 import NDP.Clocking.Domains.TMDS
 
 -- Clock rates signals period in picoseconds
-
---
--- NDP Clock Domains
---

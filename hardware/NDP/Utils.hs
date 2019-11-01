@@ -28,11 +28,9 @@ module NDP.Utils (int2Signed,
 
 import Clash.Prelude
 import Clash.Sized.Internal.BitVector (split#)
--- import Data.Proxy
--- import Data.Type.Equality
--- import qualified Prelude as P
 
 import qualified NDP.Utils.Explicit as E
+import NDP.Utils.Type
 
 int2Signed :: KnownNat n => Int -> Signed n
 int2Signed = fromInteger . toInteger
@@ -45,11 +43,11 @@ swap :: (a, b) -> (b, a)
 swap (a, b) = (b, a)
 
 pulsar :: ( KnownNat period
-          , HiddenClockReset domain gated synchronous )
+          , HiddenClockResetEnable domain )
         => SNat period
         -> Index period
         -> Signal domain Bool
-pulsar = hideClockReset E.pulsar
+pulsar = hideClockResetEnable E.pulsar
 
 highbv :: BitVector 1
 highbv = $$(bLit "1")
@@ -77,10 +75,10 @@ lsbv _ a = suffix
 lsbv' :: (BitPack a, KnownNat (BitSize a), KnownNat m, (BitSize a) ~ (m+1)) => a -> BitVector 1
 lsbv' = lsbv SNat
 
-partitionbv :: (KnownNat n, KnownNat m) => BitVector (n*m) -> SNat n -> Vec n (BitVector m)
+partitionbv :: (KnownNat n, KnownNat m) => BitVector (n `Mult` m) -> SNat n -> Vec n (BitVector m)
 partitionbv bv n = partitionbv' bv (toUNat n)
 
-partitionbv' :: (KnownNat n, KnownNat m) => BitVector (n*m) -> UNat n -> Vec n (BitVector m)
+partitionbv' :: (KnownNat n, KnownNat m) => BitVector (n `Mult` m) -> UNat n -> Vec n (BitVector m)
 partitionbv' _  UZero     = Nil
 partitionbv' bv (USucc n) = prefix :> (partitionbv' suffix n)
   where (prefix, suffix) = split# bv

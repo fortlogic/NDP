@@ -4,13 +4,15 @@ module NDP.Utils.Explicit where
 
 import Clash.Explicit.Prelude
 
-pulsar :: ( KnownNat period )
-        => Clock domain gated
-        -> Reset domain synchronous
+pulsar :: ( KnownNat period
+          , KnownDomain domain )
+        => Clock domain
+        -> Reset domain
+        -> Enable domain
         -> SNat period
         -> Index period
         -> Signal domain Bool
-pulsar clk rst _ off = moore clk rst step (==0) off (pure (errorX "unused"))
+pulsar clk rst en _ off = moore clk rst en step (==0) off (pure (errorX "unused"))
   where step 0 _ = maxBound
         step n _ = n - 1
 
