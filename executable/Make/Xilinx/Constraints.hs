@@ -7,6 +7,7 @@ module Make.Xilinx.Constraints ( ucfRules
 import Data.ByteString.Builder
 import qualified Data.ByteString.Lazy as B
 import Data.Conf
+import Data.Maybe
 import Development.Shake
 import Development.Shake.Config
 import Development.Shake.FilePath
@@ -16,7 +17,7 @@ import Constraints
 
 ucfRules :: Rules ()
 ucfRules = do
-  (Just xilinxD) <- getXilinxDir
+  xilinxD <- fromJust <$> getXilinxDir
 
   (xilinxD </> "*.ucf") %> \ ucF -> do
     let entityName = takeBaseName ucF

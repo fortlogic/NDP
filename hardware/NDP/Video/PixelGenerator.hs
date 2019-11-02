@@ -1,10 +1,11 @@
 {-# LANGUAGE Arrows #-}
 {-# LANGUAGE DataKinds #-}
+{-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE TemplateHaskell #-}
 module NDP.Video.PixelGenerator (PixelCoord (),
-                           pixelCounter,
-                           pixelControl,
-                           pixelGenerator) where
+                                 pixelCounter,
+                                 pixelControl,
+                                 pixelGenerator) where
 
 import Clash.Prelude
 
@@ -16,7 +17,7 @@ import NDP.Video.Timing
 data PixelCoord = Px (Index 628) (Index 628)
                 deriving (Show, Eq)
 
-pixelCounter :: HiddenClockReset PixelD gated synchronous => Signal PixelD VideoTime
+pixelCounter :: HiddenClockResetEnable dom => Signal dom VideoTime
 pixelCounter = register videoTimeZero step
   where step = vidTick <$> pixelCounter
 
@@ -39,5 +40,5 @@ staticPixelGenerator (Px y x) = if inFrameX && inFrameY
   where inFrameY = (y >= 44) && (y < 556)
         inFrameX = (x >= 144) && (x < 656)
 
-pixelGenerator :: Signal PixelD (Maybe PixelCoord) -> Signal PixelD (Maybe RGBColor)
+pixelGenerator :: Signal Pixel (Maybe PixelCoord) -> Signal Pixel (Maybe RGBColor)
 pixelGenerator coord = (staticPixelGenerator <$>) <$> coord

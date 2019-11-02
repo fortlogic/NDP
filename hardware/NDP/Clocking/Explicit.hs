@@ -2,6 +2,8 @@
 {-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE TypeOperators #-}
+{-# LANGUAGE TypeFamilies #-}
+{-# LANGUAGE ConstraintKinds #-}
 {-# OPTIONS_GHC -fplugin GHC.TypeLits.Extra.Solver #-}
 {-# OPTIONS_GHC -fplugin GHC.TypeLits.KnownNat.Solver #-}
 {-# OPTIONS_GHC -fplugin GHC.TypeLits.Normalise #-}
@@ -9,21 +11,27 @@ module NDP.Clocking.Explicit where
 
 import Clash.Explicit.Prelude
 
+import NDP.Utils.Type
+
 -- The fast clock speed must be an integer multiple of the slow in addition to
 -- sharing a common origin. The resulting fast signal pulses true at the
 -- beginning of every slow clock cycle.
 
-clockStrobe :: ( KnownNat stretch -- the number of fast cycles that fit in a slow one
-               , KnownNat period ) -- period of the fast clock
-            => Clock ('Dom fast period) gated1 -- fast clock
-            -> Clock ('Dom slow (period*stretch)) gated2 -- slow clock
-            -> Signal ('Dom fast period) Bool
-clockStrobe = undefined -- fastC slowC = undefined -- clockStrobe# fastC slowC 0
+clockStrobe :: ( KnownDomain fast -- the fast clock domain
+               , KnownDomain slow -- the slow clock domain
+               , Divides (DomainPeriod fast) (DomainPeriod slow)) -- slow clock period must be a multiple of the fast one
+               => Clock fast
+               -> Clock slow
+               -> Signal fast Bool
+clockStrobe fastClock slowClock = undefined
 
-clockStrobeD :: ( KnownNat stretch -- the number of fast cycles that fit in a slow one
-                , KnownNat period ) -- period of the fast clock
-             => Clock ('Dom fast period) gated1 -- fast clock
-             -> Clock ('Dom slow (period*stretch)) gated2 -- slow clock
-             -> Index stretch -- pulse offset (0 is start of cycle)
-             -> Signal ('Dom fast period) Bool
-clockStrobeD = undefined -- fastC slowC offset = undefined -- clockStrobe# fastC slowC offset
+clockStrobeD :: ( KnownDomain fast
+                , KnownDomain slow
+                , KnownNat stretch -- the number of fast clock cycles that can fit in a slow one
+                , (DomainPeriod fast) `Divides` (DomainPeriod slow)
+                , ((DomainPeriod slow) `Div` (DomainPeriod fast)) ~ stretch)
+                => Clock fast
+                -> Clock slow
+                -> Index stretch
+                -> Signal fast Bool
+clockStrobeD fastClock slowClock offset = undefined

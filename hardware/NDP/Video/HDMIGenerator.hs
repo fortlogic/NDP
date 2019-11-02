@@ -22,7 +22,7 @@ rgb2tmds (Just (RGB r g b)) _ _ = r' :> g' :> b' :> Nil
         g' = TMDSData g
         b' = TMDSData b
 
-rgb2Video :: HiddenClockReset domain gated synchronous
+rgb2Video :: HiddenClockResetEnable domain
           => Signal domain (Maybe RGBColor)
           -> Signal domain Bit
           -> Signal domain Bit

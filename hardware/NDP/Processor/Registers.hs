@@ -6,7 +6,7 @@ module NDP.Processor.Registers where
 
 import Clash.Prelude
 
-
+import NDP.Utils.Type
 
 -- register file exposes `2^fi` active 'frames' from a set of `2^pa` pages.
 registerFile :: ( KnownNat rc -- (per frame) register count
@@ -14,8 +14,8 @@ registerFile :: ( KnownNat rc -- (per frame) register count
                 , KnownNat pc -- total page count
                 ) =>
                 Signal domain (Vec fc (Index pc)) -> -- active frame selectors
-                Signal domain (Index (rc * fc)) -> -- read 1
-                Signal domain (Index (rc * fc)) -> -- read 2
-                Signal domain (Maybe (Index (rc * fc), w)) -> -- maybe a write
+                Signal domain (Index (rc `Mult` fc)) -> -- read 1
+                Signal domain (Index (rc `Mult` fc)) -> -- read 2
+                Signal domain (Maybe (Index (rc `Mult` fc), w)) -> -- maybe a write
                 Signal domain (w, w) -- output reads
 registerFile _ _ _ _ = undefined

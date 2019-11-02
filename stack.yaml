@@ -15,7 +15,7 @@
 # resolver:
 #  name: custom-snapshot
 #  location: "./custom-snapshot.yaml"
-resolver: lts-12.20
+resolver: lts-14.12
 
 # User packages to be built.
 # Various formats can be used as shown in the example below.
@@ -37,18 +37,21 @@ resolver: lts-12.20
 # will not be run. This is useful for tweaking upstream packages.
 packages:
   - '.'
-  - location: https://github.com/fortlogic/haskell-conf/archive/52459d28598aa99e9b31e9a9d3004a8705fd8ad7.zip
-    extra-dep: true
-  - location: https://github.com/fortlogic/safe-globals/archive/master.zip
-    extra-dep: true
-  - location: https://github.com/fortlogic/shake/archive/8e5e660a9ed9a9f675c7957d17db2775fa1379a8.zip
-    extra-dep: true
 
 # Dependency packages to be pulled from upstream that are not in the resolver
 # (e.g., acme-missiles-0.3)
 extra-deps:
+  - clash-ghc-1.0.1
+  - clash-lib-1.0.1
+  - clash-prelude-1.0.1
   - netpbm-1.0.2
   - posix-escape-0.1
+  - git: https://github.com/fortlogic/haskell-conf.git
+    commit: 52459d28598aa99e9b31e9a9d3004a8705fd8ad7
+  - git: https://github.com/fortlogic/safe-globals.git
+    commit: 464a31e1451f31c6865712a225b82f1933800585
+  - git: https://github.com/fortlogic/shake.git
+    commit: 8e5e660a9ed9a9f675c7957d17db2775fa1379a8
 
 # Override default flag values for local packages and extra-deps
 
