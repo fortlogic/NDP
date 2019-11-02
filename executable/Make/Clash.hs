@@ -7,6 +7,7 @@ module Make.Clash ( clashRules
 import Control.Monad.IO.Class
 import Data.Digest.Pure.SHA
 import Data.List
+import Data.Maybe
 import Development.Shake
 import Development.Shake.Config
 import Development.Shake.FilePath
@@ -28,7 +29,7 @@ ghcFlags = do
 validProjectManifest :: HDL -> Rules (FilePath -> Bool)
 validProjectManifest hdl = do
   clashOut <- getClashDir
-  (Just projectsD) <- liftIO $ getConfigIO "HDL_PROJECTS"
+  projectsD <- fromJust <$> getConfigIO "HDL_PROJECTS"
   projects <- liftIO $ getDirectoryDirsIO projectsD
   return (\ hdlD -> let hdlD' = makeRelative (clashOut </> hdlName hdl) hdlD in
                       elem hdlD' (map getManifest projects))
