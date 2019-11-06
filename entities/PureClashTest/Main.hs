@@ -20,14 +20,10 @@ import NDP.Clocking.Domains
                    , PortName "led_sd_red"
                    , PortName "led_usb_red" ]
    }) #-}
-topEntity :: Clock OutsideD Source
-          -> Reset OutsideD Asynchronous
-          -> Signal OutsideD (Bit, Bit, Bit, Bit, Bit)
+topEntity :: Clock Builtin
+          -> Reset Builtin
+          -> Signal Builtin (Bit, Bit, Bit, Bit, Bit)
 topEntity clk rst = inverter clk rst (low, high, low, high, low)
-  -- exposeClockReset out
-  -- where out = register (high, low, high, low, high) (pure lights)
-  --      lights = (low, high, low, high, low)
-
 
 {-# ANN inverter
   (Synthesize
@@ -35,10 +31,10 @@ topEntity clk rst = inverter clk rst (low, high, low, high, low)
     , t_inputs = [ PortName "values" ]
     , t_output = PortName "reg_out"
   }) #-}
-inverter :: Clock OutsideD Source
-         -> Reset OutsideD Asynchronous
+inverter :: Clock Builtin
+         -> Reset Builtin
          -> (Bit, Bit, Bit, Bit, Bit)
-         -> Signal OutsideD (Bit, Bit, Bit, Bit, Bit)
-inverter clk rst a = (exposeClockReset register) clk rst initial (pure a)
+         -> Signal Builtin (Bit, Bit, Bit, Bit, Bit)
+inverter clk rst a = (exposeClockResetEnable register) clk rst enableGen initial (pure a)
   where initial = (unpack . complement . pack) a
 {-# NOINLINE inverter #-}

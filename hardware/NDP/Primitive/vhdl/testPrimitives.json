@@ -2,7 +2,8 @@
   { "BlackBox" :
       { "name" : "Tests.Clash.Primitives.primitiveMux#"
       , "type" : "Signal Bool -> Signal Bit -> Signal Bit -> Signal Bit"
-        , "templateD" :
+      , "kind" : "Declaration"
+      , "templateD" :
 "
 -- Begin primitiveMux#
 ~GENSYM[~COMPNAME_PRIMITIVE_MUX][0] : block

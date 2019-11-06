@@ -1,5 +1,6 @@
 {-# LANGUAGE ConstraintKinds #-}
 {-# LANGUAGE DataKinds #-}
+{-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE KindSignatures #-}
 {-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE PolyKinds #-}
@@ -26,4 +27,5 @@ createDomain VDomainConfiguration
   , vInitBehavior  = Defined
   , vResetPolarity = ActiveHigh
   }
+
 

@@ -1,7 +1,8 @@
 [
   { "BlackBox" :
-      { "name" : "NDP.IO.SDCard.sdController#"
-      , "type" :
+    { "name" : "NDP.IO.SDCard.sdController#"
+    , "kind" : "Declaration"
+    , "type" :
 "sdController# :: SClock (Clk clk speed) ->                    -- (arg 0)
            SNat speed ->                                -- (arg 1)
            SNat initSpeed ->                            -- (arg 2)
